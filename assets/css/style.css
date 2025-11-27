@@ -67,25 +67,96 @@ To make it easy to update your theme, you should not edit the styles in this fil
 the custom.css file to add your styles. You can copy a style from this file and paste it in 
 custom.css and it will override the style in this file. You have been warned! :)
 */
+  /* Fuentes */ 
+
+  @font-face {
+    font-family: 'Libertad Bold';
+    src: url('assets/fonts/libertad-bold.woff2') format('woff2'),
+         url('assets/fonts/libertad-bold.woff') format('woff'), 
+;
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+} 
+  @font-face {
+    font-family: 'Libertad ExtraBold Italic';
+    src: url('assets/fonts/libertad-extrabolditalic.woff2') format('woff2'),
+         url('assets/fonts/libertad-extrabolditalic.woff') format('woff'), 
+;
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+@font-face {
+    font-family: 'Libertad Medium';
+    src: url('../fonts/libertad-medium.woff2') format('woff2'),
+         url('../fonts/libertad-medium.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Libertad Regular';
+    src: url('../fonts/libertad-regular.woff2') format('woff2'),
+         url('../fonts/libertad-regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+  @font-face {
+    font-family: 'Magistral Bold';
+    src: url('../fonts/Magistral-Bold.woff2') format('woff2'),
+         url('../fonts/Magistral-Bold.woff') format('woff'), 
+;
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Magistral Medium';
+    src: url('../fonts/Magistral-Medium.woff2') format('woff2'),
+         url('../fonts/Magistral-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+
 /*------------------------------------*\
     #CSS VARIBALES
 \*------------------------------------*/
 :root {
-  --global--color-primary: #13c5dd;
+  --global--color-primary: #0D1F61;
   --global--color-primary-darken: #263967;
   --global--color-primary-light: #e6f8fb;
-  --global--color-secondary: #283b6a;
+  --global--color-secondary: #3B6EB2;
   --global--color-heading: #26365e;
   --global--color-heading-darken: #435ba1;
   --global--color-heading-light: #1d2a4d;
   --global--color-body: #848e9f;
+  --global--color-text: #0E111C;
   --global--color-white: #ffffff;
   --global--color-gray: #f9f9f9;
-  --global--color-gray-darken: #788fc8;
+  --global--color-gray-darken: #788fc8; 
   --global--color-gray-light: #e6e8eb;
-  --global--font-body: 'Roboto', sans-serif;
-  --global--font-heading: 'Rubik', sans-serif;
-  --global--font-secondary: 'Heebo', sans-serif; }
+  --global--color-green: #ADC438;
+  --global--color-yellow: #FFCB05;
+  --global--color-orange-darken: #E6551C;
+  --global--color-orange-light: #F47A3F;
+  --global--font-body: 'Libertad Regular', sans-serif;
+  --global--font-heading: 'Magistral Bold', sans-serif;
+  --global--font-heading-italic: 'Libertad ExtraBold Italic', sans-serif;
+  --global--font-secondary: 'Libertad Medium', sans-serif; 
+}
+
+
+
+
 
 /*------------------------------------*\
     #RESET
@@ -167,7 +238,7 @@ body {
   margin: 0; }
   @media screen and (min-width: 992px) {
     body {
-      cursor: none; } }
+     /*cursor: none*/ } }
 
 .wrapper {
   background-color: var(--global--color-white); }
@@ -3754,12 +3825,12 @@ ul.dropdown-menu > li.has-dropdown > a:before {
       font-size: 13px;
       font-weight: 400;
       text-transform: capitalize;
-      color: var(--global--color-white);
+      color: var(--global--color-primary);
       margin-right: 5px;
       cursor: pointer; }
     .module-language .selected i {
       font-size: 11px;
-      color: var(--global--color-white); }
+      color: var(--global--color-primary); }
   .module-language .lang-list {
     background-color: var(--global--color-white);
     color: var(--global--color-heading);
