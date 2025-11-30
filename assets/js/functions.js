@@ -188,92 +188,103 @@
             });
     });
 
-    /* ------------------ OWL CAROUSEL ------------------ */
+/* ------------------ OWL CAROUSEL ------------------ */
 
-    var $carouselDirection = $("html").attr("dir");
-    if ($carouselDirection == "rtl") {
-        var $carouselrtl = true;
-    } else {
-        var $carouselrtl = false;
-    }
+var $carouselDirection = $("html").attr("dir");
+var $carouselrtl = $carouselDirection == "rtl";
 
-    $(".carousel").each(function() {
-        var $Carousel = $(this);
-        $Carousel.owlCarousel({
-            loop: $Carousel.data('loop'),
-            autoplay: $Carousel.data("autoplay"),
-            margin: $Carousel.data('space'),
-            nav: $Carousel.data('nav'),
-            dots: $Carousel.data('dots'),
-            center: $Carousel.data('center'),
-            dotsSpeed: $Carousel.data('speed'),
-            responsive: {
-                0: {
-                    items: 1,
-                },
-                768: {
-                    items: $Carousel.data('slide-rs'),
-                },
-                1000: {
-                    items: $Carousel.data('slide'),
-                }
-            }
-        });
+/* 1) Carruseles normales (todos menos el continuo) */
+$(".carousel").not(".carousel-continuo").each(function() {
+    var $Carousel = $(this);
+
+    $Carousel.owlCarousel({
+        loop: $Carousel.data('loop'),
+        autoplay: $Carousel.data("autoplay"),
+        margin: $Carousel.data('space') || 0,
+        nav: $Carousel.data('nav'),
+        dots: $Carousel.data('dots'),
+        center: $Carousel.data('center'),
+        rtl: $carouselrtl,
+        dotsSpeed: $Carousel.data('speed') || 600,
+        smartSpeed: $Carousel.data('speed') || 600,
+        responsive: {
+            0:    { items: 1 },
+            768:  { items: $Carousel.data('slide-rs') },
+            1000: { items: $Carousel.data('slide') }
+        }
     });
+});
 
-    $(".custom-carousel").each(function() {
-        var $Carousel = $(this);
-        $Carousel.owlCarousel({
-            loop: $Carousel.data('loop'),
-            autoplay: $Carousel.data("autoplay"),
-            margin: $Carousel.data('space'),
-            nav: $Carousel.data('nav'),
-            dots: $Carousel.data('dots'),
-            center: $Carousel.data('center'),
-            dotsSpeed: $Carousel.data('speed'),
-            dotsContainer: '#carousel-custom-dots',
-            responsive: {
-                0: {
-                    items: 1,
-                },
-                768: {
-                    items: $Carousel.data('slide-rs'),
-                },
-                1000: {
-                    items: $Carousel.data('slide'),
-                }
-            }
-        });
-    });
+/* 2) Carrusel continuo de alianzas */
+var $continuous = $(".carousel-continuo");
 
-    $('.custom-carousel').owlCarousel({
-        thumbs: true,
-        thumbsPrerendered: true
-    });
+if ($continuous.length) {
+    $continuous.owlCarousel({
+        loop: true,
+        autoplay: true,
+        autoplayHoverPause: false,
+        margin: 30,
+        nav: false,
+        dots: false,
+        rtl: $carouselrtl,
 
-    $(".slider-carousel").each(function() {
-        var $Carousel = $(this);
-        $Carousel.owlCarousel({
-            loop: $Carousel.data('loop'),
-            autoplay: $Carousel.data("autoplay"),
-            margin: $Carousel.data('space'),
-            nav: $Carousel.data('nav'),
-            dots: $Carousel.data('dots'),
-            center: $Carousel.data('center'),
-            dotsSpeed: $Carousel.data('speed'),
-            responsive: {
-                0: {
-                    items: 1,
-                },
-                768: {
-                    items: $Carousel.data('slide-rs'),
-                },
-                1000: {
-                    items: $Carousel.data('slide'),
-                }
-            },
-        });
+        
+        autoplayTimeout: 2500,   // cada cuánto avanza
+        autoplaySpeed:  2400,    // duración de la animación
+        smartSpeed:     2400,
+        slideTransition: 'linear',
+
+        responsive: {
+            0:    { items: 2 },
+            768:  { items: 4 },
+            1000: { items: 6 }
+        }
     });
+}
+
+
+$(".custom-carousel").each(function() {
+    var $Carousel = $(this);
+    $Carousel.owlCarousel({
+        loop: $Carousel.data('loop'),
+        autoplay: $Carousel.data("autoplay"),
+        margin: $Carousel.data('space'),
+        nav: $Carousel.data('nav'),
+        dots: $Carousel.data('dots'),
+        center: $Carousel.data('center'),
+        dotsSpeed: $Carousel.data('speed'),
+        dotsContainer: '#carousel-custom-dots',
+        responsive: {
+            0:    { items: 1 },
+            768:  { items: $Carousel.data('slide-rs') },
+            1000: { items: $Carousel.data('slide') }
+        }
+    });
+});
+
+$('.custom-carousel').owlCarousel({
+    thumbs: true,
+    thumbsPrerendered: true
+});
+
+$(".slider-carousel").each(function() {
+    var $Carousel = $(this);
+    $Carousel.owlCarousel({
+        loop: $Carousel.data('loop'),
+        autoplay: $Carousel.data("autoplay"),
+        margin: $Carousel.data('space'),
+        nav: $Carousel.data('nav'),
+        dots: $Carousel.data('dots'),
+        center: $Carousel.data('center'),
+        dotsSpeed: $Carousel.data('speed'),
+        responsive: {
+            0:    { items: 1 },
+            768:  { items: $Carousel.data('slide-rs') },
+            1000: { items: $Carousel.data('slide') }
+        }
+    });
+});
+
 
     // Clicking On Thumbs
     $('.testimonial-thumbs .testimonial-thumb').click(function() {
