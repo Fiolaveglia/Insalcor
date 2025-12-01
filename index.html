@@ -8,6 +8,7 @@
     <meta name="description" content="Insalcor ofrece soluciones integrales en insumos, seguridad industrial, limpieza, mantenimiento y servicios para empresas. Compromiso, calidad y atención personalizada.">
     <meta name="keywords" content="Insalcor, insumos industriales, seguridad industrial, limpieza, mantenimiento, equipos de protección personal, servicios empresariales, Uruguay">
     <meta name="author" content="Insalcor">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-omG0YqDCEV4VpWw2X2gYdEx+kt1/3uzMdGII4XESyqSeX5TR1+t0NenE2no0RvrRZtGJPD7WuaVManIeZDV+3A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="assets/images/favicon/favicon.ico" rel="icon"/>
     <link href="assets/css/vendor.min.css" rel="stylesheet"/>
     <link href="assets/css/style.css" rel="stylesheet"/>
@@ -154,13 +155,13 @@
       </section>
       
       <!--Quienes somos -->
-      <section class="testimonial testimonial-1 testimonial-2" id="testimonial-2">
+      <section class="testimonial testimonial-2" id="testimonial-2">
         <div class="container">
           <div class="row">
             <div class="col-12 col-lg-5">
               <div class="clients-img"> <img src="assets/images/testimonial/image.png" alt="image"/></div>
             </div>
-            <div class="col-12 col-lg-6 offset-lg-1">
+            <div class="col-12 col-lg-6 offset-lg-1 mt-60">
               <h2 class="section-head">Quiénes Somos</h2>
                 <div class="testimonial-panel testimonial-panel-2">
                   <div class="testimonial-body">
@@ -261,7 +262,7 @@
         </div>
         <!-- End .container-->
       </section>
-entry-authorconocenos
+      
       <!-- Ultimas novedades  -->
       <section class="blog blog-grid blog-grid-3" id="blog-2">
         <div class="bg-section"> <img src="assets/images/background/pattern.png" alt="background"/></div>
@@ -363,24 +364,105 @@ entry-authorconocenos
       </section>
 
       <!-- Nuestras Oficinas   -->
-      <section class="donations donations-3 bg-overlay bg-parallax bg-overlay-theme" id="donations-3">
-        <div class="bg-section"><img src="assets/images/background/3.jpg" alt="background"/></div>
+      <section class="donations donations-3" id="donations-3">
+      <div class="container-fluid">
+      <div class="row offices-section align-items-stretch">
+
+      <!-- Columna mapa -->
+      <div class="col-lg-7 p-0">
+        <div class="img-hotspot h-100 d-flex align-items-center justify-content-center">
+          <div class="img-hotspot-wrap">
+            <div class="img-hotspot-bg">
+              <img src="assets/images/background/america-map.png" alt="America">
+            </div>
+            <div class="img-hotspot-pointers">
+              <div class="img-hotspot-pointer" data-spot-x="47%" data-spot-y="40%">
+                <img src="assets/images/background/map-pointer.png" style="width:20px;" alt="pointer">
+                <div class="info right" data-info-x="18px" data-info-y="-128px">
+                  <span>San Francisco 457 e/España y De la Fuente<br>Asunción, Paraguay</span>
+                </div>
+              </div>
+              <div class="img-hotspot-pointer" data-spot-x="46%" data-spot-y="56%">
+                <img src="assets/images/background/map-pointer.png" style="width:20px;" alt="pointer">
+                <div class="info left" data-info-x="-160px" data-info-y="-147px">
+                  <span>Juan Díaz de Solís 1860<br>Vicente López - Buenos Aires, Argentina</span>
+                </div>
+              </div>
+              <div class="img-hotspot-pointer" data-spot-x="52%" data-spot-y="54%">
+                <img src="assets/images/background/map-pointer.png" style="width:20px;" alt="pointer">
+                <div class="info left" data-info-x="-160px" data-info-y="-97px">
+                  <span>Ruta 1 (vieja), Km. 34<br>Ciudad del Plata - San José, Uruguay</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna texto oficinas -->
+      <div class="col-lg-5 p-0">
+        <div class="heading heading-light heading-11">
+          <h2 class="heading-title">Nuestras Oficinas</h2>
+
+          <!-- Uruguay -->
+          <div class="office-item">
+            <h6 class="office-country">
+              <img src="https://flagcdn.com/uy.svg" class="flag-icon" alt="Uruguay">URUGUAY</h6>
+            <ul class="office-list">
+              <li><i class="fas fa-map-marker-alt"></i>Ruta 1 (vieja), Km. 34<br>Ciudad del Plata - San José, Uruguay</li>
+              <li><i class="fas fa-envelope"></i>info@insalcor.com.uy</li>
+              <li><i class="fas fa-phone-alt"></i>(+598) 2304 2031 | 2347 7875</li>
+            </ul>
+          </div>
+
+          <hr class="office-divider">
+
+          <!-- Argentina -->
+          <div class="office-item">
+            <h6 class="office-country">
+              <img src="https://flagcdn.com/ar.svg" class="flag-icon" alt="Argentina"> ARGENTINA</h6>
+            <ul class="office-list">
+              <li><i class="fas fa-map-marker-alt"></i>Juan Díaz de Solís 1860<br>Vicente López - Buenos Aires, Argentina</li>
+              <li><i class="fas fa-envelope"></i>leandro.galatro@insalcor.com</li>
+              <li><i class="fas fa-phone-alt"></i>(+54) 911 2727 2609</li>
+            </ul>
+          </div>
+
+          <hr class="office-divider">
+
+          <!-- Paraguay -->
+          <div class="office-item">
+            <h6 class="office-country"> 
+              <img src="https://flagcdn.com/py.svg" class="flag-icon" alt="Paraguay">PARAGUAY</h6>
+            <ul class="office-list">
+              <li><i class="fas fa-map-marker-alt"></i>San Francisco 457 e/España y De la Fuente<br>Asunción, Paraguay</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+      
+      <!-- <section class="donations donations-3" id="donations-3">
         <div class="container">
           <div class="contact-panel contact-panel-3">
             <div class="heading heading-light heading-11">
               <h2 class="heading-title">Nuestras oficinas</h2>
               <div class="img-hotspot"> 
                 <div class="img-hotspot-wrap">
-                  <div class="img-hotspot-bg"> <img src="assets/images/background/world-map.png" alt="image"/></div>
+                  <div class="img-hotspot-bg"> <img src="assets/images/background/america-map.png" alt="America"/></div>
                   <div class="img-hotspot-pointers">
-                    <div class="img-hotspot-pointer" data-spot-x="15%" data-spot-y="29%"><img src="assets/images/background/map-pointer.png" alt="pointer"/>
-                      <div class="info right" data-info-x="18px" data-info-y="-97px"><span>2307 Beverley Rd Brooklyn, New York 11226 U.S.</span></div>
+                    <div class="img-hotspot-pointer" data-spot-x="41%" data-spot-y="40%"><img src="assets/images/background/map-pointer.png" style="width: 20px;" alt="pointer"/>
+                      <div class="info right" data-info-x="18px" data-info-y="-128px"><span>San Francisco 457 e/España y De la Fuente Asunción, Paraguay</span></div>
                     </div>
-                    <div class="img-hotspot-pointer" data-spot-x="48%" data-spot-y="48%"><img src="assets/images/background/map-pointer.png" alt="pointer"/>
-                      <div class="info left" data-info-x="-160px" data-info-y="-97px"><span>2307 Beverley Rd Brooklyn, New York 11226 U.S.</span></div>
+                    <div class="img-hotspot-pointer" data-spot-x="39%" data-spot-y="57%"><img src="assets/images/background/map-pointer.png"  style="width: 20px;" alt="pointer"/>
+                      <div class="info left" data-info-x="-160px" data-info-y="-120px"><span>Juan Díaz de Solís 1860 Vicente López - Buenos Aires, Argentina</span></div>
                     </div>
-                    <div class="img-hotspot-pointer" data-spot-x="68%" data-spot-y="23%"><img src="assets/images/background/map-pointer.png" alt="pointer"/>
-                      <div class="info left" data-info-x="-160px" data-info-y="-97px"><span>2307 Beverley Rd Brooklyn, New York 11226 U.S.</span></div>
+                    <div class="img-hotspot-pointer" data-spot-x="44%" data-spot-y="54%"><img src="assets/images/background/map-pointer.png" style="width: 20px;" alt="pointer"/>
+                      <div class="info left" data-info-x="-160px" data-info-y="-97px"><span>Ruta 1 (vieja), Km. 34 Ciudad del Plata - San José, Uruguay</span></div>
                     </div>
                   </div>
                 </div>
@@ -389,7 +471,7 @@ entry-authorconocenos
           </div>
         </div>
       </section>
-
+ -->
 
 
 

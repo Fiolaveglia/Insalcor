@@ -58,6 +58,7 @@
 	44. Services
 	45. Action
 	46. Departments
+  47. Oficinas
 	47. Footer
 
 /*
@@ -6851,6 +6852,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   -ms-transform: translateY(-6px);
   transform: translateY(-6px);
   margin-bottom: 25px;
+  color: var(--global--color-primary);
 }
 
 .heading.heading-11 .heading-desc {
@@ -17762,6 +17764,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   color: var(--global--color-primary);
   text-transform: capitalize;
   margin-bottom: 7px;
+  vertical-align: middle;
 }
 
 @media screen and (max-width: 991.98px) {
@@ -17804,7 +17807,8 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 }
 
 .testimonial.testimonial-2 {
-  padding-top: 200px;
+  padding-top: 100px;
+  padding-bottom: 40px;
 }
 
 @media screen and (max-width:991.98px) {
@@ -20020,6 +20024,82 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 .single-department .entry-contact .contact-panel {
   border-radius: 8px 8px 0 8px;
 }
+/*------------------------------------*\
+    #Oficinas
+\*------------------------------------*/
+.offices-section {
+  color: #1B1A1A;
+}
+
+.offices-info {
+  padding: 70px 60px;
+  height: 100%;
+}
+
+.offices-title {
+  color: #31539a;               /* azul más claro del título */
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 40px;
+}
+
+.office-item {
+  margin-bottom: 30px;
+}
+
+.office-country {
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.office-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.office-list li {
+  display: flex;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.office-list i {
+  margin-right: 10px;
+  margin-top: 3px;
+  color: var(--global--color-primary);
+  font-size: 16px;
+}
+
+.office-divider {
+  border: 1px solid var(--global--color-gray-darken);
+  margin: 25px 0;
+  width: 40%;
+}
+
+/* Opcional: que la imagen del mapa no se deforme */
+.img-hotspot-bg img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+.flag-icon {
+  width: 26px;
+  height: auto;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+.office-country {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
 
 /*------------------------------------*\
     #Footer
