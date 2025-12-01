@@ -692,4 +692,11 @@ $(".slider-carousel").each(function() {
         }
     });
 
+    /* ---------------------------------------------------------
+            Current Year Copyright area
+        --------------------------------------------------------- */
+        $(".current-year").text((new Date).getFullYear());
+
+
+
 }(jQuery));

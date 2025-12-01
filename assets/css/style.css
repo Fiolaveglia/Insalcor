@@ -1989,9 +1989,9 @@ blockquote .author {
 
 /* Button White */
 .btn--white {
-  background-color: var(--global--color-white);
-  color: var(--global--color-secondary);
-  border-color: var(--global--color-white);
+ background-color: var(--global--color-white);
+ color: var(--global--color-primary);
+ transition: all 1s ease-in-out !important;
 }
 
 .btn--white::before {
@@ -2151,6 +2151,11 @@ blockquote .author {
 
 .btn--slide-wide {
   width: 270px;
+}
+
+.btn i {
+  margin-right: 8px;
+  font-size: 18px; 
 }
 
 @media screen and (max-width: 360px) {
@@ -6668,7 +6673,6 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 }
 
 .heading .paragraph {
-  font-weight: 700;
   font-size: 16px;
   line-height: 27px;
   color: var(--global--color-secondary);
@@ -6814,6 +6818,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 
 .heading.heading-8 .heading-title {
   margin-bottom: 39px;
+  font-family: var(--global--font-heading-italic);
 }
 
 .heading.heading-9 {
@@ -17828,7 +17833,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 
 @media screen and (min-width: 992px) {
   .video {
-    height: 528px;
+    /* height: 400px; */
   }
 }
 
@@ -18459,9 +18464,10 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 }
 
 .cta.cta-5 {
-  padding-top: 117px;
-  padding-bottom: 0px;
-  background-color: var(--global--color-heading-light);
+  padding-top: 100px;
+  padding-bottom: 117px;
+  background-color: var(--global--color-heading-darken);
+  max-height: 600px;
 }
 
 @media screen and (max-width: 991.98px) {
@@ -20081,7 +20087,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   width: 40%;
 }
 
-/* Opcional: que la imagen del mapa no se deforme */
+
 .img-hotspot-bg img {
   max-width: 100%;
   height: auto;
@@ -20098,6 +20104,78 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   align-items: center;
   gap: 10px;
 }
+
+@media only screen and (max-width: 991px) {
+  .office-item {
+    margin-left: 40px;
+    text-align: left;
+
+  }
+  .office-divider {
+    margin-left: 60px;
+  }
+}
+
+/* Mosaico fotos */ 
+
+/* grilla tipo mosaico */
+.team-projects .projects-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);  /* 6 columnas como en la imagen */
+  gap: 0;
+}
+
+.team-projects .project {
+  position: relative;
+  overflow: hidden;
+}
+
+.team-projects .project img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;   /* recorta un poco para que todas llenen el cuadro */
+}
+
+/* responsive: menos columnas en pantallas chicas */
+@media (max-width: 1199px) {
+  .team-projects .projects-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .team-projects .projects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+/* Quitar espacios entre las fotos */
+.team-projects .project,
+.team-projects .project a {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0;
+}
+
+/* Por si Owl agrega padding a cada item */
+.team-projects .owl-carousel .owl-item {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* La imagen siempre ocupa todo el cuadro y no hace zoom */
+.team-projects .project img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: none !important;
+}
+
+.team-projects .project:hover img {
+  transform: none !important;
+}
+
 
 
 
@@ -20131,11 +20209,12 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 }
 
 .footer {
-  background-color: var(--global--color-heading-light);
+  background-color: var(--global--color-primary);
   padding-top: 0;
   padding-bottom: 0;
   position: relative;
-  /* Footer Widgets */
+  color: var(--global--color-white);
+  margin-top: 60px;
 }
 
 .footer::after {
@@ -20160,6 +20239,169 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 @media screen and (max-width: 767.98px) {
   .footer::after {
     width: calc(100% - 40px);
+  }
+}
+.insalcor-footer {
+  padding: 40px 0 35px;
+}
+
+.footer a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+
+/* Títulos */
+.footer-title {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 40px;
+  color: var(--global--color-white);
+  font-size: 18px;
+}
+
+/* Logo + menú izquierdo */
+.footer-logo img {
+  max-width: 180px;
+  height: auto;
+}
+
+.footer-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-menu li {
+  margin-bottom: 6px;
+}
+
+.footer-menu li a {
+  font-size: 14px;
+}
+
+/* Oficinas */
+.offices-widget .office-block {
+  margin-bottom: 15px;
+}
+
+.office-country {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  color: var(--global--color-white);
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.flag-icon {
+  width: 22px;
+  height: auto;
+}
+
+.office-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.office-list li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 4px;
+  line-height: 1.4;
+  margin: 10px 0;
+}
+
+.office-list i {
+  margin-right: 15px;
+  margin-top: 3px;
+  font-size: 16px;
+  color: var(--global--color-white);
+}
+
+.office-divider {
+  border-color: rgba(255, 255, 255, 0.2);
+  margin: 10px 0 12px;
+}
+
+/* Redes sociales */
+.footer-social-list {
+  list-style: none;
+  padding: 0;
+  margin: 25px 0 0;
+  display: flex;
+  gap: 15px;
+}
+
+.footer-social-list li a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 20px 20px 20px 0;
+  background-color: #ffffff;
+  color: #0b2a6b;
+  font-size: 20px;
+  -webkit-border-radius: 10px 10px 0 10px;
+  -moz-border-radius: 20px 20px 20px;
+  -ms-border-radius: 20px 20px 20px;
+  -o-border-radius: 20px 20px 20px;
+  transition: 0.5s all ease-in-out;
+  -webkit-transition: 0.5s all ease-in-out;
+  -moz-transition: 0.5s all ease-in-out;
+  -ms-transition: 0.5s all ease-in-out;
+  -o-transition: 0.5s all ease-in-out;
+}
+
+.footer-social-list li a:hover {
+  background-color: var(--global--color-background-blue);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+/* Franja inferior */
+.insalcor-footer-bottom {
+  background-color: #2e6fb4;    /* azul más claro */
+  padding: 10px 0;
+  font-size: 12px;
+}
+
+.footer-copy {
+  margin: 0;
+  color: var(--global--color-gray-light);
+  font-size: 12px;
+  font-family: var(--global--font-body) ;
+
+}
+.footer-credits {
+  text-align: right;
+}
+.footer-credits a {
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.footer-credits a:hover {
+  text-decoration: underline;
+}
+
+.credits-divider {
+  margin: 0 8px;
+}
+
+/* Responsive pequeño ajuste */
+@media (max-width: 767.98px) {
+  .footer-title {
+    margin-top: 20px;
   }
 }
 
