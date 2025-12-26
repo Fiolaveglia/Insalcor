@@ -6648,6 +6648,10 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   font-weight: 500;
   color: #0e204d;
 }
+.ventajas .heading-title {
+  font-family: var(--global--font-heading-italic);
+  font-size: 50px;
+}
 
 @media (min-width: 992px) and (max-width: 1199px) {
   .heading .heading-title {
@@ -6666,14 +6670,15 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 .heading .heading-desc {
   font-family: var(--global--font-body);
   color: var(--global--color-body);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 400;
   line-height: 27px;
   margin-bottom: 0;
 }
 
 .heading .paragraph {
-  font-size: 16px;
+  font-size: 20px;
+  font-weight: 600;
   line-height: 27px;
   color: var(--global--color-secondary);
   margin-bottom: 0px;
@@ -7119,7 +7124,6 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 
 .slider .slide .slide-content .slide-desc {
   font-family: var(--global--font-body);
-  font-weight: 700;
   font-size: 17px;
   line-height: 26px;
   color: var(--global--color-gray);
@@ -15278,8 +15282,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 }
 
 .features-bar {
-  padding-top: 0;
-  padding-bottom: 170px;
+  padding: 0;
   overflow: visible;
 }
 
@@ -16212,14 +16215,36 @@ ul.dropdown-menu>li.has-dropdown>a:before {
     #Processes
 \*------------------------------------*/
 .processes .process-panel {
+  color: var(--global--color-gray-light);
   padding: 56px 50px 54px;
-  border-top: 1px solid var(--global--color-gray-light);
-  border-right: 1px solid var(--global--color-gray-light);
   position: relative;
   -webkit-transition: 0.3s ease-in-out;
   -o-transition: 0.3s ease-in-out;
   transition: 0.3s ease-in-out;
 }
+.ventajas-panel:first-child {
+  background-color: var(--global--color-orange-light);
+}
+.ventajas-panel:nth-child(2) {
+  background-color: var(--global--color-primary);
+}
+.ventajas-panel:nth-child(3) {
+  background-color: var(--global--color-green);
+}
+.ventajas-panel:nth-child(4) {
+  background-color: var(--global--color-heading-darken);
+}
+.ventajas-panel .process-panel .process-body .process-content h5 {
+  font-family: var(--global--font-heading);
+  color: var(--global--color-gray) !important;
+  font-size: 20px  !important;
+  margin-bottom: 20px;
+}
+
+.ventajas-panel .process-panel .process-body .process-content p {
+  color: var(--global--color-gray);
+}
+
 
 .processes .process-panel:hover {
   -webkit-box-shadow: 0px 5px 83px 0px rgba(9, 29, 62, 0.15);
@@ -16229,7 +16254,10 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 .processes .process-panel:hover::before {
   width: 100%;
 }
-
+.ventajas-panel .process-icon i{
+  font-size: 48px;
+  margin-bottom: 20px;
+}
 .processes .process-panel:hover .process-body .process-icon i::before {
   color: var(--global--color-primary);
 }
@@ -16249,7 +16277,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   color: var(--global--color-primary);
 }
 
-.processes .process-panel::before {
+/* .processes .process-panel::before {
   content: '';
   position: absolute;
   top: 0;
@@ -16263,7 +16291,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   -o-transition: 0.3s ease-in-out;
   transition: 0.3s ease-in-out;
   background-color: var(--global--color-primary);
-}
+} */
 
 .processes .process-panel .process-number {
   font-family: var(--global--font-heading);
@@ -16328,7 +16356,6 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 }
 
 .processes .process-panel .process-body .process-content h5 {
-  font-weight: 500;
   font-size: 19px;
   color: var(--global--color-heading);
   line-height: 28px;
@@ -16337,8 +16364,8 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 }
 
 .processes .process-panel .process-body .process-content p {
-  font-size: 14px;
-  line-height: 24px;
+  font-size: 16px;
+  line-height: 25px;
   margin-bottom: 27px;
 }
 
@@ -17771,6 +17798,11 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   margin-bottom: 7px;
   vertical-align: middle;
 }
+.title-sec > h2.section-head {
+  color: var(--global--color-gray-light);
+  text-align: left;
+  margin-bottom: 20px;
+}
 
 @media screen and (max-width: 991.98px) {
   .testimonial.testimonial-1 .section-head {
@@ -18441,8 +18473,22 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 }
 
 .cta.cta-3 {
-  padding-top: 129px;
+  padding-top: 20px;
   padding-bottom: 0;
+}
+.ventajas-panel:first-child {
+  border-radius: 15px 0 0 15px;
+  -webkit-border-radius: 15px 0 0 15px;
+  -moz-border-radius: 15px 0 0 15px;
+  -ms-border-radius: 15px 0 0 15px;
+  -o-border-radius: 15px 0 0 15px;
+}
+.ventajas-panel:last-child {
+  border-radius: 0 15px 15px 0;
+  -webkit-border-radius: 0 15px 15px 0;
+  -moz-border-radius: 0 15px 15px 0;
+  -ms-border-radius: 0 15px 15px 0;
+  -o-border-radius: 0 15px 15px 0;
 }
 
 @media screen and (max-width:991.98px) {
@@ -20104,6 +20150,9 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   align-items: center;
   gap: 10px;
 }
+.office-item > h6 {
+  color: var(--global--color-heading-light);
+}
 
 @media only screen and (max-width: 991px) {
   .office-item {
@@ -20214,7 +20263,6 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   padding-bottom: 0;
   position: relative;
   color: var(--global--color-white);
-  margin-top: 60px;
 }
 
 .footer::after {
