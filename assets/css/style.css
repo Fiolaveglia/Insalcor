@@ -6652,6 +6652,10 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   font-family: var(--global--font-heading-italic);
   font-size: 50px;
 }
+.regional-title {
+  font-family: var(--global--font-heading-italic) !important;
+  margin-top: 60px;
+}
 
 @media (min-width: 992px) and (max-width: 1199px) {
   .heading .heading-title {
@@ -14314,6 +14318,8 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 .about.about-4 {
   padding-top: 109px;
   padding-bottom: 0;
+  background-color: rgba(190, 222, 235, 37);
+  
 }
 
 @media screen and (max-width: 991.98px) {
@@ -14323,8 +14329,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 }
 
 .about.about-4 .avatars-holder {
-  position: relative;
-  z-index: 5;
+ height: 750px; 
 }
 
 .about.about-4 .avatars-holder .avatar {
@@ -16302,6 +16307,9 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   color: var(--global--color-gray-light);
   margin-bottom: 49px;
 }
+.ventajas-panel {
+  max-height: 450px;
+}
 
 @media screen and (max-width: 767.98px) {
   .processes .process-panel .process-number {
@@ -18151,6 +18159,14 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   color: var(--global--color-body);
   margin-bottom: 32px;
 }
+.cta .prief-set p:first-child {
+  color: var(--global--color-primary);
+  font-weight: 600;
+  margin-top: 40px;
+}
+.img-equipo {
+  margin-bottom: 40px !important;
+} 
 
 @media screen and (max-width: 991.98px) {
   .cta .prief-set p {
