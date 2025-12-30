@@ -1577,6 +1577,9 @@ blockquote .author {
   width: 100%;
   height: 100%;
 }
+.bg-section > img[alt="Contacto"] {
+  background-position: right;
+}
 
 .bg-parallax {
   background-attachment: fixed;
@@ -1914,9 +1917,11 @@ blockquote .author {
   display: inline-block;
   opacity: 0;
   visibility: hidden;
-  -webkit-transition: 0.3s ease-in-out;
-  -o-transition: 0.3s ease-in-out;
-  transition: 0.3s ease-in-out;
+  transition: 0.5s ease-in-out;
+  -webkit-transition: 0.5s ease-in-out;
+  -moz-transition: 0.5s ease-in-out;
+  -ms-transition: 0.5s ease-in-out;
+  -o-transition: 0.5s ease-in-out;
 }
 
 .btn-line.btn-line-before .line {
@@ -1965,17 +1970,17 @@ blockquote .author {
 
 /* Button Secondary*/
 .btn--secondary {
-  background-color: var(--global--color-secondary);
+  background-color: var(--global--color-primary);
   color: var(--global--color-white);
 }
 
 .btn--secondary::before {
-  background-color: var(--global--color-primary);
+  background-color: var(--global--color-secondary);
 }
 
 .btn--secondary:active, .btn--secondary:focus, .btn--secondary:hover {
   color: var(--global--color-white);
-  border-color: var(--global--color-primary);
+  border-color: var(--global--color-secondary);
 }
 
 .btn--secondary.btn--inversed::before {
@@ -2309,9 +2314,8 @@ form .col-12 {
   font-weight: 400;
   height: 60px;
   line-height: 59px;
+  border: 1px solid #0b2a6b;
   border-radius: 8px 8px 8px 0;
-  border: none;
-  background-color: var(--global--color-primary-light);
   padding-left: 25px;
   margin-bottom: 20px;
   position: relative;
@@ -3628,7 +3632,8 @@ ul.list-icons li i {
 .header-topbar+.hero,
 .header-topbar+.slider {
   position: relative;
-  margin-top: -155px;
+  margin-top: -200px;
+  height: 100vh;
 }
 
 /*------------------------------------*\
@@ -7557,6 +7562,12 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   line-height: 55px;
   margin-bottom: 19px;
   text-transform: capitalize;
+}
+h2.title-size {
+  font-size: 64px;
+  font-family: var(--global--font-heading);
+  color: var(--global--color-gray);
+  
 }
 
 @media (min-width: 992px) and (max-width: 1199px) {
@@ -16618,7 +16629,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 
 .contact-card .contact-body .form-control {
   border-radius: 0 8px 8px 8px;
-  border: 2px solid transparent;
+  border: 2px solid var(--global--color-heading-light);
   -webkit-transition: 0.3s ease-in-out;
   -o-transition: 0.3s ease-in-out;
   transition: 0.3s ease-in-out;
@@ -16627,7 +16638,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 
 .contact-card .contact-body .form-control:hover, .contact-card .contact-body .form-control:active, .contact-card .contact-body .form-control:focus {
   background-color: var(--global--color-white);
-  border-color: var(--global--color-primary);
+  border-color: var(--global--color-gray-darken);
 }
 
 .contact-card .contact-body .form-control.nice-select {
@@ -16870,7 +16881,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 
 .img-card.img-card-2::before {
   background: unset;
-  background-color: #14c5dddb;
+  background-color: rgba(13, 31, 97, 0.7);
 }
 
 .img-card.img-card-2 .card-content {
