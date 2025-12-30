@@ -12942,21 +12942,21 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 }
 
 /* Category Widget */
-.widget-categories {
+.especie {
   padding-bottom: 28px;
 }
 
-.widget-categories .widget-title {
+.especie .widget-title {
   margin-bottom: 8px;
 }
 
-.widget-categories ul {
+.especie ul {
   padding-left: 0;
   list-style: none;
   margin-bottom: 0;
 }
 
-.widget-categories ul li {
+.especie ul li {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -12968,18 +12968,18 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   align-items: center;
 }
 
-.widget-categories ul li:hover a {
+.especie ul li:hover a {
   padding-left: 15px;
   color: var(--global--color-primary);
 }
 
-.widget-categories ul li:hover span {
+.especie ul li:hover span {
   background-color: var(--global--color-primary);
   border-color: var(--global--color-primary);
   color: var(--global--color-white);
 }
 
-.widget-categories ul li a {
+.especie ul li a {
   color: var(--global--color-secondary);
   font-size: 15px;
   font-family: var(--global--font-body);
@@ -12998,7 +12998,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   align-items: center;
 }
 
-.widget-categories ul li a:before {
+.especie ul li a:before {
   display: inline-block;
   content: '';
   width: 12px;
@@ -13007,7 +13007,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   background-color: var(--global--color-primary);
 }
 
-.widget-categories ul li span {
+.especie ul li span {
   font-family: var(--global--font-body);
   font-weight: 400;
   font-size: 13px;
@@ -13880,7 +13880,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   content: unset;
 }
 
-.sidebar-shop .widget-categories {
+.sidebar-shop .especie {
   margin-bottom: 35px;
 }
 
