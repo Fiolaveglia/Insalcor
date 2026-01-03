@@ -692,6 +692,107 @@ $(".slider-carousel").each(function() {
         }
     });
 
+    // Scipt para el modal 
+    document.addEventListener("click", async function (e) {
+        const link = e.target.closest(".js-open-product");
+        if (!link) return;
+
+        e.preventDefault();
+
+        const url = link.getAttribute("href") || "product-single.html";
+
+        const modalEl = document.getElementById("productModal");
+        const bodyEl = document.getElementById("productModalBody");
+
+        bodyEl.innerHTML = '<div class="text-center p-5">Cargando…</div>';
+
+        // Abrir modal
+        const modal = new bootstrap.Modal(modalEl, { backdrop: true, keyboard: true });
+        modal.show();
+
+        document.addEventListener("click", function (e) {
+            const btn = e.target.closest(".product-modal-close");
+            if (!btn) return;
+
+            const modalEl = document.getElementById("productModal");
+
+            if (window.bootstrap && bootstrap.Modal) {
+                const inst = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                inst.hide();
+                return;
+            }
+
+            if (window.jQuery && jQuery.fn.modal) {
+                jQuery(modalEl).modal("hide");
+                return;
+            }
+
+            modalEl.classList.remove("show");
+            modalEl.style.display = "none";
+            document.body.classList.remove("modal-open");
+        });
+
+        try {
+            const res = await fetch(url, { cache: "no-store" });
+            const html = await res.text();
+
+            const doc = new DOMParser().parseFromString(html, "text/html");
+
+            const singleProduct = doc.querySelector("#single-product");
+            if (!singleProduct) throw new Error("No se encontró #single-product en " + url);
+
+            bodyEl.innerHTML = "";
+            bodyEl.appendChild(singleProduct);
+
+        } catch (err) {
+            bodyEl.innerHTML = '<div class="p-5 text-center">No se pudo cargar el detalle.</div>';
+            console.error(err);
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const modalEl = document.getElementById("productModal");
+        if (modalEl && modalEl.parentElement !== document.body) {
+            document.body.appendChild(modalEl);
+        }
+    });
+
+    // Filtro Pharma / VetPharma
+
+        (function(){
+            var buttons = document.querySelectorAll('.segment-card');
+            var segments = document.querySelectorAll('.segment-content');
+
+            function showSegment(targetSelector){
+            segments.forEach(function(s){
+                s.classList.remove('is-visible');
+            });
+            var target = document.querySelector(targetSelector);
+            if(target) target.classList.add('is-visible');
+
+            buttons.forEach(function(b){
+                var active = (b.getAttribute('data-target') === targetSelector);
+                b.classList.toggle('is-active', active);
+                b.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+
+            // opcional: bajar al contenido
+            // document.querySelector(targetSelector).scrollIntoView({behavior:'smooth', block:'start'});
+            }
+
+            buttons.forEach(function(btn){
+            btn.addEventListener('click', function(){
+                showSegment(btn.getAttribute('data-target'));
+            });
+            });
+
+            // default
+            showSegment('#segment-pharma');
+        })();
+
+
+
+
     /* ---------------------------------------------------------
             Current Year Copyright area
         --------------------------------------------------------- */
