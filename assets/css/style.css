@@ -17296,6 +17296,11 @@ background-color: #F9F9F9;
 /*------------------------------------*\
     #Testimonial
 \*------------------------------------*/
+
+.about-us-img img{
+  width: 100%;
+}
+
 .testimonial {
   padding-top: 130px;
   padding-bottom: 0;
