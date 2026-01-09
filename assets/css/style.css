@@ -8322,6 +8322,17 @@ h2.title-size {
   }
 }
 
+/* Pharma VetPharma */
+
+.Pharma-VetPharma-Cards .row.g-4 {
+  justify-content: center;
+}
+
+.Pharma-VetPharma-Cards .entry-more {
+  text-align: left;
+}
+
+
 /*------------------------------------*\
     #Blog Section
 \*------------------------------------*/
