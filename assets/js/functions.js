@@ -477,20 +477,21 @@ $(".slider-carousel").each(function() {
     contactForm.validate({
         debug: false,
         submitHandler: function(contactForm) {
-            $(contactResult, contactForm).html('Please Wait...');
+            $(contactResult, contactForm).html('Por favor espere...');
             $.ajax({
                 type: "POST",
                 url: "assets/php/contact.php",
                 data: $(contactForm).serialize(),
                 timeout: 20000,
                 success: function(msg) {
-                    $(contactResult, contactForm).html('<div class="alert alert-success" role="alert"><strong>Thank you. We will contact you shortly.</strong></div>').delay(3000).fadeOut(2000);
+                    $(contactResult, contactForm).html('<div class="alert alert-success" role="alert"><strong>Gracias. Te responderemos a la brevedad.</strong></div>').delay(3000).fadeOut(2000);
                 },
                 error: $('.thanks').show()
             });
             return false;
         }
     });
+
 
     /* ------------------  PARALLAX FOOTER ------------------ */
 
@@ -797,6 +798,81 @@ $(".slider-carousel").each(function() {
             Current Year Copyright area
         --------------------------------------------------------- */
         $(".current-year").text((new Date).getFullYear());
+
+/* ========================================
+   LIMPIEZA Y ENVÍO AJAX DEL FORMULARIO
+   ======================================== */
+(function($) {
+    'use strict';
+    
+    // Esperar a que el DOM esté listo
+    $(document).ready(function() {
+        
+        var $form = $('.contactForm');
+        
+        if ($form.length === 0) {
+            console.log('Formulario no encontrado');
+            return;
+        }
+        
+        console.log('Formulario de contacto detectado');
+        
+        $form.on('submit', function(e) {
+            e.preventDefault(); // Prevenir envío tradicional
+            
+            console.log('Enviando formulario...');
+            
+            var $submitButton = $form.find('button[type="submit"]');
+            var $resultDiv = $form.find('.contact-result');
+            var originalButtonText = $submitButton.text();
+            
+            // Deshabilitar botón
+            $submitButton.prop('disabled', true).text('Enviando...');
+            
+            // Enviar formulario con AJAX
+            $.ajax({
+                type: 'POST',
+                url: $form.attr('action'),
+                data: $form.serialize(),
+                success: function(response) {
+                    console.log('Respuesta recibida');
+                    
+                    // Mostrar respuesta
+                    $resultDiv.html(response);
+                    
+                    // Si es exitoso, limpiar formulario
+                    if (response.indexOf('alert-success') !== -1 || response.indexOf('Gracias por contactarnos') !== -1) {
+                        console.log('Éxito - limpiando formulario');
+                        
+                        // Limpiar formulario
+                        $form[0].reset();
+                        
+                        // Scroll al mensaje de éxito
+                        $('html, body').animate({
+                            scrollTop: $resultDiv.offset().top - 100
+                        }, 500);
+                        
+                        // Opcional: Ocultar mensaje después de 5 segundos
+                        setTimeout(function() {
+                            $resultDiv.fadeOut(function() {
+                                $(this).html('').show();
+                            });
+                        }, 5000);
+                    }
+                },
+                error: function() {
+                    console.log('Error al enviar');
+                    $resultDiv.html('<div class="alert alert-danger" role="alert">Error al enviar el mensaje. Por favor intenta nuevamente.</div>');
+                },
+                complete: function() {
+                    // Rehabilitar botón
+                    $submitButton.prop('disabled', false).text(originalButtonText);
+                }
+            });
+        });
+    });
+    
+})(jQuery);    
 
 
 

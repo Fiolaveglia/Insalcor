@@ -154,11 +154,10 @@
                             <input class="form-control" type="text" name="contact-empresa" placeholder="Empresa" required=""/>
                           </div>
                           <div class="col-12 col-md-6">
-                            <input class="form-control" type="text" name="contact-email" placeholder="Email" required=""/>
-
+                            <input class="form-control" type="email" name="contact-email" placeholder="Email*" required="" style="text-transform: lowercase;"/>
                           </div>
                           <div class="col-12 col-md-6 col-lg-6">
-                            <input class="form-control" type="text" name="contact-phone" placeholder="Teléfono" required=""/>
+                            <input class="form-control" type="tel" name="contact-phone" placeholder="Teléfono" pattern="[0-9]{9,}" title="Debe contener al menos 9 dígitos" minlength="9"/>
                           </div>
                           <div class="col-12"> 
                             <textarea class="form-control" name="contact-message" cols="30" rows="2" placeholder="Mensaje" required=""></textarea>
