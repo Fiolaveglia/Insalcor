@@ -111,7 +111,7 @@
         }
     });
 
-    $('.cart-box , .module-cart .module-icon , .module-search .form-search').click(function(e) {
+    $('.cart-box , .module-cart .module-icon , .module-search .form-search , .module-language').click(function(e) {
         e.stopPropagation();
     });
 
