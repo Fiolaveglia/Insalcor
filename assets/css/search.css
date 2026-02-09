@@ -1,0 +1,186 @@
+/**
+ * Estilos para el sistema de búsqueda - Insalcor
+ */
+
+/* Contenedor de sugerencias */
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    margin-top: -1px;
+}
+
+.suggestions-wrapper {
+    padding: 10px 0;
+}
+
+.suggestion-group {
+    margin-bottom: 15px;
+}
+
+.suggestion-group h4 {
+    padding: 10px 20px 5px;
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #999;
+    letter-spacing: 0.5px;
+}
+
+.suggestion-item {
+    display: block;
+    padding: 12px 20px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.suggestion-item:hover {
+    background-color: #f8f9fa;
+    border-left-color: #007bff;
+}
+
+.suggestion-item strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+.suggestion-category {
+    display: inline-block;
+    font-size: 12px;
+    color: #666;
+    padding: 2px 8px;
+    background: #f0f0f0;
+    border-radius: 3px;
+    margin-top: 4px;
+}
+
+.suggestion-footer {
+    border-top: 1px solid #eee;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.suggestion-footer a {
+    display: inline-block;
+    padding: 8px 16px;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.suggestion-footer a:hover {
+    background: #007bff;
+    color: white;
+}
+
+/* Mejorar el input de búsqueda */
+.form-search {
+    position: relative;
+}
+
+.form-search input[type="text"] {
+    padding-right: 50px;
+}
+
+.form-search button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    color: #999;
+    transition: color 0.2s;
+}
+
+.form-search button:hover {
+    color: #007bff;
+}
+
+/* Loading indicator */
+.search-loading {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+}
+
+.search-loading::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .search-suggestions {
+        max-height: 300px;
+    }
+    
+    .suggestion-item {
+        padding: 10px 15px;
+    }
+    
+    .suggestion-item strong {
+        font-size: 13px;
+    }
+}
+
+/* Destacar texto coincidente en sugerencias */
+.suggestion-item .highlight {
+    background-color: #fff3cd;
+    font-weight: 600;
+}
+
+/* Estilos para el modal de búsqueda fullscreen */
+.module-fullscreen.module-active {
+    z-index: 9999;
+}
+
+.module-fullscreen .form-search {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Mensaje cuando no hay resultados */
+.no-suggestions {
+    padding: 30px 20px;
+    text-align: center;
+    color: #999;
+}
+
+.no-suggestions p {
+    margin: 0;
+    font-size: 14px;
+}
