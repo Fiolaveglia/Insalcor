@@ -1775,7 +1775,7 @@ blockquote .author {
 }
 
 .breadcrumb>li a:hover {
-  color: var(--global--color-primary);
+  color: var(--global--color-secondary);
 }
 
 .breadcrumb>.active {
@@ -2301,6 +2301,15 @@ blockquote .author {
 .btn-news{
   margin-top: 40px;
 }
+
+.entry-more > a.tutorial {
+  color: var(--global--color-white) !important;
+}
+
+.line > span {
+  color: var(--global--color-white) !important;
+}
+
 
 /*------------------------------------*\
     #FORMS
@@ -9417,6 +9426,12 @@ background-color: #F9F9F9;
 .blog-single .entry-add-comment .btn:active, .blog-single .entry-add-comment .btn:focus, .blog-single .entry-add-comment .btn:hover {
   border-color: var(--global--color-heading-darken);
   color: var(--global--color-white);
+}
+
+.blog .title-sub-heading {
+  color: var(--global--color-secondary);
+  font-family: var(--global--font-secondary);
+  
 }
 
 /*------------------------------------*\
