@@ -1751,11 +1751,12 @@ blockquote .author {
   padding: 0;
   border-radius: 0;
   color: #e5e4e4;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1;
   text-transform: capitalize;
   display: block;
+  margin-top: 200px;
 }
 
 .breadcrumb>li {
@@ -6033,6 +6034,10 @@ ul.dropdown-menu>li.has-dropdown>a:before {
     font-size: 32px;
     line-height: 1.4;
   }
+    .breadcrumb {
+    margin-top: 10px !important;
+  }
+
 }
 
 .page-title .title .title-desc p {
@@ -6063,6 +6068,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
     -ms-flex-pack: start;
     justify-content: start;
   }
+  
 }
 
 @media screen and (max-width: 767.98px) {
@@ -7686,7 +7692,7 @@ h2.title-size {
 }
 
 .hero .hero-content .breadcrumb .breadcrumb-item+.breadcrumb-item a {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1;
 }
 
@@ -7696,7 +7702,7 @@ h2.title-size {
   font-size: 10px;
   padding: 0 10px;
   color: var(--global--color-white);
-  content: "\f054";
+  content: "\f053";
 }
 
 .hero .hero-panel-holder {
@@ -8144,9 +8150,6 @@ h2.title-size {
   }
 }
 
-.hero.hero-5 {
-  background-position-y: 150px;
-}
 .hero.hero-5.bg-overlay.bg-overlay-dark, .hero.bg-overlay.bg-overlay-dark.bg-section {
   height: 780px;
 }
@@ -20359,7 +20362,7 @@ background-color: #F9F9F9;
 #wrapperParallax {
   position: relative;
   z-index: 1060;
-  min-height: 100vh;
+  /* min-height: 100vh; */
 }
 
 #footerParallax {
@@ -20400,6 +20403,12 @@ background-color: #F9F9F9;
   background-color: var(--global--color-primary);
   width: calc(100% - 120px);
   height: 4px;
+}
+h6.social-title {
+  color: var(--global--color-white);
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 20px;
 }
 
 @media screen and (max-width: 991.98px) {
