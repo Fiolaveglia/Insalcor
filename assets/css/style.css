@@ -6026,7 +6026,6 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   font-weight: 500;
   line-height: 60px;
   margin-bottom: 0;
-  text-transform: capitalize;
 }
 
 @media screen and (max-width: 767.98px) {
@@ -6652,7 +6651,6 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 
 .heading .heading-subtitle {
   font-family: var(--global--font-body);
-  text-transform: capitalize;
   color: var(--global--color-primary);
   font-size: 15px;
   font-weight: 700;
@@ -17911,7 +17909,6 @@ background-color: #F9F9F9;
   line-height: 1;
   text-align: center;
   color: var(--global--color-primary);
-  text-transform: capitalize;
   margin-bottom: 7px;
   vertical-align: middle;
 }
