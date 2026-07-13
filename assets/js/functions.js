@@ -700,8 +700,13 @@ $(".slider-carousel").each(function() {
             });
             });
 
-            // default
-            showSegment('#segment-pharma');
+            // Honor a #segment-… hash (e.g. after a VetPharma filter reload),
+            // otherwise default to Pharma.
+            var initial = '#segment-pharma';
+            if (location.hash && document.querySelector(location.hash + '.segment-content')) {
+                initial = location.hash;
+            }
+            showSegment(initial);
         })();
 
 
