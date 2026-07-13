@@ -363,6 +363,41 @@ function render_filter_list(string $area, string $type, array $options, string $
     return $html;
 }
 
+/**
+ * A single noticia formatted as an owl-carousel slide, matching the
+ * "Artículos y Novedades Recientes" markup on the area pages.
+ */
+function render_noticia_slide(array $item, string $detailBase): string
+{
+    $d = date_parts($item['published_at'] ?: $item['created_at']);
+    $img = asset($item['imagen']) ?: asset('assets/images/blog/grid/1.jpg');
+    $href = $detailBase . '?id=' . (int) $item['id'];
+    return '
+            <div>
+              <div class="blog-entry" data-hover="">
+                <div class="entry-img">
+                  <div class="entry-date">
+                    <div class="entry-content"><span class="day">' . e($d['day']) . '</span><span class="month">' . e($d['month']) . '</span><span class="year">' . e($d['year']) . '</span></div>
+                  </div>
+                   <a href="' . e($href) . '"><img src="' . e($img) . '" alt="' . e($item['titulo']) . '"/></a>
+                </div>
+                <div class="entry-content">
+                  <div class="entry-meta">
+                    <div class="entry-category"><a href="javascript:void(0)">' . e($item['categoria']) . '</a></div>
+                  </div>
+                  <div class="entry-title">
+                    <h4><a href="' . e($href) . '">' . e($item['titulo']) . '</a></h4>
+                  </div>
+                  <div class="entry-bio">
+                    <p>' . e($item['extracto']) . '</p>
+                  </div>
+                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="' . e($href) . '">
+                      <div class="line"> <span> </span></div><span>' . e(t('common.see_more')) . '</span></a></div>
+                </div>
+              </div>
+            </div>';
+}
+
 function render_noticia_card(array $item, string $detailBase): string
 {
     $d = date_parts($item['published_at'] ?: $item['created_at']);

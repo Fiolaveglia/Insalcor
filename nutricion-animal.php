@@ -8,6 +8,7 @@ $filters = active_filters();
 $productos = pub_productos($area, $filters);
 $recent = array_slice($productos, 0, 3);
 $especieOptions = array_combine(ESPECIES, ESPECIES);
+$noticias = array_slice(pub_noticias(), 0, 3);
 ?>
 <!DOCTYPE html>
 <html dir="ltr" lang="<?= e(current_lang()) ?>">
@@ -429,117 +430,16 @@ $especieOptions = array_combine(ESPECIES, ESPECIES);
               </div>
             </div>
           </div>
-          <div class="carousel owl-carousel carousel-dots" data-slide="3" data-slide-rs="2" data-autoplay="true" data-nav="false" data-dots="true" data-space="30" data-loop="true" data-speed="200">
-            <div>
-              <div class="blog-entry" data-hover="">
-                <div class="entry-img">
-                  <div class="entry-date">
-                    <div class="entry-content"><span class="day">20</span><span class="month">Ene</span><span class="year">2025</span></div>
-                  </div>
-                   <a href="blog-single-sidebar.html"><img src="assets/images/blog/grid/1.jpg" alt="6 tips to protect your mental health when sick"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)">Nutrición Animal</a>
-                    </div>
-                    <!-- <div class="divider"></div>
-                    <div class="entry-author"> 
-                      <p>Lorem Ipsum</p>
-                    </div> -->
-                  </div>
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Título más extenso de la noticia que ocupa más de una fila</a></h4>
-                  </div>
-                  <div class="entry-bio">
-                    <p>Lorem ipsum dolor sit amet consectetur. Turpis auctor pulvinar fringilla aliquet id. Mi est malesuada eu mattis. Elementum risus convallis pulvinar velit nulla mi rutrum. Id at tristique condimentum viverra vel nec vestibulum.</p>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver Más</span></a></div>
-                </div>
-              </div>
-              <!-- End .Card-->
-           
-          </div>
-           <div>
-              <div class="blog-entry" data-hover="">
-                <div class="entry-img">
-                  <div class="entry-date">
-                    <div class="entry-content"><span class="day">20</span><span class="month">Ene</span><span class="year">2025</span></div>
-                  </div>
-                   <a href="blog-single-sidebar.html"><img src="assets/images/blog/grid/1.jpg" alt="6 tips to protect your mental health when sick"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)">Nutrición Animal</a>
-                    </div>
-                  </div>
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Título de la noticia</a></h4>
-                  </div>
-                  <div class="entry-bio">
-                    <p>Lorem ipsum dolor sit amet consectetur. Turpis auctor pulvinar fringilla aliquet id. Mi est malesuada eu mattis. Elementum risus convallis pulvinar velit nulla mi rutrum. Id at tristique condimentum viverra vel nec vestibulum.</p>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver Más</span></a></div>
-                </div>
-              </div>
-              <!-- End .Card-->
-           
-          </div>
-           <div>
-              <div class="blog-entry" data-hover="">
-                <div class="entry-img">
-                  <div class="entry-date">
-                    <div class="entry-content"><span class="day">20</span><span class="month">Ene</span><span class="year">2025</span></div>
-                  </div>
-                   <a href="blog-single-sidebar.html"><img src="assets/images/blog/grid/1.jpg" alt="6 tips to protect your mental health when sick"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)">Nutrición Animal</a>
-                    </div>
-                  </div>
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Título de la noticia</a></h4>
-                  </div>
-                  <div class="entry-bio">
-                    <p>Lorem ipsum dolor sit amet consectetur. Turpis auctor pulvinar fringilla aliquet id. Mi est malesuada eu mattis. Elementum risus convallis pulvinar velit nulla mi rutrum. Id at tristique condimentum viverra vel nec vestibulum.</p>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver Más</span></a></div>
-                </div>
-              </div>
-              <!-- End .Card-->
-           
-          </div>
-           <div>
-              <div class="blog-entry" data-hover="">
-                <div class="entry-img">
-                  <div class="entry-date">
-                    <div class="entry-content"><span class="day">20</span><span class="month">Ene</span><span class="year">2025</span></div>
-                  </div>
-                   <a href="blog-single-sidebar.html"><img src="assets/images/blog/grid/1.jpg" alt="6 tips to protect your mental health when sick"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)">Nutrición Animal</a>
-                    </div>
-                  </div>
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Título de la noticia</a></h4>
-                  </div>
-                  <div class="entry-bio">
-                    <p>Lorem ipsum dolor sit amet consectetur. Turpis auctor pulvinar fringilla aliquet id. Mi est malesuada eu mattis. Elementum risus convallis pulvinar velit nulla mi rutrum. Id at tristique condimentum viverra vel nec vestibulum.</p>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver Más</span></a></div>
-                </div>
-              </div>
-              <!-- End .Card-->
-           
+          <?php if ($noticias): ?>
+          <div class="carousel owl-carousel carousel-dots" data-slide="3" data-slide-rs="2" data-autoplay="<?= count($noticias) > 3 ? 'true' : 'false' ?>" data-nav="false" data-dots="true" data-space="30" data-loop="<?= count($noticias) > 3 ? 'true' : 'false' ?>" data-speed="200">
+            <?php foreach ($noticias as $item) { echo render_noticia_slide($item, 'blog-single.php'); } ?>
           </div>
           <!-- End .carousel-->
-           
+          <?php else: ?>
+          <div class="row">
+            <div class="col-12"><p class="text-center"><?= e(t('common.no_news')) ?></p></div>
+          </div>
+          <?php endif; ?>
         </div>
         <!-- Button -->
          <a class="btn btn--secondary btn-line btn-news" href="/blog.php">Ir a Novedades</a>
