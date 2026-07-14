@@ -1,0 +1,115 @@
+/**
+ * Styling for admin-authored rich-text (Quill) rendered on public pages.
+ * Applies to noticia `contenido` (.entry-content) and product `descripcion`
+ * (.product-desc). Gives padding + typographic styles so headings, lists,
+ * blockquotes, links and alignment classes render as intended.
+ */
+
+.rich-content {
+  padding-top: 4px;
+}
+
+/* Blog single: full-bleed image at the card top, padded text below. */
+.blog-single .article-body {
+  padding: 30px 34px 40px;
+}
+@media (max-width: 575.98px) {
+  .blog-single .article-body {
+    padding: 24px 20px 32px;
+  }
+}
+
+.rich-content,
+.entry-content,
+.product-desc {
+  color: #4a4a55;
+  font-size: 1.05rem;
+  line-height: 1.85;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.entry-content > *:first-child,
+.product-desc > *:first-child {
+  margin-top: 0;
+}
+.entry-content > *:last-child,
+.product-desc > *:last-child {
+  margin-bottom: 0;
+}
+
+.entry-content p,
+.product-desc p {
+  margin: 0 0 1.2em;
+}
+
+.entry-content h1,
+.entry-content h2,
+.entry-content h3,
+.entry-content h4,
+.product-desc h1,
+.product-desc h2,
+.product-desc h3,
+.product-desc h4 {
+  color: #1c2b63;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 1.6em 0 0.6em;
+}
+.entry-content h1, .product-desc h1 { font-size: 1.9rem; }
+.entry-content h2, .product-desc h2 { font-size: 1.55rem; }
+.entry-content h3, .product-desc h3 { font-size: 1.3rem; }
+.entry-content h4, .product-desc h4 { font-size: 1.12rem; }
+
+.entry-content ul,
+.entry-content ol,
+.product-desc ul,
+.product-desc ol {
+  margin: 0 0 1.2em;
+  padding-left: 1.6em;
+}
+.entry-content ul, .product-desc ul { list-style: disc; }
+.entry-content ol, .product-desc ol { list-style: decimal; }
+.entry-content li,
+.product-desc li {
+  margin-bottom: 0.45em;
+}
+
+.entry-content a,
+.product-desc a {
+  color: #2b57d6;
+  text-decoration: underline;
+}
+.entry-content a:hover,
+.product-desc a:hover {
+  color: #1c2b63;
+}
+
+.entry-content strong,
+.product-desc strong { font-weight: 700; }
+.entry-content em,
+.product-desc em { font-style: italic; }
+
+.entry-content blockquote,
+.product-desc blockquote {
+  margin: 1.5em 0;
+  padding: 0.8em 1.2em;
+  border-left: 4px solid #2b57d6;
+  background: #f5f7fb;
+  color: #55596a;
+  font-style: italic;
+  border-radius: 0 6px 6px 0;
+}
+
+.entry-content img,
+.product-desc img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1.2em 0;
+}
+
+/* Quill alignment classes */
+.ql-align-center { text-align: center; }
+.ql-align-right { text-align: right; }
+.ql-align-justify { text-align: justify; }
