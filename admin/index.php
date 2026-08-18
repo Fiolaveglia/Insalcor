@@ -29,7 +29,7 @@
         <div class="topbar-user">
           <div>
             <strong>Admin</strong>
-            <span id="user-email"></span>
+            <span id="user-username"></span>
           </div>
           <button class="icon-btn" id="btn-logout" title="Salir" type="button"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
@@ -80,6 +80,7 @@
                   <th>Producto</th>
                   <th>Área</th>
                   <th>Categoría</th>
+                  <th>Especies</th>
                   <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
@@ -182,16 +183,17 @@
               <option>Otros</option>
             </select>
           </div>
-          <div class="form-group" id="producto-especie-wrap">
-            <label for="producto-especie">Especie</label>
-            <select id="producto-especie">
-              <option value="">—</option>
-              <option>Aves</option>
-              <option>Porcinos</option>
-              <option>Ganadería</option>
-              <option>Mascotas</option>
-              <option>Lechería</option>
-            </select>
+        </div>
+        <div class="form-group" id="producto-especie-wrap">
+          <label>Especies <span class="hint">(un producto puede estar en varias)</span></label>
+          <div class="checkbox-grid" id="producto-especies">
+            <label><input type="checkbox" name="especie" value="Aves"> Aves</label>
+            <label><input type="checkbox" name="especie" value="Porcinos"> Porcinos</label>
+            <label><input type="checkbox" name="especie" value="Ganadería"> Ganadería</label>
+            <label><input type="checkbox" name="especie" value="Mascotas"> Mascotas</label>
+            <label><input type="checkbox" name="especie" value="Lechería"> Lechería</label>
+            <label><input type="checkbox" name="especie" value="Equinos"> Equinos</label>
+            <label><input type="checkbox" name="especie" value="Ovinos"> Ovinos</label>
           </div>
         </div>
         <div class="form-group">

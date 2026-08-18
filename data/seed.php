@@ -2,8 +2,10 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/api/bootstrap.php';
+require_once __DIR__ . '/migrate.php';
 
 db(); // ensure schema exists
+migrar(db());
 
 $products = [
     [
@@ -13,7 +15,7 @@ $products = [
         'area_negocio' => 'Nutricion Animal',
         'categoria' => 'Aditivos',
         'marca' => 'Otros',
-        'especie' => 'Ganadería',
+        'especies' => ['Ganadería', 'Lechería'],
         'estado' => 'published',
     ],
     [
@@ -23,7 +25,6 @@ $products = [
         'area_negocio' => 'Pharma',
         'categoria' => 'Excipientes',
         'marca' => 'Mingtai Chemicals',
-        'especie' => null,
         'estado' => 'published',
     ],
     [
@@ -33,7 +34,6 @@ $products = [
         'area_negocio' => 'VetPharma',
         'categoria' => 'APIS',
         'marca' => 'Kerry BioScience',
-        'especie' => null,
         'estado' => 'published',
     ],
     [
@@ -43,16 +43,16 @@ $products = [
         'area_negocio' => 'Pharma',
         'categoria' => 'Premezclas',
         'marca' => 'Otros',
-        'especie' => null,
         'estado' => 'published',
     ],
 ];
 
 $check = db()->prepare('SELECT id FROM productos WHERE nombre = ? AND area_negocio = ? LIMIT 1');
 $insert = db()->prepare(
-    'INSERT INTO productos (nombre, descripcion, imagen, area_negocio, categoria, marca, especie, estado, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    'INSERT INTO productos (nombre, descripcion, imagen, area_negocio, categoria, marca, estado, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
 );
+$insertEspecie = db()->prepare('INSERT INTO producto_especies (producto_id, especie) VALUES (?, ?)');
 
 $added = 0;
 $skipped = 0;
@@ -69,10 +69,13 @@ foreach ($products as $p) {
         $p['area_negocio'],
         $p['categoria'],
         $p['marca'],
-        $p['especie'],
         $p['estado'],
         now_sql(),
     ]);
+    $productoId = (int) db()->lastInsertId();
+    foreach ($p['especies'] ?? [] as $especie) {
+        $insertEspecie->execute([$productoId, $especie]);
+    }
     $added++;
 }
 

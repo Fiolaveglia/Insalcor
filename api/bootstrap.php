@@ -8,8 +8,15 @@ header('X-Content-Type-Options: nosniff');
 const AREAS = ['Nutricion Animal', 'Pharma', 'VetPharma'];
 const CATEGORIAS = ['Premezclas', 'Aditivos', 'Correctores', 'Excipientes', 'APIS', 'Minerales', 'Vitaminas'];
 const MARCAS = ['Ingredion', 'Mingtai Chemicals', 'Kerry BioScience', 'Research AG', 'Otros'];
-const ESPECIES = ['Aves', 'Porcinos', 'Ganadería', 'Mascotas', 'Lechería'];
+const ESPECIES = ['Aves', 'Porcinos', 'Ganadería', 'Mascotas', 'Lechería', 'Equinos', 'Ovinos'];
 const ESTADOS = ['draft', 'published'];
+
+/**
+ * Alta de usuarios desde el sitio. Está cerrada: las cuentas se crean a mano.
+ * Poner en true vuelve a habilitar /admin/register.php y la acción `register`
+ * de la API; no hace falta tocar nada más.
+ */
+const REGISTRO_HABILITADO = false;
 
 function root_path(): string
 {
@@ -84,7 +91,7 @@ function current_user(): ?array
     if (empty($_SESSION['user_id'])) {
         return null;
     }
-    $stmt = db()->prepare('SELECT id, email, created_at FROM users WHERE id = ?');
+    $stmt = db()->prepare('SELECT id, username, created_at FROM users WHERE id = ?');
     $stmt->execute([(int) $_SESSION['user_id']]);
     $user = $stmt->fetch();
     return $user ?: null;

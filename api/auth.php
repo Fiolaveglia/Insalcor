@@ -6,6 +6,29 @@ require_once __DIR__ . '/bootstrap.php';
 $action = $_GET['action'] ?? '';
 $method = request_method();
 
+/**
+ * Normaliza el nombre de usuario: sin espacios y en minúsculas, para que
+ * "Admin" y "admin" sean la misma cuenta.
+ */
+function normalizar_username(mixed $valor): string
+{
+    return strtolower(sanitize_text(is_string($valor) ? $valor : ''));
+}
+
+/** Corta la request con un error si el nombre de usuario no sirve. */
+function validar_username(string $username): void
+{
+    if ($username === '') {
+        json_error('El nombre de usuario es obligatorio');
+    }
+    if (mb_strlen($username) < 3 || mb_strlen($username) > 30) {
+        json_error('El nombre de usuario debe tener entre 3 y 30 caracteres');
+    }
+    if (!preg_match('/^[a-z0-9._-]+$/', $username)) {
+        json_error('El nombre de usuario sólo puede tener letras, números, punto, guión y guión bajo');
+    }
+}
+
 switch ($action) {
     case 'me':
         if ($method !== 'GET') {
@@ -19,17 +42,18 @@ switch ($action) {
         ]);
 
     case 'register':
+        if (!REGISTRO_HABILITADO) {
+            json_error('El registro de usuarios está deshabilitado', 403);
+        }
         if ($method !== 'POST') {
             json_error('Método no permitido', 405);
         }
         $body = read_json_body();
-        $email = strtolower(sanitize_text($body['email'] ?? ''));
+        $username = normalizar_username($body['username'] ?? '');
         $password = (string) ($body['password'] ?? '');
         $passwordConfirm = (string) ($body['password_confirm'] ?? '');
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            json_error('Email inválido');
-        }
+        validar_username($username);
         if (strlen($password) < 6) {
             json_error('La contraseña debe tener al menos 6 caracteres');
         }
@@ -37,15 +61,15 @@ switch ($action) {
             json_error('Las contraseñas no coinciden');
         }
 
-        $exists = db()->prepare('SELECT id FROM users WHERE email = ?');
-        $exists->execute([$email]);
+        $exists = db()->prepare('SELECT id FROM users WHERE username = ?');
+        $exists->execute([$username]);
         if ($exists->fetch()) {
-            json_error('Este email ya está registrado', 409);
+            json_error('Este nombre de usuario ya está registrado', 409);
         }
 
         $hash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = db()->prepare('INSERT INTO users (email, password_hash) VALUES (?, ?)');
-        $stmt->execute([$email, $hash]);
+        $stmt = db()->prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)');
+        $stmt->execute([$username, $hash]);
         $id = (int) db()->lastInsertId();
 
         $_SESSION['user_id'] = $id;
@@ -53,7 +77,7 @@ switch ($action) {
 
         json_response([
             'ok' => true,
-            'user' => ['id' => $id, 'email' => $email],
+            'user' => ['id' => $id, 'username' => $username],
             'csrf_token' => csrf_token(),
         ], 201);
 
@@ -62,15 +86,15 @@ switch ($action) {
             json_error('Método no permitido', 405);
         }
         $body = read_json_body();
-        $email = strtolower(sanitize_text($body['email'] ?? ''));
+        $username = normalizar_username($body['username'] ?? '');
         $password = (string) ($body['password'] ?? '');
 
-        $stmt = db()->prepare('SELECT id, email, password_hash FROM users WHERE email = ?');
-        $stmt->execute([$email]);
+        $stmt = db()->prepare('SELECT id, username, password_hash FROM users WHERE username = ?');
+        $stmt->execute([$username]);
         $user = $stmt->fetch();
 
         if (!$user || !password_verify($password, $user['password_hash'])) {
-            json_error('Email o contraseña incorrectos', 401);
+            json_error('Usuario o contraseña incorrectos', 401);
         }
 
         $_SESSION['user_id'] = (int) $user['id'];
@@ -78,7 +102,7 @@ switch ($action) {
 
         json_response([
             'ok' => true,
-            'user' => ['id' => (int) $user['id'], 'email' => $user['email']],
+            'user' => ['id' => (int) $user['id'], 'username' => $user['username']],
             'csrf_token' => csrf_token(),
         ]);
 

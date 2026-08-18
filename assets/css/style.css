@@ -9637,8 +9637,8 @@ background-color: #F9F9F9;
 }
 
 .product-item .product-content .product-title a {
-  text-transform: capitalize;
-  font-family: var(--global--font-heading);
+  text-transform: none;
+  font-family: var(--global--font-body);
   font-size: 21px;
   line-height: 32px;
   font-weight: 500;

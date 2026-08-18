@@ -1,5 +1,6 @@
 # Ignore local SQLite DB and uploaded files
 data/insalcor.sqlite
 data/insalcor.sqlite-*
+data/insalcor.sqlite.bak-*
 uploads/images/
 uploads/docs/

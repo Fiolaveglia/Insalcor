@@ -85,12 +85,24 @@
     }
   }
 
+  function especieBoxes() {
+    return Array.from(document.querySelectorAll('#producto-especies input[name="especie"]'));
+  }
+
+  function getEspecies() {
+    return especieBoxes().filter((b) => b.checked).map((b) => b.value);
+  }
+
+  function setEspecies(list) {
+    const selected = new Set(list || []);
+    especieBoxes().forEach((b) => { b.checked = selected.has(b.value); });
+  }
+
   function toggleEspecie() {
     const area = document.getElementById('producto-area').value;
-    const wrap = document.getElementById('producto-especie-wrap');
     const show = area === 'Nutricion Animal';
-    wrap.classList.toggle('hidden', !show);
-    if (!show) document.getElementById('producto-especie').value = '';
+    document.getElementById('producto-especie-wrap').classList.toggle('hidden', !show);
+    if (!show) setEspecies([]);
   }
 
   /* -------- Noticias -------- */
@@ -118,7 +130,7 @@
             </div>
           </div>
         </td>
-        <td>${escapeHtml(item.autor_email || 'Admin')}</td>
+        <td>${escapeHtml(item.autor_username || 'Admin')}</td>
         <td>${formatDate(item.published_at || item.created_at)}</td>
         <td>${badge(item.estado)}</td>
         <td>
@@ -210,6 +222,7 @@
         </td>
         <td>${escapeHtml(item.area_negocio)}</td>
         <td>${escapeHtml(item.categoria || '—')}</td>
+        <td>${escapeHtml((item.especies || []).join(', ') || '—')}</td>
         <td>${badge(item.estado)}</td>
         <td>
           <div class="actions">
@@ -228,7 +241,7 @@
     document.getElementById('producto-area').value = 'Nutricion Animal';
     document.getElementById('producto-categoria').value = '';
     document.getElementById('producto-marca').value = '';
-    document.getElementById('producto-especie').value = '';
+    setEspecies([]);
     document.getElementById('producto-imagen').value = '';
     document.getElementById('producto-ficha').value = '';
     productoQuill.setContents([]);
@@ -248,7 +261,7 @@
       document.getElementById('producto-area').value = item.area_negocio;
       document.getElementById('producto-categoria').value = item.categoria || '';
       document.getElementById('producto-marca').value = item.marca || '';
-      document.getElementById('producto-especie').value = item.especie || '';
+      setEspecies(item.especies);
       document.getElementById('producto-imagen').value = item.imagen || '';
       document.getElementById('producto-ficha').value = item.ficha_tecnica || '';
       setImagePreview('producto-preview', item.imagen);
@@ -266,7 +279,7 @@
       area_negocio: area,
       categoria: document.getElementById('producto-categoria').value,
       marca: document.getElementById('producto-marca').value,
-      especie: area === 'Nutricion Animal' ? document.getElementById('producto-especie').value : null,
+      especies: area === 'Nutricion Animal' ? getEspecies() : [],
       imagen: document.getElementById('producto-imagen').value,
       ficha_tecnica: document.getElementById('producto-ficha').value.trim(),
       descripcion: productoQuill.root.innerHTML,
@@ -313,7 +326,7 @@
         return;
       }
       currentUser = me.user;
-      document.getElementById('user-email').textContent = currentUser.email;
+      document.getElementById('user-username').textContent = currentUser.username;
       document.getElementById('app').style.display = 'flex';
     } catch {
       location.href = 'login.php';

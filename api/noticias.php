@@ -17,7 +17,7 @@ function noticia_row(array $row): array
         'categoria' => $row['categoria'],
         'estado' => $row['estado'],
         'autor_id' => $row['autor_id'] !== null ? (int) $row['autor_id'] : null,
-        'autor_email' => $row['autor_email'] ?? null,
+        'autor_username' => $row['autor_username'] ?? null,
         'vistas' => (int) $row['vistas'],
         'created_at' => $row['created_at'],
         'updated_at' => $row['updated_at'],
@@ -58,7 +58,7 @@ function validate_noticia(array $body, bool $partial = false): array
 
 if ($method === 'GET' && $id > 0) {
     $stmt = db()->prepare(
-        'SELECT n.*, u.email AS autor_email FROM noticias n
+        'SELECT n.*, u.username AS autor_username FROM noticias n
          LEFT JOIN users u ON u.id = n.autor_id WHERE n.id = ?'
     );
     $stmt->execute([$id]);
@@ -83,7 +83,7 @@ if ($method === 'GET' && $id > 0) {
 if ($method === 'GET') {
     $user = current_user();
     $q = sanitize_text($_GET['q'] ?? '');
-    $sql = 'SELECT n.*, u.email AS autor_email FROM noticias n LEFT JOIN users u ON u.id = n.autor_id WHERE 1=1';
+    $sql = 'SELECT n.*, u.username AS autor_username FROM noticias n LEFT JOIN users u ON u.id = n.autor_id WHERE 1=1';
     $params = [];
 
     if (!$user) {
@@ -132,7 +132,7 @@ if ($method === 'POST') {
     ]);
     $newId = (int) db()->lastInsertId();
     $stmt = db()->prepare(
-        'SELECT n.*, u.email AS autor_email FROM noticias n LEFT JOIN users u ON u.id = n.autor_id WHERE n.id = ?'
+        'SELECT n.*, u.username AS autor_username FROM noticias n LEFT JOIN users u ON u.id = n.autor_id WHERE n.id = ?'
     );
     $stmt->execute([$newId]);
     json_response(['ok' => true, 'item' => noticia_row($stmt->fetch())], 201);
@@ -175,7 +175,7 @@ if ($method === 'PUT' || $method === 'PATCH') {
     $stmt->execute([$titulo, $extracto, $contenido, $imagen, $categoria, $estado, $publishedAt, now_sql(), $id]);
 
     $stmt = db()->prepare(
-        'SELECT n.*, u.email AS autor_email FROM noticias n LEFT JOIN users u ON u.id = n.autor_id WHERE n.id = ?'
+        'SELECT n.*, u.username AS autor_username FROM noticias n LEFT JOIN users u ON u.id = n.autor_id WHERE n.id = ?'
     );
     $stmt->execute([$id]);
     json_response(['ok' => true, 'item' => noticia_row($stmt->fetch())]);

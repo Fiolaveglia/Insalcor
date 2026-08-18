@@ -16,12 +16,66 @@ function producto_row(array $row): array
         'area_negocio' => $row['area_negocio'],
         'categoria' => $row['categoria'],
         'marca' => $row['marca'],
-        'especie' => $row['especie'],
+        'especies' => especies_de((int) $row['id']),
         'ficha_tecnica' => $row['ficha_tecnica'],
+        'nota_blog' => $row['nota_blog'],
         'estado' => $row['estado'],
         'created_at' => $row['created_at'],
         'updated_at' => $row['updated_at'],
     ];
+}
+
+/** @return string[] Especies asociadas a un producto. */
+function especies_de(int $productoId): array
+{
+    $stmt = db()->prepare('SELECT especie FROM producto_especies WHERE producto_id = ? ORDER BY especie');
+    $stmt->execute([$productoId]);
+    return array_column($stmt->fetchAll(), 'especie');
+}
+
+/**
+ * Normaliza y valida el array de especies del body.
+ * Fuera de Nutrición Animal siempre es vacío.
+ *
+ * @return string[]
+ */
+function validar_especies(mixed $valor, string $area): array
+{
+    if ($area !== 'Nutricion Animal') {
+        return [];
+    }
+    if ($valor === null || $valor === '') {
+        return [];
+    }
+    // Se acepta un string suelto por compatibilidad con clientes viejos.
+    $lista = is_array($valor) ? $valor : [$valor];
+
+    $out = [];
+    foreach ($lista as $e) {
+        $e = sanitize_text(is_string($e) ? $e : '');
+        if ($e === '') {
+            continue;
+        }
+        if (!in_array($e, ESPECIES, true)) {
+            json_error("Especie inválida: $e");
+        }
+        $out[$e] = true;
+    }
+    return array_keys($out);
+}
+
+/** Reemplaza el conjunto de especies de un producto. @param string[] $especies */
+function guardar_especies(int $productoId, array $especies): void
+{
+    $del = db()->prepare('DELETE FROM producto_especies WHERE producto_id = ?');
+    $del->execute([$productoId]);
+    if (!$especies) {
+        return;
+    }
+    $ins = db()->prepare('INSERT INTO producto_especies (producto_id, especie) VALUES (?, ?)');
+    foreach ($especies as $e) {
+        $ins->execute([$productoId, $e]);
+    }
 }
 
 function validate_producto(array $body, bool $partial = false): array
@@ -64,6 +118,9 @@ function validate_producto(array $body, bool $partial = false): array
     if (!$partial || array_key_exists('ficha_tecnica', $body)) {
         $data['ficha_tecnica'] = sanitize_text($body['ficha_tecnica'] ?? '');
     }
+    if (!$partial || array_key_exists('nota_blog', $body)) {
+        $data['nota_blog'] = sanitize_text($body['nota_blog'] ?? '');
+    }
     if (!$partial || array_key_exists('estado', $body)) {
         $estado = sanitize_text($body['estado'] ?? 'draft');
         if (!in_array($estado, ESTADOS, true)) {
@@ -73,28 +130,6 @@ function validate_producto(array $body, bool $partial = false): array
     }
 
     return $data;
-}
-
-function resolve_especie(array $data, ?string $existingArea = null, ?string $existingEspecie = null): ?string
-{
-    $area = $data['area_negocio'] ?? $existingArea;
-    $especie = array_key_exists('especie', $data)
-        ? (sanitize_text($data['especie'] ?? '') ?: null)
-        : $existingEspecie;
-
-    if ($area === 'Nutricion Animal') {
-        if ($especie === null || $especie === '') {
-            // allow empty during draft but prefer validation when explicitly set
-            return $especie;
-        }
-        if (!in_array($especie, ESPECIES, true)) {
-            json_error('Especie inválida');
-        }
-        return $especie;
-    }
-
-    // Pharma / VetPharma: especie must be null
-    return null;
 }
 
 if ($method === 'GET' && $id > 0) {
@@ -134,7 +169,9 @@ if ($method === 'GET') {
     }
 
     if ($q !== '') {
-        $sql .= ' AND (nombre LIKE ? OR categoria LIKE ? OR marca LIKE ? OR especie LIKE ?)';
+        $sql .= ' AND (nombre LIKE ? OR categoria LIKE ? OR marca LIKE ?
+                       OR EXISTS (SELECT 1 FROM producto_especies pe
+                                  WHERE pe.producto_id = productos.id AND pe.especie LIKE ?))';
         $like = '%' . $q . '%';
         array_push($params, $like, $like, $like, $like);
     }
@@ -156,29 +193,37 @@ if ($method === 'POST') {
         json_error('Área de negocio es obligatoria');
     }
 
-    // Include especie from body for resolve
-    if (array_key_exists('especie', $body)) {
-        $data['especie'] = $body['especie'];
-    }
-    $especie = resolve_especie($data);
+    $especies = validar_especies($body['especies'] ?? ($body['especie'] ?? null), $data['area_negocio']);
 
-    $stmt = db()->prepare(
-        'INSERT INTO productos (nombre, descripcion, imagen, area_negocio, categoria, marca, especie, ficha_tecnica, estado, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-    );
-    $stmt->execute([
-        $data['nombre'],
-        $data['descripcion'] ?? '',
-        $data['imagen'] ?? '',
-        $data['area_negocio'],
-        $data['categoria'] ?? '',
-        $data['marca'] ?? '',
-        $especie,
-        $data['ficha_tecnica'] ?? '',
-        $data['estado'] ?? 'draft',
-        now_sql(),
-    ]);
-    $newId = (int) db()->lastInsertId();
+    db()->beginTransaction();
+    try {
+        $stmt = db()->prepare(
+            'INSERT INTO productos (nombre, descripcion, imagen, area_negocio, categoria, marca, ficha_tecnica, nota_blog, estado, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        );
+        $stmt->execute([
+            $data['nombre'],
+            $data['descripcion'] ?? '',
+            $data['imagen'] ?? '',
+            $data['area_negocio'],
+            $data['categoria'] ?? '',
+            $data['marca'] ?? '',
+            $data['ficha_tecnica'] ?? '',
+            $data['nota_blog'] ?? '',
+            $data['estado'] ?? 'draft',
+            now_sql(),
+        ]);
+        $newId = (int) db()->lastInsertId();
+        guardar_especies($newId, $especies);
+        db()->commit();
+    } catch (PDOException $e) {
+        db()->rollBack();
+        if (str_contains($e->getMessage(), 'UNIQUE constraint failed: productos.nombre')) {
+            json_error('Ya existe un producto con ese nombre en esa área de negocio', 409);
+        }
+        throw $e;
+    }
+
     $stmt = db()->prepare('SELECT * FROM productos WHERE id = ?');
     $stmt->execute([$newId]);
     json_response(['ok' => true, 'item' => producto_row($stmt->fetch())], 201);
@@ -200,9 +245,6 @@ if ($method === 'PUT' || $method === 'PATCH') {
     }
 
     $data = validate_producto($body, true);
-    if (array_key_exists('especie', $body)) {
-        $data['especie'] = $body['especie'];
-    }
 
     $nombre = $data['nombre'] ?? $row['nombre'];
     $descripcion = $data['descripcion'] ?? $row['descripcion'];
@@ -211,17 +253,32 @@ if ($method === 'PUT' || $method === 'PATCH') {
     $categoria = $data['categoria'] ?? $row['categoria'];
     $marca = $data['marca'] ?? $row['marca'];
     $ficha = $data['ficha_tecnica'] ?? $row['ficha_tecnica'];
+    $notaBlog = $data['nota_blog'] ?? $row['nota_blog'];
     $estado = $data['estado'] ?? $row['estado'];
-    $especie = resolve_especie(
-        array_merge(['area_negocio' => $area], $data),
-        $area,
-        $row['especie']
-    );
 
-    $stmt = db()->prepare(
-        'UPDATE productos SET nombre=?, descripcion=?, imagen=?, area_negocio=?, categoria=?, marca=?, especie=?, ficha_tecnica=?, estado=?, updated_at=? WHERE id=?'
-    );
-    $stmt->execute([$nombre, $descripcion, $imagen, $area, $categoria, $marca, $especie, $ficha, $estado, now_sql(), $id]);
+    // Las especies sólo se tocan si vienen en el body; si el área cambia a
+    // Pharma/VetPharma se limpian igual.
+    $tocaEspecies = array_key_exists('especies', $body) || array_key_exists('especie', $body)
+        || $area !== $row['area_negocio'];
+    $especies = validar_especies($body['especies'] ?? ($body['especie'] ?? null), $area);
+
+    db()->beginTransaction();
+    try {
+        $stmt = db()->prepare(
+            'UPDATE productos SET nombre=?, descripcion=?, imagen=?, area_negocio=?, categoria=?, marca=?, ficha_tecnica=?, nota_blog=?, estado=?, updated_at=? WHERE id=?'
+        );
+        $stmt->execute([$nombre, $descripcion, $imagen, $area, $categoria, $marca, $ficha, $notaBlog, $estado, now_sql(), $id]);
+        if ($tocaEspecies) {
+            guardar_especies($id, $especies);
+        }
+        db()->commit();
+    } catch (PDOException $e) {
+        db()->rollBack();
+        if (str_contains($e->getMessage(), 'UNIQUE constraint failed: productos.nombre')) {
+            json_error('Ya existe un producto con ese nombre en esa área de negocio', 409);
+        }
+        throw $e;
+    }
 
     $stmt = db()->prepare('SELECT * FROM productos WHERE id = ?');
     $stmt->execute([$id]);

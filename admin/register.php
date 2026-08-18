@@ -1,3 +1,14 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__ . '/_init.php';
+
+// El alta de usuarios está cerrada. Se conserva la página entera para poder
+// reabrirla poniendo REGISTRO_HABILITADO en true (api/bootstrap.php).
+if (!REGISTRO_HABILITADO) {
+    header('Location: login.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -16,8 +27,11 @@
       <div id="alert" class="alert alert-error hidden"></div>
       <form id="register-form">
         <div class="form-group">
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" placeholder="tu@email.com" required autocomplete="username">
+          <label for="username">Nombre de usuario</label>
+          <input id="username" name="username" type="text" placeholder="tu-usuario" required
+                 minlength="3" maxlength="30" pattern="[A-Za-z0-9._\-]+"
+                 title="Entre 3 y 30 caracteres: letras, números, punto, guión o guión bajo"
+                 autocomplete="username" autocapitalize="none" spellcheck="false">
         </div>
         <div class="form-group">
           <label for="password">Contraseña</label>
@@ -47,7 +61,7 @@
       }
       try {
         await AdminAPI.register({
-          email: document.getElementById('email').value,
+          username: document.getElementById('username').value.trim(),
           password,
           password_confirm,
         });

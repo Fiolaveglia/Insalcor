@@ -1,3 +1,7 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__ . '/_init.php';
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -16,8 +20,9 @@
       <div id="alert" class="alert alert-error hidden"></div>
       <form id="login-form">
         <div class="form-group">
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" placeholder="tu@email.com" required autocomplete="username">
+          <label for="username">Nombre de usuario</label>
+          <input id="username" name="username" type="text" placeholder="tu-usuario" required
+                 autocomplete="username" autocapitalize="none" spellcheck="false">
         </div>
         <div class="form-group">
           <label for="password">Contraseña</label>
@@ -25,7 +30,9 @@
         </div>
         <button class="btn btn-primary btn-block" type="submit">Ingresar</button>
       </form>
+<?php if (REGISTRO_HABILITADO): ?>
       <p class="auth-footer">¿No tenés cuenta? <a href="register.php">Registrarse</a></p>
+<?php endif; ?>
     </div>
   </div>
   <script src="../assets/js/admin/api.js"></script>
@@ -41,7 +48,7 @@
       alertEl.classList.add('hidden');
       try {
         await AdminAPI.login({
-          email: document.getElementById('email').value,
+          username: document.getElementById('username').value.trim(),
           password: document.getElementById('password').value,
         });
         location.href = 'index.php';

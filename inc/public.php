@@ -202,22 +202,30 @@ function date_parts(?string $iso, ?string $lang = null): array
  */
 function pub_productos(string $area, array $filters = []): array
 {
-    $sql = "SELECT * FROM productos WHERE estado = 'published' AND area_negocio = ?";
+    $sql = "SELECT p.* FROM productos p WHERE p.estado = 'published' AND p.area_negocio = ?";
     $params = [$area];
 
-    foreach (['especie' => 'especie', 'categoria' => 'categoria', 'marca' => 'marca'] as $key => $col) {
+    foreach (['categoria' => 'categoria', 'marca' => 'marca'] as $key => $col) {
         if (!empty($filters[$key])) {
-            $sql .= " AND $col = ?";
+            $sql .= " AND p.$col = ?";
             $params[] = $filters[$key];
         }
     }
+    // Un producto puede estar en varias especies: alcanza con que exista el vínculo.
+    if (!empty($filters['especie'])) {
+        $sql .= ' AND EXISTS (SELECT 1 FROM producto_especies pe
+                              WHERE pe.producto_id = p.id AND pe.especie = ?)';
+        $params[] = $filters['especie'];
+    }
     if (!empty($filters['q'])) {
-        $sql .= ' AND (nombre LIKE ? OR categoria LIKE ? OR marca LIKE ? OR especie LIKE ?)';
+        $sql .= ' AND (p.nombre LIKE ? OR p.categoria LIKE ? OR p.marca LIKE ?
+                       OR EXISTS (SELECT 1 FROM producto_especies pe
+                                  WHERE pe.producto_id = p.id AND pe.especie LIKE ?))';
         $like = '%' . $filters['q'] . '%';
         array_push($params, $like, $like, $like, $like);
     }
 
-    $sql .= ' ORDER BY updated_at DESC, id DESC';
+    $sql .= ' ORDER BY p.updated_at DESC, p.id DESC';
     $stmt = db()->prepare($sql);
     $stmt->execute($params);
     return $stmt->fetchAll();
@@ -228,7 +236,19 @@ function pub_producto(int $id): ?array
     $stmt = db()->prepare("SELECT * FROM productos WHERE id = ? AND estado = 'published'");
     $stmt->execute([$id]);
     $row = $stmt->fetch();
-    return $row ?: null;
+    if (!$row) {
+        return null;
+    }
+    $row['especies'] = producto_especies($id);
+    return $row;
+}
+
+/** @return string[] Especies de un producto, ordenadas. */
+function producto_especies(int $productoId): array
+{
+    $stmt = db()->prepare('SELECT especie FROM producto_especies WHERE producto_id = ? ORDER BY especie');
+    $stmt->execute([$productoId]);
+    return array_column($stmt->fetchAll(), 'especie');
 }
 
 function pub_noticias(array $filters = []): array
@@ -300,10 +320,22 @@ function filter_active(string $type, string $value): bool
 /** Count published items in an area grouped by a column (unfiltered totals). */
 function area_counts(string $area, string $col): array
 {
-    $stmt = db()->prepare(
-        "SELECT $col AS k, COUNT(*) AS c FROM productos
-         WHERE estado = 'published' AND area_negocio = ? AND $col <> '' GROUP BY $col"
-    );
+    // `especie` no vive en productos: se cuenta a través de la tabla de vínculos,
+    // así un producto suma en cada una de sus especies.
+    if ($col === 'especie') {
+        $stmt = db()->prepare(
+            "SELECT pe.especie AS k, COUNT(*) AS c
+             FROM producto_especies pe
+             JOIN productos p ON p.id = pe.producto_id
+             WHERE p.estado = 'published' AND p.area_negocio = ?
+             GROUP BY pe.especie"
+        );
+    } else {
+        $stmt = db()->prepare(
+            "SELECT $col AS k, COUNT(*) AS c FROM productos
+             WHERE estado = 'published' AND area_negocio = ? AND $col <> '' GROUP BY $col"
+        );
+    }
     $stmt->execute([$area]);
     $out = [];
     foreach ($stmt->fetchAll() as $r) {
