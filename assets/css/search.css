@@ -184,3 +184,15 @@
     margin: 0;
     font-size: 14px;
 }
+
+/* Noticias pagination */
+.pagination li a.disabled,
+.pagination li a.disabled:hover {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  background-color: var(--global--color-white, #fff);
+  color: var(--global--color-heading, #1a2332);
+  border-color: var(--global--color-gray-light, #e5e7eb);
+}
+

@@ -1621,7 +1621,7 @@ blockquote .author {
 }
 
 .bg-overlay-dark-slider {
-  background-position-y: 150px;
+  /* background-position-y: 150px; */
   margin-top: -45px;
 }
 
@@ -1751,11 +1751,12 @@ blockquote .author {
   padding: 0;
   border-radius: 0;
   color: #e5e4e4;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1;
   text-transform: capitalize;
   display: block;
+  margin-top: 200px;
 }
 
 .breadcrumb>li {
@@ -6025,7 +6026,6 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   font-weight: 500;
   line-height: 60px;
   margin-bottom: 0;
-  text-transform: capitalize;
 }
 
 @media screen and (max-width: 767.98px) {
@@ -6033,6 +6033,10 @@ ul.dropdown-menu>li.has-dropdown>a:before {
     font-size: 32px;
     line-height: 1.4;
   }
+    .breadcrumb {
+    margin-top: 10px !important;
+  }
+
 }
 
 .page-title .title .title-desc p {
@@ -6063,6 +6067,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
     -ms-flex-pack: start;
     justify-content: start;
   }
+  
 }
 
 @media screen and (max-width: 767.98px) {
@@ -6646,7 +6651,6 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 
 .heading .heading-subtitle {
   font-family: var(--global--font-body);
-  text-transform: capitalize;
   color: var(--global--color-primary);
   font-size: 15px;
   font-weight: 700;
@@ -7686,7 +7690,7 @@ h2.title-size {
 }
 
 .hero .hero-content .breadcrumb .breadcrumb-item+.breadcrumb-item a {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1;
 }
 
@@ -7696,7 +7700,7 @@ h2.title-size {
   font-size: 10px;
   padding: 0 10px;
   color: var(--global--color-white);
-  content: "\f054";
+  content: "\f053";
 }
 
 .hero .hero-panel-holder {
@@ -8144,13 +8148,14 @@ h2.title-size {
   }
 }
 
-.hero.hero-5 {
-  background-position-y: 150px;
+.hero.hero-5.bg-overlay.bg-overlay-dark, .hero.bg-overlay.bg-overlay-dark.bg-section {
+  height: 780px;
 }
 
 @media screen and (max-width: 991.98px) {
   .hero.hero-5 {
     background-position-y: 100px;
+    
   }
 }
 
@@ -9632,8 +9637,8 @@ background-color: #F9F9F9;
 }
 
 .product-item .product-content .product-title a {
-  text-transform: capitalize;
-  font-family: var(--global--font-heading);
+  text-transform: none;
+  font-family: var(--global--font-body);
   font-size: 21px;
   line-height: 32px;
   font-weight: 500;
@@ -17904,7 +17909,6 @@ background-color: #F9F9F9;
   line-height: 1;
   text-align: center;
   color: var(--global--color-primary);
-  text-transform: capitalize;
   margin-bottom: 7px;
   vertical-align: middle;
 }
@@ -20355,7 +20359,7 @@ background-color: #F9F9F9;
 #wrapperParallax {
   position: relative;
   z-index: 1060;
-  min-height: 100vh;
+  /* min-height: 100vh; */
 }
 
 #footerParallax {
@@ -20396,6 +20400,12 @@ background-color: #F9F9F9;
   background-color: var(--global--color-primary);
   width: calc(100% - 120px);
   height: 4px;
+}
+h6.social-title {
+  color: var(--global--color-white);
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 20px;
 }
 
 @media screen and (max-width: 991.98px) {

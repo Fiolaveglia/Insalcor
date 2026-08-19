@@ -1,0 +1,2 @@
+# Deny web access to SQLite and seed scripts
+Require all denied

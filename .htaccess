@@ -1,0 +1,8 @@
+# Redirect legacy HTML content pages to PHP
+RewriteEngine On
+RewriteRule ^blog\.html$ blog.php [R=301,L]
+RewriteRule ^nutricion-animal\.html$ nutricion-animal.php [R=301,L]
+RewriteRule ^pharma-vetpharma\.html$ pharma-vetpharma.php [R=301,L]
+RewriteRule ^product-single\.html$ product-single.php [R=301,L]
+# Legacy English mirror -> same page (i18n JSON)
+RewriteRule ^en/(.*)$ /$1 [R=301,L]
