@@ -244,6 +244,7 @@
     setEspecies([]);
     document.getElementById('producto-imagen').value = '';
     document.getElementById('producto-ficha').value = '';
+    document.getElementById('producto-ficha-file').value = '';
     productoQuill.setContents([]);
     setImagePreview('producto-preview', '');
     toggleEspecie();

@@ -606,6 +606,29 @@ $(".slider-carousel").each(function() {
         }
     });
 
+    // Cerrar modal de producto (registrado una sola vez)
+    document.addEventListener("click", function (e) {
+        const btn = e.target.closest(".product-modal-close");
+        if (!btn) return;
+
+        const modalEl = document.getElementById("productModal");
+
+        if (window.bootstrap && bootstrap.Modal) {
+            const inst = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            inst.hide();
+            return;
+        }
+
+        if (window.jQuery && jQuery.fn.modal) {
+            jQuery(modalEl).modal("hide");
+            return;
+        }
+
+        modalEl.classList.remove("show");
+        modalEl.style.display = "none";
+        document.body.classList.remove("modal-open");
+    });
+
     // Scipt para el modal 
     document.addEventListener("click", async function (e) {
         const link = e.target.closest(".js-open-product");
@@ -623,28 +646,6 @@ $(".slider-carousel").each(function() {
         // Abrir modal
         const modal = new bootstrap.Modal(modalEl, { backdrop: true, keyboard: true });
         modal.show();
-
-        document.addEventListener("click", function (e) {
-            const btn = e.target.closest(".product-modal-close");
-            if (!btn) return;
-
-            const modalEl = document.getElementById("productModal");
-
-            if (window.bootstrap && bootstrap.Modal) {
-                const inst = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                inst.hide();
-                return;
-            }
-
-            if (window.jQuery && jQuery.fn.modal) {
-                jQuery(modalEl).modal("hide");
-                return;
-            }
-
-            modalEl.classList.remove("show");
-            modalEl.style.display = "none";
-            document.body.classList.remove("modal-open");
-        });
 
         try {
             const res = await fetch(url, { cache: "no-store" });

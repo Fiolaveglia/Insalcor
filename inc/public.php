@@ -356,11 +356,11 @@ function render_product_card(array $item, string $detailBase): string
         <div class="product-item">
           <div class="product-img">
             <img src="' . e($img) . '" alt="' . $nombre . '"/>
-            <a class="ver-detalle" href="' . e($href) . '"><i class="fas fa-eye"></i> ' . e(t('common.view_details')) . '</a>
+            <a class="ver-detalle js-open-product" href="' . e($href) . '"><i class="fas fa-eye"></i> ' . e(t('common.view_details')) . '</a>
             <div class="badge"></div>
           </div>
           <div class="product-content">
-            <div class="product-title"><a href="' . e($href) . '">' . $nombre . '</a></div>
+            <div class="product-title"><a class="js-open-product" href="' . e($href) . '">' . $nombre . '</a></div>
           </div>
         </div>
       </div>';
@@ -373,7 +373,7 @@ function render_recent_product(array $item, string $detailBase): string
     return '
         <div class="product">
           <div class="product-img"><img src="' . e($img) . '" alt="product"/></div>
-          <div class="product-desc"><div class="product-title"><a href="' . e($href) . '">' . e($item['nombre']) . '</a></div></div>
+          <div class="product-desc"><div class="product-title"><a class="js-open-product" href="' . e($href) . '">' . e($item['nombre']) . '</a></div></div>
         </div>';
 }
 
