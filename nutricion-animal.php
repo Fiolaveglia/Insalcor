@@ -9,6 +9,11 @@ $productos = pub_productos($area, $filters);
 $recent = array_slice($productos, 0, 3);
 $especieOptions = array_combine(ESPECIES, ESPECIES);
 $noticias = array_slice(pub_noticias(), 0, 3);
+
+// Paginado: 9 productos por página.
+$productosPorPagina = 9;
+$paginaActual = current_page();
+$productosPagina = array_slice($productos, ($paginaActual - 1) * $productosPorPagina, $productosPorPagina);
 ?>
 <!DOCTYPE html>
 <html dir="ltr" lang="<?= e(current_lang()) ?>">
@@ -65,8 +70,8 @@ $noticias = array_slice(pub_noticias(), 0, 3);
               <div class="selected"><img src="assets/images/module-language/uy.png" alt=""/><span data-i18n="lang.name">Español</span><i class="fas fa-chevron-down"></i></div>
               <div class="lang-list">
                 <ul>
-                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="?lang=en" data-i18n="lang.name_en">Inglés</a></li>
-                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="?lang=es" data-i18n="lang.name_es">Español</a></li>
+                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="<?= e(lang_switch_url('en')) ?>" data-i18n="lang.name_en">Inglés</a></li>
+                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="<?= e(lang_switch_url('es')) ?>" data-i18n="lang.name_es">Español</a></li>
                 </ul>
               </div>
             </div>
@@ -91,8 +96,6 @@ $noticias = array_slice(pub_noticias(), 0, 3);
               </li>
               <li class="nav-item" ><a href="blog.php"><span data-i18n="nav.news">NOVEDADES</span></a>
               </li>
-               <!-- <li class="nav-item active"><a href="./tutoriales.html"><span data-i18n="nav.tutorials">TUTORIALES</span></a>
-              </li> -->
               <li class="nav-item" id="contact" ><a href="contact.html"><span data-i18n="nav.contact">CONTACTO</span></a></li>
             </ul>
             
@@ -107,8 +110,8 @@ $noticias = array_slice(pub_noticias(), 0, 3);
               <div class="selected"><img src="assets/images/module-language/uy.png" alt=""/><span data-i18n="lang.name">Español</span><i class="fas fa-chevron-down"></i></div>
               <div class="lang-list">
                 <ul>
-                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="?lang=en" data-i18n="lang.name_en">Inglés</a></li>
-                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="?lang=es" data-i18n="lang.name_es">Español</a></li>
+                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="<?= e(lang_switch_url('en')) ?>" data-i18n="lang.name_en">Inglés</a></li>
+                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="<?= e(lang_switch_url('es')) ?>" data-i18n="lang.name_es">Español</a></li>
                 </ul>
               </div>
             </div>
@@ -331,10 +334,10 @@ $noticias = array_slice(pub_noticias(), 0, 3);
                   </div>
                 </div>
 
-                <!-- Especies -->
+                <!-- Categorías -->
                 <div class="widget especie">
                   <div class="widget-title">
-                    <h5 data-i18n="shop.species">Especies</h5>
+                    <h5 data-i18n="shop.categories">Categorías</h5>
                   </div>
                   <div class="widget-content">
                     <?= render_filter_list($area, 'especie', $especieOptions) ?>
@@ -376,12 +379,13 @@ $noticias = array_slice(pub_noticias(), 0, 3);
                 </div>
               </div>
               <div class="row">
-                <?php if ($productos) {
-                    foreach ($productos as $item) { echo render_product_card($item, $detailBase); }
+                <?php if ($productosPagina) {
+                    foreach ($productosPagina as $item) { echo render_product_card($item, $detailBase); }
                 } else { ?>
                   <div class="col-12"><p><?= e(t('common.no_products')) ?></p></div>
                 <?php } ?>
               </div>
+              <?= render_pagination(count($productos), $productosPorPagina, $paginaActual) ?>
             </div>
           </div>
         </div>

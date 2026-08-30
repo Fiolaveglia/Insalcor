@@ -2,19 +2,16 @@
 require __DIR__ . '/inc/public.php';
 i18n_begin();
 
-$detailBase = 'blog-single.php';
-$noticias = pub_noticias();
-$tutorialDetailBase = 'tutorial-single.php';
-$tutoriales = pub_tutoriales();
-
-// Paginado: 6 por página, cada sección con su propio número de página.
-$noticiasPorPagina = 6;
-$paginaNoticias = current_page();
-$noticiasPagina = array_slice($noticias, ($paginaNoticias - 1) * $noticiasPorPagina, $noticiasPorPagina);
-
-$tutorialesPorPagina = 6;
-$paginaTutoriales = current_page('page_tutoriales');
-$tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorialesPorPagina, $tutorialesPorPagina);
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+$item = $id > 0 ? pub_noticia($id) : null;
+if ($item) {
+    // Count a view (public read of a published article).
+    db()->prepare('UPDATE noticias SET vistas = vistas + 1 WHERE id = ?')->execute([$item['id']]);
+    $d = date_parts($item['published_at'] ?: $item['created_at']);
+}
+$titulo = $item ? campo_i18n($item, 'titulo') : '';
+$extracto = $item ? campo_i18n($item, 'extracto') : '';
+$contenido = $item ? campo_i18n($item, 'contenido') : '';
 ?>
 <!DOCTYPE html>
 <html dir="ltr" lang="<?= e(current_lang()) ?>">
@@ -22,18 +19,17 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Novedades - Insalcor</title>
-    <meta name="description" content="Insalcor ofrece soluciones integrales en insumos, seguridad industrial, limpieza, mantenimiento y servicios para empresas. Compromiso, calidad y atención personalizada.">
-    <meta name="keywords" content="Insalcor, insumos industriales, seguridad industrial, limpieza, mantenimiento, equipos de protección personal, servicios empresariales, Uruguay">
-    <meta name="author" content="Insalcor">
+    <title>Insalcor – <?= e($titulo ?: t('common.article_not_found')) ?></title>
+    <meta name="description" content="<?= e($extracto) ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link href="assets/images/favicon/favicon.ico" rel="icon"/>
     <link href="assets/css/vendor.min.css" rel="stylesheet"/>
     <link href="assets/css/style.css" rel="stylesheet"/>
     <link href="assets/css/search.css" rel="stylesheet"/>
+    <link href="assets/css/content.css" rel="stylesheet"/>
   </head>
-  
-  <body data-i18n-base="assets/i18n" data-lang="es" data-api-root="." data-asset-prefix="" data-noticia-detail="blog-single.php">
+
+  <body data-i18n-base="assets/i18n" data-lang="es" data-api-root="." data-asset-prefix="">
     <div class="preloader">
       <div class="spinner">
         <div class="dot1"></div>
@@ -57,7 +53,7 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
           </div>
         </div><a class="module-cancel" href="#"><i class="fas fa-times"></i></a>
       </div>
-      
+
       <!--   Header   -->
       <header class="header header-light header-topbar" id="navbar-spy">
         <nav class="navbar navbar-expand-xl navbar-sticky" id="primary-menu"><a class="navbar-brand" href="index.html"><img class="logo logo-dark" src="assets/images/logo/logo-dark.png" alt="Insalcor"/><img class="logo logo-mobile" src="assets/images/logo/logo-mobile.png" alt="Medisch Logo"/></a>
@@ -66,14 +62,14 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
             <div class="module module-search float-left">
               <div class="module-icon search-icon"><i class="icon-search"></i></div>
             </div>
-          
+
             <!-- Language-->
             <div class="module module-language">
               <div class="selected"><img src="assets/images/module-language/uy.png" alt=""/><span data-i18n="lang.name">Español</span><i class="fas fa-chevron-down"></i></div>
               <div class="lang-list">
                 <ul>
-                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="<?= e(lang_switch_url('en')) ?>" data-i18n="lang.name_en">Inglés</a></li>
-                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="<?= e(lang_switch_url('es')) ?>" data-i18n="lang.name_es">Español</a></li>
+                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="?lang=en" data-i18n="lang.name_en">Inglés</a></li>
+                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="?lang=es" data-i18n="lang.name_es">Español</a></li>
                 </ul>
               </div>
             </div>
@@ -84,7 +80,7 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
           <!-- Navbar -->
           <div class="collapse navbar-collapse" id="navbarContent">
             <ul class="navbar-nav ">
-              <li class="nav-item"><a href="#"><span data-i18n="nav.home">INICIO</span></a>
+              <li class="nav-item"><a href="index.html"><span data-i18n="nav.home">INICIO</span></a>
               </li>
               <li class="nav-item"><a href="./nosotros.html"><span data-i18n="nav.about">NOSOTROS</span></a>
               </li>
@@ -93,14 +89,13 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
                 <ul class="dropdown-menu">
                   <li class="nav-item"><a href="nutricion-animal.php"><span data-i18n="nav.nutrition">Nutrición</span></a></li>
                   <li class="nav-item"><a href="pharma-vetpharma.php"><span data-i18n="nav.pharma">Pharma y VetPharma</span></a></li>
-          
                 </ul>
               </li>
               <li class="nav-item active"><a href="blog.php"><span data-i18n="nav.news">NOVEDADES</span></a>
               </li>
               <li class="nav-item" id="contact"><a href="contact.html"><span data-i18n="nav.contact">CONTACTO</span></a></li>
             </ul>
-            
+
             <div class="module-holder">
               <!--  Search  -->
               <div class="module module-search float-left">
@@ -112,8 +107,8 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
               <div class="selected"><img src="assets/images/module-language/uy.png" alt=""/><span data-i18n="lang.name">Español</span><i class="fas fa-chevron-down"></i></div>
               <div class="lang-list">
                 <ul>
-                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="<?= e(lang_switch_url('en')) ?>" data-i18n="lang.name_en">Inglés</a></li>
-                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="<?= e(lang_switch_url('es')) ?>" data-i18n="lang.name_es">Español</a></li>
+                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="?lang=en" data-i18n="lang.name_en">Inglés</a></li>
+                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="?lang=es" data-i18n="lang.name_es">Español</a></li>
                 </ul>
               </div>
             </div>
@@ -121,97 +116,65 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
             </div>
           </nav>
       </header>
-      
+
       <!--  Page Title Section -->
       <section class="hero bg-overlay bg-overlay-dark">
         <div class="bg-section"> <img src="assets/images/heros/novedades/img1.png" alt="background"/></div>
-        <div class="container"> 
-          <div class="hero-content"> 
-            <div class="row"> 
-              <div class="col-12 col-lg-5">
-                <h1 class="hero-title" data-i18n="blog.hero_title">Blog & Novedades</h1>
-                <h2 class="hero-desc" data-i18n="blog.hero_desc">Encontrá contenido técnico, novedades institucionales y tutoriales prácticos</h2>
-                <!-- <div class="hero-action"> <a class="btn btn--white btn-line btn-line-after btn-line-inversed" href="#"> <span>Posible CTA</span><span class="line"><span></span></span></a><a class="btn btn--transparent btn-line btn-line-after" href="#"> <span>Posible CTA</span><span class="line"><span></span></span></a></div> -->
+        <div class="container">
+          <div class="hero-content">
+            <div class="row">
+              <div class="col-12 col-lg-8">
+                <h1 class="hero-title"><?= e($titulo ?: t('common.article_not_found')) ?></h1>
+                <?php if ($item && $item['categoria']): ?>
+                <h2 class="hero-desc"><?= e($item['categoria']) ?> · <?= e($d['day']) ?> <?= e($d['month']) ?> <?= e($d['year']) ?></h2>
+                <?php endif; ?>
               </div>
-              <div class="col-12"> 
+              <div class="col-12">
                 <ol class="breadcrumb d-flex justify-content-center align--bottom">
                   <li class="breadcrumb-item"><a href="index.html" data-i18n="blog.breadcrumb_home">Inicio</a></li>
-                  <li class="breadcrumb-item active"><a href="blog.php" data-i18n="blog.breadcrumb_news">Novedades</a></li>
+                  <li class="breadcrumb-item"><a href="blog.php" data-i18n="blog.breadcrumb_news">Novedades</a></li>
+                  <?php if ($item): ?><li class="breadcrumb-item active"><a href="javascript:void(0)"><?= e($titulo) ?></a></li><?php endif; ?>
                 </ol>
               </div>
             </div>
           </div>
         </div>
       </section>
-        
-        
-      <!--  Blog Section  -->
-      <section class="blog blog-grid" id="blog">
-        <div class="container">
-          <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-6 offset-lg-3">
-              <div class="heading heading-7 text--center">
-                <h2 class="heading-title" data-i18n="blog.title">Noticias y Novedades</h2>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <?php if ($noticiasPagina) {
-                foreach ($noticiasPagina as $item) { echo render_noticia_card($item, $detailBase); }
-            } else { ?>
-              <div class="col-12"><p class="text-center"><?= e(t('common.no_news')) ?></p></div>
-            <?php } ?>
-          </div>
-          <?= render_pagination(count($noticias), $noticiasPorPagina, $paginaNoticias) ?>
-        </div>
-      </section>
 
-      <!--  Tutoriales Section  -->
-      <section class="blog blog-grid" id="blog">
+      <!--  Article  -->
+      <section class="blog" style="padding:60px 0">
         <div class="container">
           <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-6 offset-lg-3">
-              <div class="heading heading-7 text--center">
-                <h2 class="heading-title" data-i18n="blog.tutorials_title">Tutoriales</h2>
-                <p class="title-sub-heading" data-i18n="blog.tutorials_sub">Todo lo que necesitás saber, en nuestros tutoriales</p>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <?php if ($tutorialesPagina) {
-                foreach ($tutorialesPagina as $item) { echo render_tutorial_card($item, $tutorialDetailBase); }
-            } else { ?>
-              <div class="col-12"><p class="text-center">No hay tutoriales publicados.</p></div>
-            <?php } ?>
-          </div>
-          <?= render_pagination(count($tutoriales), $tutorialesPorPagina, $paginaTutoriales, 'page_tutoriales') ?>
-        </div>
-      </section>
+            <div class="col-12 col-lg-8 offset-lg-2">
+              <?php if ($item):
+                  $img = asset($item['imagen']);
+              ?>
+              <article class="blog-entry blog-single" style="padding:0;overflow:hidden">
+                <?php if ($img): ?>
+                <div class="entry-img">
+                  <img src="<?= e($img) ?>" alt="<?= e($titulo) ?>" style="display:block;width:100%;max-height:460px;object-fit:cover"/>
+                </div>
+                <?php endif; ?>
+                <div class="article-body">
+                  <div class="entry-meta mb-3">
+                    <span class="entry-category"><?= e($item['categoria']) ?></span>
+                    <span class="ms-2 text-muted"><?= e($d['day']) ?> <?= e($d['month']) ?> <?= e($d['year']) ?></span>
+                  </div>
+                  <h1 class="entry-title mb-3"><?= e($titulo) ?></h1>
+                  <?php if ($extracto): ?><p class="entry-bio lead mb-4"><?= e($extracto) ?></p><?php endif; ?>
+                  <div class="entry-content rich-content"><?= $contenido ?></div>
+                </div>
+              </article>
+              <?php else: ?>
+              <p class="text-center"><?= e(t('common.article_not_found')) ?></p>
+              <?php endif; ?>
 
-      
-      
-      <!-- CTA Section -->
-      <section class="cta cta-5" id="cta-5">
-        <div class="bg-section"> <img src="assets/images/background/wavy-pattern.png" alt="background"/></div>
-        <div class="container">
-          <div class="row align-items-center mb-60">
-            <div class="col-12 col-lg-5">
-              <div class="heading heading-8 heading-light">
-                <h2 class="heading-title">¿Querés conocer más sobre nuestras soluciones?</h2>
-                <p class="paragraph">Nuestro equipo técnico y comercial está listo para asesorarte en cada paso.</p>
-              </div>
-            </div>
-            <div class="col-12 col-lg-6">
-              <!--Pendiente cambiar clase video-->
-              <div class="video" id="video1">
-                <a class="btn btn--white btn-line" href="https://api.whatsapp.com/send/?phone=59895144852&text=Hola%20quisiera%20asesoramiento%20comercial." target="_blank"><i class="fab fa-whatsapp"></i>Contactanos</a>
-              </div>
+              <p class="mt-5"><a class="btn btn--secondary btn-line" href="blog.php">&larr; <span data-i18n="common.back_news">Volver a Novedades</span></a></p>
             </div>
           </div>
         </div>
       </section>
 
-    
       <!-- Footer -->
       <footer class="footer footer-1 mt-60">
         <div class="footer-top insalcor-footer">
@@ -333,7 +296,7 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
                       </a>
                     </li>
                   </ul>
-                  
+
                   <h6 class="social-title mt-30">Pharma y VetPharma</h6>
                   <ul class="footer-social-list">
                     <li>
@@ -374,8 +337,7 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
           </div>
         </div>
       </footer>
-            
-      
+
       <!--Back to top btn-->
       <div class="backtop" id="back-to-top">
         <svg class="bi bi-chevron-up" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">

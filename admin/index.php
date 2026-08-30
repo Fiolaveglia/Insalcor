@@ -21,6 +21,9 @@
       <button class="nav-item" data-section="productos" type="button">
         <i class="fa-regular fa-image"></i> Productos
       </button>
+      <button class="nav-item" data-section="tutoriales" type="button">
+        <i class="fa-brands fa-youtube"></i> Tutoriales
+      </button>
     </aside>
 
     <div class="main">
@@ -79,8 +82,7 @@
                 <tr>
                   <th>Producto</th>
                   <th>Área</th>
-                  <th>Categoría</th>
-                  <th>Especies</th>
+                  <th>Categorías</th>
                   <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
@@ -88,6 +90,34 @@
               <tbody id="productos-tbody"></tbody>
             </table>
             <div id="productos-empty" class="empty hidden">No hay productos todavía.</div>
+          </div>
+        </section>
+
+        <!-- Tutoriales -->
+        <section id="section-tutoriales" class="hidden">
+          <div class="toolbar">
+            <div class="meta-count">Total de tutoriales: <span id="tutoriales-count">0</span></div>
+            <div class="search-wrap">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="search" id="tutoriales-search" placeholder="Buscar tutoriales...">
+            </div>
+            <button class="btn btn-blue" id="btn-new-tutorial" type="button"><i class="fa-solid fa-plus"></i> Nuevo Tutorial</button>
+          </div>
+          <div class="card-table">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>Miniatura</th>
+                  <th>Título</th>
+                  <th>Video</th>
+                  <th>Fecha</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tutoriales-tbody"></tbody>
+            </table>
+            <div id="tutoriales-empty" class="empty hidden">No hay tutoriales todavía.</div>
           </div>
         </section>
       </div>
@@ -113,11 +143,29 @@
         </div>
         <div class="form-group">
           <label for="noticia-categoria">Categoría</label>
-          <input id="noticia-categoria" type="text" placeholder="Ej. Nutrición Animal">
+          <select id="noticia-categoria">
+            <option value="">Seleccionar categoría</option>
+            <option value="Nutricion Animal">Nutrición Animal</option>
+            <option value="Pharma">Pharma</option>
+            <option value="VetPharma">VetPharma</option>
+          </select>
         </div>
         <div class="form-group">
           <label>Contenido</label>
           <div id="noticia-contenido-editor"></div>
+        </div>
+        <div style="font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:.5px;color:#6b7280;border-top:1px solid #e5e7eb;padding-top:16px;margin-top:8px;margin-bottom:4px">English <span class="hint" style="text-transform:none;font-weight:400;letter-spacing:normal">(opcional — si se deja vacío, el sitio muestra la versión en español)</span></div>
+        <div class="form-group">
+          <label for="noticia-titulo-en">Título (Inglés)</label>
+          <input id="noticia-titulo-en" type="text" placeholder="News title">
+        </div>
+        <div class="form-group">
+          <label for="noticia-extracto-en">Extracto (Inglés)</label>
+          <textarea id="noticia-extracto-en" rows="2" placeholder="Short summary..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Contenido (Inglés)</label>
+          <div id="noticia-contenido-en-editor"></div>
         </div>
         <div class="form-group">
           <label>Imagen</label>
@@ -150,42 +198,16 @@
           <label for="producto-nombre">Nombre</label>
           <input id="producto-nombre" type="text" placeholder="Nombre del producto">
         </div>
-        <div class="grid-2">
-          <div class="form-group">
-            <label for="producto-area">Área de negocio</label>
-            <select id="producto-area">
-              <option value="Nutricion Animal">Nutricion Animal</option>
-              <option value="Pharma">Pharma</option>
-              <option value="VetPharma">VetPharma</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="producto-categoria">Categoría</label>
-            <select id="producto-categoria">
-              <option value="">—</option>
-              <option>Premezclas</option>
-              <option>Aditivos</option>
-              <option>Correctores</option>
-              <option>Excipientes</option>
-              <option>APIS</option>
-              <option>Minerales</option>
-              <option>Vitaminas</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="producto-marca">Marca</label>
-            <select id="producto-marca">
-              <option value="">—</option>
-              <option>Ingredion</option>
-              <option>Mingtai Chemicals</option>
-              <option>Kerry BioScience</option>
-              <option>Research AG</option>
-              <option>Otros</option>
-            </select>
-          </div>
+        <div class="form-group">
+          <label for="producto-area">Área de negocio</label>
+          <select id="producto-area">
+            <option value="Nutricion Animal">Nutricion Animal</option>
+            <option value="Pharma">Pharma</option>
+            <option value="VetPharma">VetPharma</option>
+          </select>
         </div>
         <div class="form-group" id="producto-especie-wrap">
-          <label>Especies <span class="hint">(un producto puede estar en varias)</span></label>
+          <label>Categorías <span class="hint">(un producto puede estar en varias)</span></label>
           <div class="checkbox-grid" id="producto-especies">
             <label><input type="checkbox" name="especie" value="Aves"> Aves</label>
             <label><input type="checkbox" name="especie" value="Porcinos"> Porcinos</label>
@@ -199,6 +221,15 @@
         <div class="form-group">
           <label>Descripción</label>
           <div id="producto-descripcion-editor"></div>
+        </div>
+        <div style="font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:.5px;color:#6b7280;border-top:1px solid #e5e7eb;padding-top:16px;margin-top:8px;margin-bottom:4px">English <span class="hint" style="text-transform:none;font-weight:400;letter-spacing:normal">(opcional — si se deja vacío, el sitio muestra la versión en español)</span></div>
+        <div class="form-group">
+          <label for="producto-nombre-en">Nombre (Inglés)</label>
+          <input id="producto-nombre-en" type="text" placeholder="Product name">
+        </div>
+        <div class="form-group">
+          <label>Descripción (Inglés)</label>
+          <div id="producto-descripcion-en-editor"></div>
         </div>
         <div class="form-group">
           <label>Imagen</label>
@@ -219,6 +250,50 @@
         <button class="btn btn-secondary" data-close="modal-producto" type="button">Cancelar</button>
         <button class="btn btn-secondary" id="btn-save-producto-draft" type="button">Guardar</button>
         <button class="btn btn-blue" id="btn-save-producto-publish" type="button">Publicar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tutorial Modal -->
+  <div id="modal-tutorial" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-tutorial-title">Nuevo Tutorial</h3>
+        <button class="close-btn" data-close="modal-tutorial" type="button">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="tutorial-id">
+        <div class="form-group">
+          <label for="tutorial-titulo">Título</label>
+          <input id="tutorial-titulo" type="text" placeholder="Ej: Cómo usar A-Max Ultra">
+        </div>
+        <div class="form-group">
+          <label for="tutorial-youtube-url">URL de YouTube</label>
+          <input id="tutorial-youtube-url" type="text" placeholder="https://www.youtube.com/watch?v=...">
+          <div class="hint">Formatos aceptados: youtube.com/watch?v=..., youtu.be/..., youtube.com/embed/...</div>
+        </div>
+        <div class="form-group" id="tutorial-preview-wrap" style="display:none">
+          <label>Vista previa</label>
+          <img id="tutorial-preview" alt="" style="max-width:280px;border-radius:8px;display:block">
+        </div>
+        <div class="form-group">
+          <label for="tutorial-descripcion">Descripción</label>
+          <textarea id="tutorial-descripcion" rows="4" placeholder="Texto de detalle del tutorial..."></textarea>
+        </div>
+        <div style="font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:.5px;color:#6b7280;border-top:1px solid #e5e7eb;padding-top:16px;margin-top:8px;margin-bottom:4px">English <span class="hint" style="text-transform:none;font-weight:400;letter-spacing:normal">(opcional — si se deja vacío, el sitio muestra la versión en español)</span></div>
+        <div class="form-group">
+          <label for="tutorial-titulo-en">Título (Inglés)</label>
+          <input id="tutorial-titulo-en" type="text" placeholder="Ej: How to use A-Max Ultra">
+        </div>
+        <div class="form-group">
+          <label for="tutorial-descripcion-en">Descripción (Inglés)</label>
+          <textarea id="tutorial-descripcion-en" rows="4" placeholder="Tutorial detail text..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="modal-tutorial" type="button">Cancelar</button>
+        <button class="btn btn-secondary" id="btn-save-tutorial-draft" type="button">Guardar</button>
+        <button class="btn btn-blue" id="btn-save-tutorial-publish" type="button">Publicar</button>
       </div>
     </div>
   </div>

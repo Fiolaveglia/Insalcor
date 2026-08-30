@@ -11,11 +11,11 @@ function producto_row(array $row): array
     return [
         'id' => (int) $row['id'],
         'nombre' => $row['nombre'],
+        'nombre_en' => $row['nombre_en'],
         'descripcion' => $row['descripcion'],
+        'descripcion_en' => $row['descripcion_en'],
         'imagen' => $row['imagen'],
         'area_negocio' => $row['area_negocio'],
-        'categoria' => $row['categoria'],
-        'marca' => $row['marca'],
         'especies' => especies_de((int) $row['id']),
         'ficha_tecnica' => $row['ficha_tecnica'],
         'nota_blog' => $row['nota_blog'],
@@ -35,15 +35,12 @@ function especies_de(int $productoId): array
 
 /**
  * Normaliza y valida el array de especies del body.
- * Fuera de Nutrición Animal siempre es vacío.
+ * Catálogo único: aplica igual para las 3 áreas de negocio.
  *
  * @return string[]
  */
-function validar_especies(mixed $valor, string $area): array
+function validar_especies(mixed $valor): array
 {
-    if ($area !== 'Nutricion Animal') {
-        return [];
-    }
     if ($valor === null || $valor === '') {
         return [];
     }
@@ -88,8 +85,14 @@ function validate_producto(array $body, bool $partial = false): array
             json_error('El nombre es obligatorio');
         }
     }
+    if (!$partial || array_key_exists('nombre_en', $body)) {
+        $data['nombre_en'] = sanitize_text($body['nombre_en'] ?? '');
+    }
     if (!$partial || array_key_exists('descripcion', $body)) {
         $data['descripcion'] = sanitize_html($body['descripcion'] ?? '');
+    }
+    if (!$partial || array_key_exists('descripcion_en', $body)) {
+        $data['descripcion_en'] = sanitize_html($body['descripcion_en'] ?? '');
     }
     if (!$partial || array_key_exists('imagen', $body)) {
         $data['imagen'] = sanitize_text($body['imagen'] ?? '');
@@ -100,20 +103,6 @@ function validate_producto(array $body, bool $partial = false): array
             json_error('Área de negocio inválida');
         }
         $data['area_negocio'] = $area;
-    }
-    if (!$partial || array_key_exists('categoria', $body)) {
-        $cat = sanitize_text($body['categoria'] ?? '');
-        if ($cat !== '' && !in_array($cat, CATEGORIAS, true)) {
-            json_error('Categoría inválida');
-        }
-        $data['categoria'] = $cat;
-    }
-    if (!$partial || array_key_exists('marca', $body)) {
-        $marca = sanitize_text($body['marca'] ?? '');
-        if ($marca !== '' && !in_array($marca, MARCAS, true)) {
-            json_error('Marca inválida');
-        }
-        $data['marca'] = $marca;
     }
     if (!$partial || array_key_exists('ficha_tecnica', $body)) {
         $data['ficha_tecnica'] = sanitize_text($body['ficha_tecnica'] ?? '');
@@ -169,11 +158,11 @@ if ($method === 'GET') {
     }
 
     if ($q !== '') {
-        $sql .= ' AND (nombre LIKE ? OR categoria LIKE ? OR marca LIKE ?
+        $sql .= ' AND (nombre LIKE ?
                        OR EXISTS (SELECT 1 FROM producto_especies pe
                                   WHERE pe.producto_id = productos.id AND pe.especie LIKE ?))';
         $like = '%' . $q . '%';
-        array_push($params, $like, $like, $like, $like);
+        array_push($params, $like, $like);
     }
 
     $sql .= ' ORDER BY updated_at DESC, id DESC';
@@ -193,21 +182,21 @@ if ($method === 'POST') {
         json_error('Área de negocio es obligatoria');
     }
 
-    $especies = validar_especies($body['especies'] ?? ($body['especie'] ?? null), $data['area_negocio']);
+    $especies = validar_especies($body['especies'] ?? ($body['especie'] ?? null));
 
     db()->beginTransaction();
     try {
         $stmt = db()->prepare(
-            'INSERT INTO productos (nombre, descripcion, imagen, area_negocio, categoria, marca, ficha_tecnica, nota_blog, estado, updated_at)
+            'INSERT INTO productos (nombre, nombre_en, descripcion, descripcion_en, imagen, area_negocio, ficha_tecnica, nota_blog, estado, updated_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         $stmt->execute([
             $data['nombre'],
+            $data['nombre_en'] ?? '',
             $data['descripcion'] ?? '',
+            $data['descripcion_en'] ?? '',
             $data['imagen'] ?? '',
             $data['area_negocio'],
-            $data['categoria'] ?? '',
-            $data['marca'] ?? '',
             $data['ficha_tecnica'] ?? '',
             $data['nota_blog'] ?? '',
             $data['estado'] ?? 'draft',
@@ -247,27 +236,25 @@ if ($method === 'PUT' || $method === 'PATCH') {
     $data = validate_producto($body, true);
 
     $nombre = $data['nombre'] ?? $row['nombre'];
+    $nombreEn = $data['nombre_en'] ?? $row['nombre_en'];
     $descripcion = $data['descripcion'] ?? $row['descripcion'];
+    $descripcionEn = $data['descripcion_en'] ?? $row['descripcion_en'];
     $imagen = $data['imagen'] ?? $row['imagen'];
     $area = $data['area_negocio'] ?? $row['area_negocio'];
-    $categoria = $data['categoria'] ?? $row['categoria'];
-    $marca = $data['marca'] ?? $row['marca'];
     $ficha = $data['ficha_tecnica'] ?? $row['ficha_tecnica'];
     $notaBlog = $data['nota_blog'] ?? $row['nota_blog'];
     $estado = $data['estado'] ?? $row['estado'];
 
-    // Las especies sólo se tocan si vienen en el body; si el área cambia a
-    // Pharma/VetPharma se limpian igual.
-    $tocaEspecies = array_key_exists('especies', $body) || array_key_exists('especie', $body)
-        || $area !== $row['area_negocio'];
-    $especies = validar_especies($body['especies'] ?? ($body['especie'] ?? null), $area);
+    // Las especies sólo se tocan si vienen en el body.
+    $tocaEspecies = array_key_exists('especies', $body) || array_key_exists('especie', $body);
+    $especies = validar_especies($body['especies'] ?? ($body['especie'] ?? null));
 
     db()->beginTransaction();
     try {
         $stmt = db()->prepare(
-            'UPDATE productos SET nombre=?, descripcion=?, imagen=?, area_negocio=?, categoria=?, marca=?, ficha_tecnica=?, nota_blog=?, estado=?, updated_at=? WHERE id=?'
+            'UPDATE productos SET nombre=?, nombre_en=?, descripcion=?, descripcion_en=?, imagen=?, area_negocio=?, ficha_tecnica=?, nota_blog=?, estado=?, updated_at=? WHERE id=?'
         );
-        $stmt->execute([$nombre, $descripcion, $imagen, $area, $categoria, $marca, $ficha, $notaBlog, $estado, now_sql(), $id]);
+        $stmt->execute([$nombre, $nombreEn, $descripcion, $descripcionEn, $imagen, $area, $ficha, $notaBlog, $estado, now_sql(), $id]);
         if ($tocaEspecies) {
             guardar_especies($id, $especies);
         }

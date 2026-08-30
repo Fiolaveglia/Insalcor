@@ -11,8 +11,11 @@ function noticia_row(array $row): array
     return [
         'id' => (int) $row['id'],
         'titulo' => $row['titulo'],
+        'titulo_en' => $row['titulo_en'],
         'extracto' => $row['extracto'],
+        'extracto_en' => $row['extracto_en'],
         'contenido' => $row['contenido'],
+        'contenido_en' => $row['contenido_en'],
         'imagen' => $row['imagen'],
         'categoria' => $row['categoria'],
         'estado' => $row['estado'],
@@ -34,17 +37,30 @@ function validate_noticia(array $body, bool $partial = false): array
             json_error('El título es obligatorio');
         }
     }
+    if (!$partial || array_key_exists('titulo_en', $body)) {
+        $data['titulo_en'] = sanitize_text($body['titulo_en'] ?? '');
+    }
     if (!$partial || array_key_exists('extracto', $body)) {
         $data['extracto'] = sanitize_text($body['extracto'] ?? '');
     }
+    if (!$partial || array_key_exists('extracto_en', $body)) {
+        $data['extracto_en'] = sanitize_text($body['extracto_en'] ?? '');
+    }
     if (!$partial || array_key_exists('contenido', $body)) {
         $data['contenido'] = sanitize_html($body['contenido'] ?? '');
+    }
+    if (!$partial || array_key_exists('contenido_en', $body)) {
+        $data['contenido_en'] = sanitize_html($body['contenido_en'] ?? '');
     }
     if (!$partial || array_key_exists('imagen', $body)) {
         $data['imagen'] = sanitize_text($body['imagen'] ?? '');
     }
     if (!$partial || array_key_exists('categoria', $body)) {
-        $data['categoria'] = sanitize_text($body['categoria'] ?? '');
+        $cat = sanitize_text($body['categoria'] ?? '');
+        if ($cat !== '' && !in_array($cat, AREAS, true)) {
+            json_error('Categoría inválida');
+        }
+        $data['categoria'] = $cat;
     }
     if (!$partial || array_key_exists('estado', $body)) {
         $estado = sanitize_text($body['estado'] ?? 'draft');
@@ -116,13 +132,16 @@ if ($method === 'POST') {
 
     $publishedAt = $data['estado'] === 'published' ? now_sql() : null;
     $stmt = db()->prepare(
-        'INSERT INTO noticias (titulo, extracto, contenido, imagen, categoria, estado, autor_id, published_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO noticias (titulo, titulo_en, extracto, extracto_en, contenido, contenido_en, imagen, categoria, estado, autor_id, published_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
     $stmt->execute([
         $data['titulo'],
+        $data['titulo_en'] ?? '',
         $data['extracto'] ?? '',
+        $data['extracto_en'] ?? '',
         $data['contenido'] ?? '',
+        $data['contenido_en'] ?? '',
         $data['imagen'] ?? '',
         $data['categoria'] ?? '',
         $data['estado'],
@@ -155,8 +174,11 @@ if ($method === 'PUT' || $method === 'PATCH') {
 
     $data = validate_noticia($body, true);
     $titulo = $data['titulo'] ?? $row['titulo'];
+    $tituloEn = $data['titulo_en'] ?? $row['titulo_en'];
     $extracto = $data['extracto'] ?? $row['extracto'];
+    $extractoEn = $data['extracto_en'] ?? $row['extracto_en'];
     $contenido = $data['contenido'] ?? $row['contenido'];
+    $contenidoEn = $data['contenido_en'] ?? $row['contenido_en'];
     $imagen = $data['imagen'] ?? $row['imagen'];
     $categoria = $data['categoria'] ?? $row['categoria'];
     $estado = $data['estado'] ?? $row['estado'];
@@ -170,9 +192,9 @@ if ($method === 'PUT' || $method === 'PATCH') {
     }
 
     $stmt = db()->prepare(
-        'UPDATE noticias SET titulo=?, extracto=?, contenido=?, imagen=?, categoria=?, estado=?, published_at=?, updated_at=? WHERE id=?'
+        'UPDATE noticias SET titulo=?, titulo_en=?, extracto=?, extracto_en=?, contenido=?, contenido_en=?, imagen=?, categoria=?, estado=?, published_at=?, updated_at=? WHERE id=?'
     );
-    $stmt->execute([$titulo, $extracto, $contenido, $imagen, $categoria, $estado, $publishedAt, now_sql(), $id]);
+    $stmt->execute([$titulo, $tituloEn, $extracto, $extractoEn, $contenido, $contenidoEn, $imagen, $categoria, $estado, $publishedAt, now_sql(), $id]);
 
     $stmt = db()->prepare(
         'SELECT n.*, u.username AS autor_username FROM noticias n LEFT JOIN users u ON u.id = n.autor_id WHERE n.id = ?'

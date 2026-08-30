@@ -47,6 +47,24 @@ function current_lang(): string
     return $lang;
 }
 
+/**
+ * Resuelve un campo traducible de una fila de la base (productos, noticias,
+ * tutoriales): si el idioma actual es inglés y existe `{$campo}_en` con
+ * contenido, la devuelve; si no, cae al campo en español (siempre presente).
+ * Así el contenido sin traducir sigue mostrándose (en español) en vez de
+ * quedar vacío.
+ */
+function campo_i18n(array $row, string $campo): string
+{
+    if (current_lang() === 'en') {
+        $en = trim((string) ($row[$campo . '_en'] ?? ''));
+        if ($en !== '') {
+            return $en;
+        }
+    }
+    return (string) ($row[$campo] ?? '');
+}
+
 function i18n_dict(): array
 {
     static $dict = null;
@@ -198,19 +216,13 @@ function date_parts(?string $iso, ?string $lang = null): array
 
 /**
  * Published products for an area, with optional sidebar filters.
- * $filters keys: q, especie, categoria, marca.
+ * $filters keys: q, especie (catálogo único: mismo campo para las 3 áreas).
  */
 function pub_productos(string $area, array $filters = []): array
 {
     $sql = "SELECT p.* FROM productos p WHERE p.estado = 'published' AND p.area_negocio = ?";
     $params = [$area];
 
-    foreach (['categoria' => 'categoria', 'marca' => 'marca'] as $key => $col) {
-        if (!empty($filters[$key])) {
-            $sql .= " AND p.$col = ?";
-            $params[] = $filters[$key];
-        }
-    }
     // Un producto puede estar en varias especies: alcanza con que exista el vínculo.
     if (!empty($filters['especie'])) {
         $sql .= ' AND EXISTS (SELECT 1 FROM producto_especies pe
@@ -218,11 +230,11 @@ function pub_productos(string $area, array $filters = []): array
         $params[] = $filters['especie'];
     }
     if (!empty($filters['q'])) {
-        $sql .= ' AND (p.nombre LIKE ? OR p.categoria LIKE ? OR p.marca LIKE ?
+        $sql .= ' AND (p.nombre LIKE ?
                        OR EXISTS (SELECT 1 FROM producto_especies pe
                                   WHERE pe.producto_id = p.id AND pe.especie LIKE ?))';
         $like = '%' . $filters['q'] . '%';
-        array_push($params, $like, $like, $like, $like);
+        array_push($params, $like, $like);
     }
 
     $sql .= ' ORDER BY p.updated_at DESC, p.id DESC';
@@ -274,6 +286,23 @@ function pub_noticia(int $id): ?array
     return $row ?: null;
 }
 
+function pub_tutoriales(int $limit = 0): array
+{
+    $sql = "SELECT * FROM tutoriales WHERE estado = 'published' ORDER BY COALESCE(published_at, created_at) DESC, id DESC";
+    if ($limit > 0) {
+        $sql .= ' LIMIT ' . $limit;
+    }
+    return db()->query($sql)->fetchAll();
+}
+
+function pub_tutorial(int $id): ?array
+{
+    $stmt = db()->prepare("SELECT * FROM tutoriales WHERE id = ? AND estado = 'published'");
+    $stmt->execute([$id]);
+    $row = $stmt->fetch();
+    return $row ?: null;
+}
+
 /* ------------------------------------------------- sidebar filter helpers */
 
 /** Read the active sidebar filters from the query string. */
@@ -282,8 +311,6 @@ function active_filters(): array
     return [
         'q' => trim((string) ($_GET['q'] ?? '')),
         'especie' => trim((string) ($_GET['especie'] ?? '')),
-        'categoria' => trim((string) ($_GET['categoria'] ?? '')),
-        'marca' => trim((string) ($_GET['marca'] ?? '')),
     ];
 }
 
@@ -297,8 +324,6 @@ function filter_url(string $type, string $value, string $anchor = ''): string
         'lang' => $_GET['lang'] ?? null,
         'q' => $_GET['q'] ?? null,
         'especie' => $_GET['especie'] ?? null,
-        'categoria' => $_GET['categoria'] ?? null,
-        'marca' => $_GET['marca'] ?? null,
     ], static fn ($v) => $v !== null && $v !== '');
 
     if (($params[$type] ?? null) === $value) {
@@ -350,7 +375,7 @@ function render_product_card(array $item, string $detailBase): string
 {
     $img = asset($item['imagen']) ?: asset('assets/images/products/grid/1.png');
     $href = $detailBase . '?id=' . (int) $item['id'];
-    $nombre = e($item['nombre']);
+    $nombre = e(campo_i18n($item, 'nombre'));
     return '
       <div class="col-12 col-md-6 col-lg-4" data-product-card>
         <div class="product-item">
@@ -373,12 +398,13 @@ function render_recent_product(array $item, string $detailBase): string
     return '
         <div class="product">
           <div class="product-img"><img src="' . e($img) . '" alt="product"/></div>
-          <div class="product-desc"><div class="product-title"><a class="js-open-product" href="' . e($href) . '">' . e($item['nombre']) . '</a></div></div>
+          <div class="product-desc"><div class="product-title"><a class="js-open-product" href="' . e($href) . '">' . e(campo_i18n($item, 'nombre')) . '</a></div></div>
         </div>';
 }
 
 /**
- * Render a sidebar filter <ul> for one column (especie|categoria|marca).
+ * Render a sidebar filter <ul> for one column (especie: catálogo único, misma
+ * columna para las 3 áreas de negocio; se muestra como "Categoría" al usuario).
  * $options maps stored value => display label. Counts come from the area.
  */
 function render_filter_list(string $area, string $type, array $options, string $anchor = ''): string
@@ -395,6 +421,68 @@ function render_filter_list(string $area, string $type, array $options, string $
     return $html;
 }
 
+/* ------------------------------------------------------- pagination helpers */
+
+/** Read & clamp a page number from the query string (1-based, min 1). */
+function current_page(string $param = 'page'): int
+{
+    $p = (int) ($_GET[$param] ?? 1);
+    return $p > 0 ? $p : 1;
+}
+
+/** Build the href for a given page number, preserving every other query param. */
+function page_url(int $page, string $param = 'page'): string
+{
+    $params = $_GET;
+    if ($page <= 1) {
+        unset($params[$param]);
+    } else {
+        $params[$param] = $page;
+    }
+    $qs = http_build_query($params);
+    $path = strtok($_SERVER['REQUEST_URI'], '?');
+    return $qs ? $path . '?' . $qs : $path;
+}
+
+/**
+ * Build the href for the language switcher, preserving every other query
+ * param (id, filtros, página, etc.) — así cambiar de idioma nunca te saca
+ * del producto/noticia/tutorial ni del filtro que estabas viendo.
+ */
+function lang_switch_url(string $lang): string
+{
+    $params = $_GET;
+    $params['lang'] = $lang;
+    $qs = http_build_query($params);
+    $path = strtok($_SERVER['REQUEST_URI'], '?');
+    return $qs ? $path . '?' . $qs : $path;
+}
+
+/**
+ * Render a <ul class="pagination"> block (same markup as the site templates)
+ * for $totalItems split into pages of $perPage, currently on $page.
+ * Returns '' when everything fits on a single page (no pager needed).
+ */
+function render_pagination(int $totalItems, int $perPage, int $page, string $param = 'page'): string
+{
+    $totalPages = (int) ceil($totalItems / max(1, $perPage));
+    if ($totalPages <= 1) {
+        return '';
+    }
+    $page = max(1, min($page, $totalPages));
+
+    $html = '<div class="row"><div class="col-12 clearfix text--center"><ul class="pagination">';
+    for ($i = 1; $i <= $totalPages; $i++) {
+        $cls = $i === $page ? ' class="current"' : '';
+        $html .= '<li><a' . $cls . ' href="' . e(page_url($i, $param)) . '">' . $i . '</a></li>';
+    }
+    if ($page < $totalPages) {
+        $html .= '<li><a href="' . e(page_url($page + 1, $param)) . '" aria-label="Next"><i class="icon-arrow-right"></i></a></li>';
+    }
+    $html .= '</ul></div></div>';
+    return $html;
+}
+
 /**
  * A single noticia formatted as an owl-carousel slide, matching the
  * "Artículos y Novedades Recientes" markup on the area pages.
@@ -404,6 +492,7 @@ function render_noticia_slide(array $item, string $detailBase): string
     $d = date_parts($item['published_at'] ?: $item['created_at']);
     $img = asset($item['imagen']) ?: asset('assets/images/blog/grid/1.jpg');
     $href = $detailBase . '?id=' . (int) $item['id'];
+    $titulo = e(campo_i18n($item, 'titulo'));
     return '
             <div>
               <div class="blog-entry" data-hover="">
@@ -411,17 +500,17 @@ function render_noticia_slide(array $item, string $detailBase): string
                   <div class="entry-date">
                     <div class="entry-content"><span class="day">' . e($d['day']) . '</span><span class="month">' . e($d['month']) . '</span><span class="year">' . e($d['year']) . '</span></div>
                   </div>
-                   <a href="' . e($href) . '"><img src="' . e($img) . '" alt="' . e($item['titulo']) . '"/></a>
+                   <a href="' . e($href) . '"><img src="' . e($img) . '" alt="' . $titulo . '"/></a>
                 </div>
                 <div class="entry-content">
                   <div class="entry-meta">
                     <div class="entry-category"><a href="javascript:void(0)">' . e($item['categoria']) . '</a></div>
                   </div>
                   <div class="entry-title">
-                    <h4><a href="' . e($href) . '">' . e($item['titulo']) . '</a></h4>
+                    <h4><a href="' . e($href) . '">' . $titulo . '</a></h4>
                   </div>
                   <div class="entry-bio">
-                    <p>' . e($item['extracto']) . '</p>
+                    <p>' . e(campo_i18n($item, 'extracto')) . '</p>
                   </div>
                   <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="' . e($href) . '">
                       <div class="line"> <span> </span></div><span>' . e(t('common.see_more')) . '</span></a></div>
@@ -435,6 +524,7 @@ function render_noticia_card(array $item, string $detailBase): string
     $d = date_parts($item['published_at'] ?: $item['created_at']);
     $img = asset($item['imagen']) ?: asset('assets/images/blog/grid/1.jpg');
     $href = $detailBase . '?id=' . (int) $item['id'];
+    $titulo = e(campo_i18n($item, 'titulo'));
     return '
       <div class="col-12 col-md-6 col-lg-4">
         <div class="blog-entry" data-hover="">
@@ -442,18 +532,60 @@ function render_noticia_card(array $item, string $detailBase): string
             <div class="entry-date">
               <div class="entry-content"><span class="day">' . e($d['day']) . '</span><span class="month">' . e($d['month']) . '</span><span class="year">' . e($d['year']) . '</span></div>
             </div>
-            <a href="' . e($href) . '"><img src="' . e($img) . '" alt="' . e($item['titulo']) . '"/></a>
+            <a href="' . e($href) . '"><img src="' . e($img) . '" alt="' . $titulo . '"/></a>
           </div>
           <div class="entry-content">
             <div class="entry-meta">
               <div class="entry-category"><a href="javascript:void(0)">' . e($item['categoria']) . '</a></div>
             </div>
             <div class="entry-title">
-              <h4><a href="' . e($href) . '">' . e($item['titulo']) . '</a></h4>
+              <h4><a href="' . e($href) . '">' . $titulo . '</a></h4>
             </div>
-            <div class="entry-bio"><p>' . e($item['extracto']) . '</p></div>
+            <div class="entry-bio"><p>' . e(campo_i18n($item, 'extracto')) . '</p></div>
             <div class="entry-more">
               <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="' . e($href) . '">
+                <div class="line"><span></span></div><span>' . e(t('common.see_more')) . '</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>';
+}
+
+function render_tutorial_card(array $item, string $detailBase): string
+{
+    $d = date_parts($item['published_at'] ?: $item['created_at']);
+    $img = $item['youtube_id']
+        ? 'https://img.youtube.com/vi/' . rawurlencode($item['youtube_id']) . '/hqdefault.jpg'
+        : asset('assets/images/blog/grid/1.jpg');
+    $href = $detailBase . '?id=' . (int) $item['id'];
+    $titulo = e(campo_i18n($item, 'titulo'));
+    $resumen = trim((string) strip_tags(campo_i18n($item, 'descripcion')));
+    if (mb_strlen($resumen) > 140) {
+        $resumen = mb_substr($resumen, 0, 140) . '…';
+    }
+    return '
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="blog-entry" data-hover="">
+          <div class="entry-img">
+            <div class="entry-date">
+              <div class="entry-content"><span class="day">' . e($d['day']) . '</span><span class="month">' . e($d['month']) . '</span><span class="year">' . e($d['year']) . '</span></div>
+            </div>
+            <a href="' . e($href) . '" style="position:relative;display:block">
+              <img src="' . e($img) . '" alt="' . $titulo . '"/>
+              <i class="fas fa-play-circle" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;color:#fff;opacity:.9"></i>
+            </a>
+          </div>
+          <div class="entry-content">
+            <div class="entry-meta">
+              <div class="entry-category"><a href="javascript:void(0)">Tutorial</a></div>
+            </div>
+            <div class="entry-title">
+              <h4><a href="' . e($href) . '">' . $titulo . '</a></h4>
+            </div>
+            <div class="entry-bio"><p>' . e($resumen) . '</p></div>
+            <div class="entry-more">
+              <a class="btn btn--white btn-line btn-line-before btn-line-inversed tutorial" href="' . e($href) . '">
                 <div class="line"><span></span></div><span>' . e(t('common.see_more')) . '</span>
               </a>
             </div>

@@ -6,8 +6,6 @@ session_start();
 header('X-Content-Type-Options: nosniff');
 
 const AREAS = ['Nutricion Animal', 'Pharma', 'VetPharma'];
-const CATEGORIAS = ['Premezclas', 'Aditivos', 'Correctores', 'Excipientes', 'APIS', 'Minerales', 'Vitaminas'];
-const MARCAS = ['Ingredion', 'Mingtai Chemicals', 'Kerry BioScience', 'Research AG', 'Otros'];
 const ESPECIES = ['Aves', 'Porcinos', 'Ganadería', 'Mascotas', 'Lechería', 'Equinos', 'Ovinos'];
 const ESTADOS = ['draft', 'published'];
 
@@ -146,4 +144,33 @@ function sanitize_text(?string $value): string
 function now_sql(): string
 {
     return gmdate('Y-m-d H:i:s');
+}
+
+/**
+ * Extrae el ID de un video de YouTube desde cualquier formato de URL usual:
+ * youtube.com/watch?v=ID, youtu.be/ID, youtube.com/embed/ID, youtube.com/shorts/ID.
+ * Devuelve null si no se pudo reconocer.
+ */
+function extraer_youtube_id(?string $url): ?string
+{
+    $url = trim((string) $url);
+    if ($url === '') {
+        return null;
+    }
+    $patrones = [
+        '~youtu\.be/([A-Za-z0-9_-]{11})~',
+        '~[?&]v=([A-Za-z0-9_-]{11})~',
+        '~youtube\.com/embed/([A-Za-z0-9_-]{11})~',
+        '~youtube\.com/shorts/([A-Za-z0-9_-]{11})~',
+    ];
+    foreach ($patrones as $patron) {
+        if (preg_match($patron, $url, $m)) {
+            return $m[1];
+        }
+    }
+    // Por si ya viene solo el ID (11 caracteres, sin espacios ni barras).
+    if (preg_match('~^[A-Za-z0-9_-]{11}$~', $url)) {
+        return $url;
+    }
+    return null;
 }

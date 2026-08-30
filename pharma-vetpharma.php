@@ -11,14 +11,14 @@ $vetRecent = array_slice($vetProductos, 0, 3);
 $recentNoticias = array_slice(pub_noticias(), 0, 3);
 $pharmaNoticias = $recentNoticias;
 $vetNoticias = $recentNoticias;
-$catOptions = ['Excipientes' => 'Excipientes', 'APIS' => 'APIS'];
-$marcaOptions = [
-    'Ingredion' => 'Ingredion',
-    'Mingtai Chemicals' => 'Mingtai Chemicals',
-    'Kerry BioScience' => 'Kerry Bio Science',
-    'Research AG' => 'Research AG',
-    'Otros' => 'Otros',
-];
+$especieOptions = array_combine(ESPECIES, ESPECIES);
+
+// Paginado: 9 productos por página, independiente para cada segmento.
+$productosPorPagina = 9;
+$paginaPharma = current_page('page_pharma');
+$pharmaProductosPagina = array_slice($pharmaProductos, ($paginaPharma - 1) * $productosPorPagina, $productosPorPagina);
+$paginaVet = current_page('page_vet');
+$vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPorPagina, $productosPorPagina);
 ?>
 <!DOCTYPE html>
 <html dir="ltr" lang="<?= e(current_lang()) ?>">
@@ -75,8 +75,8 @@ $marcaOptions = [
               <div class="selected"><img src="assets/images/module-language/uy.png" alt=""/><span data-i18n="lang.name">Español</span><i class="fas fa-chevron-down"></i></div>
               <div class="lang-list">
                 <ul>
-                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="?lang=en" data-i18n="lang.name_en">Inglés</a></li>
-                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="?lang=es" data-i18n="lang.name_es">Español</a></li>
+                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="<?= e(lang_switch_url('en')) ?>" data-i18n="lang.name_en">Inglés</a></li>
+                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="<?= e(lang_switch_url('es')) ?>" data-i18n="lang.name_es">Español</a></li>
                 </ul>
               </div>
             </div>
@@ -101,8 +101,6 @@ $marcaOptions = [
               </li>
               <li class="nav-item" ><a href="blog.php"><span data-i18n="nav.news">NOVEDADES</span></a>
               </li>
-               <!-- <li class="nav-item active"><a href="./tutoriales.html"><span data-i18n="nav.tutorials">TUTORIALES</span></a>
-              </li> -->
               <li class="nav-item" id="contact" ><a href="contact.html"><span data-i18n="nav.contact">CONTACTO</span></a></li>
             </ul>
             
@@ -117,8 +115,8 @@ $marcaOptions = [
               <div class="selected"><img src="assets/images/module-language/uy.png" alt=""/><span data-i18n="lang.name">Español</span><i class="fas fa-chevron-down"></i></div>
               <div class="lang-list">
                 <ul>
-                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="?lang=en" data-i18n="lang.name_en">Inglés</a></li>
-                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="?lang=es" data-i18n="lang.name_es">Español</a></li>
+                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="<?= e(lang_switch_url('en')) ?>" data-i18n="lang.name_en">Inglés</a></li>
+                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="<?= e(lang_switch_url('es')) ?>" data-i18n="lang.name_es">Español</a></li>
                 </ul>
               </div>
             </div>
@@ -260,25 +258,20 @@ $marcaOptions = [
                   </div>
                 </div>
 
-                <!-- Categorías -->
+                <?php /* Categorías: oculto momentáneamente hasta tener
+                       productos reales de Pharma para filtrar (hoy todo
+                       da 0). Para reactivar, borrar esta marca de
+                       comentario y la de más abajo. */ ?>
+                <?php if (false): ?>
                 <div class="widget especie">
                   <div class="widget-title">
                     <h5 data-i18n="shop.categories">Categorías</h5>
                   </div>
                   <div class="widget-content">
-                    <?= render_filter_list('Pharma', 'categoria', $catOptions) ?>
+                    <?= render_filter_list('Pharma', 'especie', $especieOptions) ?>
                   </div>
                 </div>
-
-                <!-- Marcas -->
-                <div class="widget especie">
-                  <div class="widget-title">
-                    <h5 data-i18n="shop.brands">Marcas</h5>
-                  </div>
-                  <div class="widget-content">
-                    <?= render_filter_list('Pharma', 'marca', $marcaOptions) ?>
-                  </div>
-                </div>
+                <?php endif; ?>
 
                 <!-- Recent Products-->
                 <div class="widget widget-recent-products">
@@ -301,12 +294,13 @@ $marcaOptions = [
                 </div>
               </div>
               <div class="row">
-                <?php if ($pharmaProductos) {
-                    foreach ($pharmaProductos as $item) { echo render_product_card($item, $detailBase); }
+                <?php if ($pharmaProductosPagina) {
+                    foreach ($pharmaProductosPagina as $item) { echo render_product_card($item, $detailBase); }
                 } else { ?>
                   <div class="col-12"><p><?= e(t('common.no_products')) ?></p></div>
                 <?php } ?>
               </div>
+              <?= render_pagination(count($pharmaProductos), $productosPorPagina, $paginaPharma, 'page_pharma') ?>
             </div>
           </div>
         </div>
@@ -498,25 +492,20 @@ $marcaOptions = [
                   </div>
                 </div>
 
-                <!-- Categorías -->
+                <?php /* Categorías: oculto momentáneamente hasta tener
+                       productos reales de VetPharma para filtrar (hoy todo
+                       da 0). Para reactivar, borrar esta marca de
+                       comentario y la de más abajo. */ ?>
+                <?php if (false): ?>
                 <div class="widget especie">
                   <div class="widget-title">
                     <h5 data-i18n="shop.categories">Categorías</h5>
                   </div>
                   <div class="widget-content">
-                    <?= render_filter_list('VetPharma', 'categoria', $catOptions, 'segment-vetpharma') ?>
+                    <?= render_filter_list('VetPharma', 'especie', $especieOptions, 'segment-vetpharma') ?>
                   </div>
                 </div>
-
-                <!-- Marcas -->
-                <div class="widget especie">
-                  <div class="widget-title">
-                    <h5 data-i18n="shop.brands">Marcas</h5>
-                  </div>
-                  <div class="widget-content">
-                    <?= render_filter_list('VetPharma', 'marca', $marcaOptions, 'segment-vetpharma') ?>
-                  </div>
-                </div>
+                <?php endif; ?>
 
                 <!-- Recent Products-->
                 <div class="widget widget-recent-products">
@@ -539,12 +528,13 @@ $marcaOptions = [
                 </div>
               </div>
               <div class="row">
-                <?php if ($vetProductos) {
-                    foreach ($vetProductos as $item) { echo render_product_card($item, $detailBase); }
+                <?php if ($vetProductosPagina) {
+                    foreach ($vetProductosPagina as $item) { echo render_product_card($item, $detailBase); }
                 } else { ?>
                   <div class="col-12"><p><?= e(t('common.no_products')) ?></p></div>
                 <?php } ?>
               </div>
+              <?= render_pagination(count($vetProductos), $productosPorPagina, $paginaVet, 'page_vet') ?>
             </div>
           </div>
         </div>

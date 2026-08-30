@@ -58,6 +58,15 @@ const AdminAPI = (() => {
       }),
     deleteProducto: (id) =>
       request(`${API}/productos.php?id=${id}`, { method: 'DELETE', body: {} }),
+    listTutoriales: (q = '') => request(`${API}/tutoriales.php?q=${encodeURIComponent(q)}`),
+    getTutorial: (id) => request(`${API}/tutoriales.php?id=${id}`),
+    saveTutorial: (payload, id) =>
+      request(id ? `${API}/tutoriales.php?id=${id}` : `${API}/tutoriales.php`, {
+        method: id ? 'PUT' : 'POST',
+        body: payload,
+      }),
+    deleteTutorial: (id) =>
+      request(`${API}/tutoriales.php?id=${id}`, { method: 'DELETE', body: {} }),
     upload: async (file) => {
       const fd = new FormData();
       fd.append('file', file);

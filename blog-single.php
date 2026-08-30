@@ -9,6 +9,9 @@ if ($item) {
     db()->prepare('UPDATE noticias SET vistas = vistas + 1 WHERE id = ?')->execute([$item['id']]);
     $d = date_parts($item['published_at'] ?: $item['created_at']);
 }
+$titulo = $item ? campo_i18n($item, 'titulo') : '';
+$extracto = $item ? campo_i18n($item, 'extracto') : '';
+$contenido = $item ? campo_i18n($item, 'contenido') : '';
 ?>
 <!DOCTYPE html>
 <html dir="ltr" lang="<?= e(current_lang()) ?>">
@@ -16,8 +19,8 @@ if ($item) {
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Insalcor – <?= e($item['titulo'] ?? t('common.article_not_found')) ?></title>
-    <meta name="description" content="<?= e($item['extracto'] ?? '') ?>">
+    <title>Insalcor – <?= e($titulo ?: t('common.article_not_found')) ?></title>
+    <meta name="description" content="<?= e($extracto) ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link href="assets/images/favicon/favicon.ico" rel="icon"/>
     <link href="assets/css/vendor.min.css" rel="stylesheet"/>
@@ -65,8 +68,8 @@ if ($item) {
               <div class="selected"><img src="assets/images/module-language/uy.png" alt=""/><span data-i18n="lang.name">Español</span><i class="fas fa-chevron-down"></i></div>
               <div class="lang-list">
                 <ul>
-                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="?lang=en" data-i18n="lang.name_en">Inglés</a></li>
-                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="?lang=es" data-i18n="lang.name_es">Español</a></li>
+                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="<?= e(lang_switch_url('en')) ?>" data-i18n="lang.name_en">Inglés</a></li>
+                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="<?= e(lang_switch_url('es')) ?>" data-i18n="lang.name_es">Español</a></li>
                 </ul>
               </div>
             </div>
@@ -104,8 +107,8 @@ if ($item) {
               <div class="selected"><img src="assets/images/module-language/uy.png" alt=""/><span data-i18n="lang.name">Español</span><i class="fas fa-chevron-down"></i></div>
               <div class="lang-list">
                 <ul>
-                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="?lang=en" data-i18n="lang.name_en">Inglés</a></li>
-                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="?lang=es" data-i18n="lang.name_es">Español</a></li>
+                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="<?= e(lang_switch_url('en')) ?>" data-i18n="lang.name_en">Inglés</a></li>
+                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="<?= e(lang_switch_url('es')) ?>" data-i18n="lang.name_es">Español</a></li>
                 </ul>
               </div>
             </div>
@@ -121,7 +124,7 @@ if ($item) {
           <div class="hero-content">
             <div class="row">
               <div class="col-12 col-lg-8">
-                <h1 class="hero-title"><?= e($item['titulo'] ?? t('common.article_not_found')) ?></h1>
+                <h1 class="hero-title"><?= e($titulo ?: t('common.article_not_found')) ?></h1>
                 <?php if ($item && $item['categoria']): ?>
                 <h2 class="hero-desc"><?= e($item['categoria']) ?> · <?= e($d['day']) ?> <?= e($d['month']) ?> <?= e($d['year']) ?></h2>
                 <?php endif; ?>
@@ -130,7 +133,7 @@ if ($item) {
                 <ol class="breadcrumb d-flex justify-content-center align--bottom">
                   <li class="breadcrumb-item"><a href="index.html" data-i18n="blog.breadcrumb_home">Inicio</a></li>
                   <li class="breadcrumb-item"><a href="blog.php" data-i18n="blog.breadcrumb_news">Novedades</a></li>
-                  <?php if ($item): ?><li class="breadcrumb-item active"><a href="javascript:void(0)"><?= e($item['titulo']) ?></a></li><?php endif; ?>
+                  <?php if ($item): ?><li class="breadcrumb-item active"><a href="javascript:void(0)"><?= e($titulo) ?></a></li><?php endif; ?>
                 </ol>
               </div>
             </div>
@@ -149,7 +152,7 @@ if ($item) {
               <article class="blog-entry blog-single" style="padding:0;overflow:hidden">
                 <?php if ($img): ?>
                 <div class="entry-img">
-                  <img src="<?= e($img) ?>" alt="<?= e($item['titulo']) ?>" style="display:block;width:100%;max-height:460px;object-fit:cover"/>
+                  <img src="<?= e($img) ?>" alt="<?= e($titulo) ?>" style="display:block;width:100%;max-height:460px;object-fit:cover"/>
                 </div>
                 <?php endif; ?>
                 <div class="article-body">
@@ -157,9 +160,9 @@ if ($item) {
                     <span class="entry-category"><?= e($item['categoria']) ?></span>
                     <span class="ms-2 text-muted"><?= e($d['day']) ?> <?= e($d['month']) ?> <?= e($d['year']) ?></span>
                   </div>
-                  <h1 class="entry-title mb-3"><?= e($item['titulo']) ?></h1>
-                  <?php if ($item['extracto']): ?><p class="entry-bio lead mb-4"><?= e($item['extracto']) ?></p><?php endif; ?>
-                  <div class="entry-content rich-content"><?= $item['contenido'] ?></div>
+                  <h1 class="entry-title mb-3"><?= e($titulo) ?></h1>
+                  <?php if ($extracto): ?><p class="entry-bio lead mb-4"><?= e($extracto) ?></p><?php endif; ?>
+                  <div class="entry-content rich-content"><?= $contenido ?></div>
                 </div>
               </article>
               <?php else: ?>

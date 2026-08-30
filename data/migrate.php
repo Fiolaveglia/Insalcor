@@ -21,21 +21,23 @@ const PRODUCTOS_COLUMNAS_NUEVAS = [
     'producto_terminado' => 'INTEGER',
     'nota_replicar'      => "TEXT NOT NULL DEFAULT ''",
     'origen'             => "TEXT NOT NULL DEFAULT ''",
+    'nombre_en'          => "TEXT NOT NULL DEFAULT ''",
+    'descripcion_en'     => "TEXT NOT NULL DEFAULT ''",
 ];
 
-/** DDL de `productos` en su forma actual (una ficha, N especies). */
+/** DDL de `productos` en su forma actual (una ficha, N especies, catálogo único). */
 const DDL_PRODUCTOS = <<<'SQL'
 CREATE TABLE productos (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
   nombre        TEXT NOT NULL,
+  nombre_en     TEXT NOT NULL DEFAULT '',
   descripcion   TEXT NOT NULL DEFAULT '',
+  descripcion_en TEXT NOT NULL DEFAULT '',
   imagen        TEXT NOT NULL DEFAULT '',
   ficha_tecnica TEXT NOT NULL DEFAULT '',
   nota_blog     TEXT NOT NULL DEFAULT '',
   area_negocio  TEXT NOT NULL
                 CHECK (area_negocio IN ('Nutricion Animal', 'Pharma', 'VetPharma')),
-  categoria     TEXT NOT NULL DEFAULT '',
-  marca         TEXT NOT NULL DEFAULT '',
   estado        TEXT NOT NULL DEFAULT 'draft' CHECK (estado IN ('draft', 'published')),
   tiene_imagen       INTEGER,
   tiene_ficha        INTEGER,
@@ -151,8 +153,6 @@ function migrar_especies(PDO $pdo): array
             'ficha_tecnica'      => primer_no_vacio($col('ficha_tecnica')),
             'nota_blog'          => primer_no_vacio($col('nota_blog')),
             'area_negocio'       => $ganador['area_negocio'],
-            'categoria'          => primer_no_vacio($col('categoria')),
-            'marca'              => primer_no_vacio($col('marca')),
             // Si alguna de las fichas estaba publicada, el producto queda publicado.
             'estado'             => in_array('published', $col('estado'), true) ? 'published' : 'draft',
             'tiene_imagen'       => primer_no_null($col('tiene_imagen')),
@@ -250,6 +250,101 @@ function migrar_usuarios(PDO $pdo): array
         . 'entran con su email como nombre de usuario).'];
 }
 
+/**
+ * Catálogo único: `categoria` y `marca` dejan de existir. Todo se clasifica
+ * por especie (Especies ya se usa igual para Nutrición Animal, Pharma y
+ * VetPharma).
+ *
+ * @return string[] Log de lo que se hizo.
+ */
+function migrar_quitar_categoria_marca(PDO $pdo): array
+{
+    $existentes = tabla_columnas($pdo, 'productos');
+    if (!in_array('categoria', $existentes, true) && !in_array('marca', $existentes, true)) {
+        return [];
+    }
+
+    // Sólo las columnas que van a sobrevivir, en el orden en que existan hoy.
+    $columnasFinales = array_values(array_diff($existentes, ['categoria', 'marca']));
+
+    $pdo->beginTransaction();
+    try {
+        if (tabla_existe($pdo, 'productos_pre_sin_categoria')) {
+            $pdo->exec('DROP TABLE productos_pre_sin_categoria');
+        }
+        $pdo->exec('ALTER TABLE productos RENAME TO productos_pre_sin_categoria');
+        foreach (['idx_productos_estado', 'idx_productos_area', 'idx_productos_unico'] as $idx) {
+            $pdo->exec("DROP INDEX IF EXISTS $idx");
+        }
+        $pdo->exec(DDL_PRODUCTOS);
+
+        $lista = implode(', ', $columnasFinales);
+        $pdo->exec("INSERT INTO productos ($lista) SELECT $lista FROM productos_pre_sin_categoria");
+
+        $pdo->exec('CREATE INDEX idx_productos_estado ON productos(estado)');
+        $pdo->exec('CREATE INDEX idx_productos_area ON productos(area_negocio)');
+        $pdo->exec('CREATE UNIQUE INDEX idx_productos_unico ON productos(nombre, area_negocio)');
+
+        $pdo->exec('DROP TABLE productos_pre_sin_categoria');
+
+        $pdo->commit();
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        throw $e;
+    }
+
+    return ['productos: columnas categoria y marca eliminadas (catálogo único, todo se clasifica por especie).'];
+}
+
+/** DDL de `tutoriales` (video de YouTube con título y descripción). */
+const DDL_TUTORIALES = <<<'SQL'
+CREATE TABLE tutoriales (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  titulo        TEXT NOT NULL,
+  titulo_en     TEXT NOT NULL DEFAULT '',
+  descripcion   TEXT NOT NULL DEFAULT '',
+  descripcion_en TEXT NOT NULL DEFAULT '',
+  youtube_url   TEXT NOT NULL DEFAULT '',
+  youtube_id    TEXT NOT NULL DEFAULT '',
+  estado        TEXT NOT NULL DEFAULT 'draft' CHECK (estado IN ('draft', 'published')),
+  autor_id      INTEGER,
+  vistas        INTEGER NOT NULL DEFAULT 0,
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  published_at  TEXT,
+  FOREIGN KEY (autor_id) REFERENCES users(id) ON DELETE SET NULL
+)
+SQL;
+
+/** Columnas de traducción (inglés) agregadas después de la versión inicial. */
+const NOTICIAS_COLUMNAS_NUEVAS = [
+    'titulo_en'    => "TEXT NOT NULL DEFAULT ''",
+    'extracto_en'  => "TEXT NOT NULL DEFAULT ''",
+    'contenido_en' => "TEXT NOT NULL DEFAULT ''",
+];
+
+const TUTORIALES_COLUMNAS_NUEVAS = [
+    'titulo_en'      => "TEXT NOT NULL DEFAULT ''",
+    'descripcion_en' => "TEXT NOT NULL DEFAULT ''",
+];
+
+/**
+ * Crea la tabla `tutoriales` si todavía no existe (bases creadas antes de
+ * esta funcionalidad).
+ *
+ * @return string[] Log de lo que se hizo.
+ */
+function migrar_tutoriales(PDO $pdo): array
+{
+    if (tabla_existe($pdo, 'tutoriales')) {
+        return [];
+    }
+    $pdo->exec(DDL_TUTORIALES);
+    $pdo->exec('CREATE INDEX idx_tutoriales_estado ON tutoriales(estado)');
+
+    return ['tutoriales: tabla creada.'];
+}
+
 function migrar(PDO $pdo): array
 {
     $log = migrar_usuarios($pdo);
@@ -265,7 +360,36 @@ function migrar(PDO $pdo): array
 
     // Un producto vive en N especies: la columna `especie` se reemplaza por la
     // tabla producto_especies.
-    return array_merge($log, migrar_especies($pdo));
+    $log = array_merge($log, migrar_especies($pdo));
+
+    // Catálogo único: se elimina la distinción categoria/marca.
+    $log = array_merge($log, migrar_quitar_categoria_marca($pdo));
+
+    // Sección de tutoriales (video de YouTube).
+    $log = array_merge($log, migrar_tutoriales($pdo));
+
+    // Traducción al inglés de noticias.
+    $existentesNoticias = tabla_columnas($pdo, 'noticias');
+    foreach (NOTICIAS_COLUMNAS_NUEVAS as $col => $tipo) {
+        if (in_array($col, $existentesNoticias, true)) {
+            continue;
+        }
+        $pdo->exec("ALTER TABLE noticias ADD COLUMN $col $tipo");
+        $log[] = "noticias: + columna $col ($tipo)";
+    }
+
+    // Traducción al inglés de tutoriales (la tabla ya existe a esta altura,
+    // migrar_tutoriales() la crea si hacía falta).
+    $existentesTutoriales = tabla_columnas($pdo, 'tutoriales');
+    foreach (TUTORIALES_COLUMNAS_NUEVAS as $col => $tipo) {
+        if (in_array($col, $existentesTutoriales, true)) {
+            continue;
+        }
+        $pdo->exec("ALTER TABLE tutoriales ADD COLUMN $col $tipo");
+        $log[] = "tutoriales: + columna $col ($tipo)";
+    }
+
+    return $log;
 }
 
 if (PHP_SAPI === 'cli' && realpath($argv[0] ?? '') === realpath(__FILE__)) {

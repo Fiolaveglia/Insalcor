@@ -3,6 +3,8 @@
 
   let noticiaQuill = null;
   let productoQuill = null;
+  let noticiaQuillEn = null;
+  let productoQuillEn = null;
   let currentUser = null;
 
   function assetUrl(path) {
@@ -43,6 +45,20 @@
       productoQuill = new Quill('#producto-descripcion-editor', {
         theme: 'snow',
         placeholder: 'Descripción del producto...',
+        modules: { toolbar: [['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link'], ['clean']] },
+      });
+    }
+    if (!noticiaQuillEn) {
+      noticiaQuillEn = new Quill('#noticia-contenido-en-editor', {
+        theme: 'snow',
+        placeholder: 'Full content...',
+        modules: { toolbar: [['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link'], ['clean']] },
+      });
+    }
+    if (!productoQuillEn) {
+      productoQuillEn = new Quill('#producto-descripcion-en-editor', {
+        theme: 'snow',
+        placeholder: 'Product description...',
         modules: { toolbar: [['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link'], ['clean']] },
       });
     }
@@ -98,13 +114,6 @@
     especieBoxes().forEach((b) => { b.checked = selected.has(b.value); });
   }
 
-  function toggleEspecie() {
-    const area = document.getElementById('producto-area').value;
-    const show = area === 'Nutricion Animal';
-    document.getElementById('producto-especie-wrap').classList.toggle('hidden', !show);
-    if (!show) setEspecies([]);
-  }
-
   /* -------- Noticias -------- */
   async function loadNoticias() {
     const q = document.getElementById('noticias-search').value.trim();
@@ -147,10 +156,13 @@
     ensureQuills();
     document.getElementById('noticia-id').value = '';
     document.getElementById('noticia-titulo').value = '';
+    document.getElementById('noticia-titulo-en').value = '';
     document.getElementById('noticia-extracto').value = '';
+    document.getElementById('noticia-extracto-en').value = '';
     document.getElementById('noticia-categoria').value = '';
     document.getElementById('noticia-imagen').value = '';
     noticiaQuill.setContents([]);
+    noticiaQuillEn.setContents([]);
     setImagePreview('noticia-preview', '');
     document.getElementById('modal-noticia-title').textContent = 'Nueva Noticia';
   }
@@ -163,11 +175,14 @@
       document.getElementById('modal-noticia-title').textContent = 'Editar Noticia';
       document.getElementById('noticia-id').value = item.id;
       document.getElementById('noticia-titulo').value = item.titulo;
+      document.getElementById('noticia-titulo-en').value = item.titulo_en || '';
       document.getElementById('noticia-extracto').value = item.extracto;
+      document.getElementById('noticia-extracto-en').value = item.extracto_en || '';
       document.getElementById('noticia-categoria').value = item.categoria;
       document.getElementById('noticia-imagen').value = item.imagen || '';
       setImagePreview('noticia-preview', item.imagen);
       noticiaQuill.root.innerHTML = item.contenido || '';
+      noticiaQuillEn.root.innerHTML = item.contenido_en || '';
     }
     openModal('modal-noticia');
   }
@@ -176,10 +191,13 @@
     const id = document.getElementById('noticia-id').value;
     const payload = {
       titulo: document.getElementById('noticia-titulo').value.trim(),
+      titulo_en: document.getElementById('noticia-titulo-en').value.trim(),
       extracto: document.getElementById('noticia-extracto').value.trim(),
+      extracto_en: document.getElementById('noticia-extracto-en').value.trim(),
       categoria: document.getElementById('noticia-categoria').value.trim(),
       imagen: document.getElementById('noticia-imagen').value,
       contenido: noticiaQuill.root.innerHTML,
+      contenido_en: noticiaQuillEn.root.innerHTML,
       estado,
     };
     if (!payload.titulo) {
@@ -216,12 +234,10 @@
             <img class="item-thumb" src="${assetUrl(item.imagen) || ''}" alt="">
             <div>
               <strong>${escapeHtml(item.nombre)}</strong>
-              <div class="sub">${escapeHtml(item.marca || '')}</div>
             </div>
           </div>
         </td>
         <td>${escapeHtml(item.area_negocio)}</td>
-        <td>${escapeHtml(item.categoria || '—')}</td>
         <td>${escapeHtml((item.especies || []).join(', ') || '—')}</td>
         <td>${badge(item.estado)}</td>
         <td>
@@ -238,16 +254,15 @@
     ensureQuills();
     document.getElementById('producto-id').value = '';
     document.getElementById('producto-nombre').value = '';
+    document.getElementById('producto-nombre-en').value = '';
     document.getElementById('producto-area').value = 'Nutricion Animal';
-    document.getElementById('producto-categoria').value = '';
-    document.getElementById('producto-marca').value = '';
     setEspecies([]);
     document.getElementById('producto-imagen').value = '';
     document.getElementById('producto-ficha').value = '';
     document.getElementById('producto-ficha-file').value = '';
     productoQuill.setContents([]);
+    productoQuillEn.setContents([]);
     setImagePreview('producto-preview', '');
-    toggleEspecie();
     document.getElementById('modal-producto-title').textContent = 'Nuevo Producto';
   }
 
@@ -259,15 +274,14 @@
       document.getElementById('modal-producto-title').textContent = 'Editar Producto';
       document.getElementById('producto-id').value = item.id;
       document.getElementById('producto-nombre').value = item.nombre;
+      document.getElementById('producto-nombre-en').value = item.nombre_en || '';
       document.getElementById('producto-area').value = item.area_negocio;
-      document.getElementById('producto-categoria').value = item.categoria || '';
-      document.getElementById('producto-marca').value = item.marca || '';
       setEspecies(item.especies);
       document.getElementById('producto-imagen').value = item.imagen || '';
       document.getElementById('producto-ficha').value = item.ficha_tecnica || '';
       setImagePreview('producto-preview', item.imagen);
       productoQuill.root.innerHTML = item.descripcion || '';
-      toggleEspecie();
+      productoQuillEn.root.innerHTML = item.descripcion_en || '';
     }
     openModal('modal-producto');
   }
@@ -277,13 +291,13 @@
     const area = document.getElementById('producto-area').value;
     const payload = {
       nombre: document.getElementById('producto-nombre').value.trim(),
+      nombre_en: document.getElementById('producto-nombre-en').value.trim(),
       area_negocio: area,
-      categoria: document.getElementById('producto-categoria').value,
-      marca: document.getElementById('producto-marca').value,
-      especies: area === 'Nutricion Animal' ? getEspecies() : [],
+      especies: getEspecies(),
       imagen: document.getElementById('producto-imagen').value,
       ficha_tecnica: document.getElementById('producto-ficha').value.trim(),
       descripcion: productoQuill.root.innerHTML,
+      descripcion_en: productoQuillEn.root.innerHTML,
       estado,
     };
     if (!payload.nombre) {
@@ -294,6 +308,125 @@
       await AdminAPI.saveProducto(payload, id || null);
       closeModal('modal-producto');
       await loadProductos();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  /* -------- Tutoriales -------- */
+
+  /** Extrae el ID de YouTube de cualquier formato de URL usual (mismo criterio que el backend). */
+  function extraerYoutubeId(url) {
+    url = (url || '').trim();
+    if (!url) return null;
+    const patrones = [
+      /youtu\.be\/([A-Za-z0-9_-]{11})/,
+      /[?&]v=([A-Za-z0-9_-]{11})/,
+      /youtube\.com\/embed\/([A-Za-z0-9_-]{11})/,
+      /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
+    ];
+    for (const p of patrones) {
+      const m = url.match(p);
+      if (m) return m[1];
+    }
+    if (/^[A-Za-z0-9_-]{11}$/.test(url)) return url;
+    return null;
+  }
+
+  function updateTutorialPreview() {
+    const url = document.getElementById('tutorial-youtube-url').value;
+    const ytId = extraerYoutubeId(url);
+    const wrap = document.getElementById('tutorial-preview-wrap');
+    const img = document.getElementById('tutorial-preview');
+    if (ytId) {
+      img.src = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+      wrap.style.display = '';
+    } else {
+      img.src = '';
+      wrap.style.display = 'none';
+    }
+  }
+
+  async function loadTutoriales() {
+    const q = document.getElementById('tutoriales-search').value.trim();
+    const data = await AdminAPI.listTutoriales(q);
+    document.getElementById('tutoriales-count').textContent = data.total;
+    const tbody = document.getElementById('tutoriales-tbody');
+    const empty = document.getElementById('tutoriales-empty');
+    tbody.innerHTML = '';
+    if (!data.items.length) {
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+    data.items.forEach((item) => {
+      const tr = document.createElement('tr');
+      const thumb = item.youtube_id ? `https://img.youtube.com/vi/${item.youtube_id}/default.jpg` : '';
+      tr.innerHTML = `
+        <td><img class="item-thumb" src="${thumb}" alt=""></td>
+        <td><strong>${escapeHtml(item.titulo)}</strong></td>
+        <td>${item.youtube_url ? `<a href="${escapeHtml(item.youtube_url)}" target="_blank" rel="noopener">Ver en YouTube</a>` : '—'}</td>
+        <td>${formatDate(item.published_at || item.created_at)}</td>
+        <td>${badge(item.estado)}</td>
+        <td>
+          <div class="actions">
+            <button class="icon-btn" data-edit-tutorial="${item.id}" type="button" title="Editar"><i class="fa-solid fa-pen"></i></button>
+            <button class="icon-btn danger" data-del-tutorial="${item.id}" type="button" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function resetTutorialForm() {
+    document.getElementById('tutorial-id').value = '';
+    document.getElementById('tutorial-titulo').value = '';
+    document.getElementById('tutorial-titulo-en').value = '';
+    document.getElementById('tutorial-youtube-url').value = '';
+    document.getElementById('tutorial-descripcion').value = '';
+    document.getElementById('tutorial-descripcion-en').value = '';
+    updateTutorialPreview();
+    document.getElementById('modal-tutorial-title').textContent = 'Nuevo Tutorial';
+  }
+
+  async function openTutorialEditor(id) {
+    resetTutorialForm();
+    if (id) {
+      const { item } = await AdminAPI.getTutorial(id);
+      document.getElementById('modal-tutorial-title').textContent = 'Editar Tutorial';
+      document.getElementById('tutorial-id').value = item.id;
+      document.getElementById('tutorial-titulo').value = item.titulo;
+      document.getElementById('tutorial-titulo-en').value = item.titulo_en || '';
+      document.getElementById('tutorial-youtube-url').value = item.youtube_url || '';
+      document.getElementById('tutorial-descripcion').value = item.descripcion || '';
+      document.getElementById('tutorial-descripcion-en').value = item.descripcion_en || '';
+      updateTutorialPreview();
+    }
+    openModal('modal-tutorial');
+  }
+
+  async function saveTutorial(estado) {
+    const id = document.getElementById('tutorial-id').value;
+    const payload = {
+      titulo: document.getElementById('tutorial-titulo').value.trim(),
+      titulo_en: document.getElementById('tutorial-titulo-en').value.trim(),
+      youtube_url: document.getElementById('tutorial-youtube-url').value.trim(),
+      descripcion: document.getElementById('tutorial-descripcion').value.trim(),
+      descripcion_en: document.getElementById('tutorial-descripcion-en').value.trim(),
+      estado,
+    };
+    if (!payload.titulo) {
+      alert('El título es obligatorio');
+      return;
+    }
+    if (!payload.youtube_url) {
+      alert('La URL de YouTube es obligatoria');
+      return;
+    }
+    try {
+      await AdminAPI.saveTutorial(payload, id || null);
+      closeModal('modal-tutorial');
+      await loadTutoriales();
     } catch (err) {
       alert(err.message);
     }
@@ -313,10 +446,16 @@
     });
     document.getElementById('section-noticias').classList.toggle('hidden', name !== 'noticias');
     document.getElementById('section-productos').classList.toggle('hidden', name !== 'productos');
-    document.getElementById('page-title').textContent =
-      name === 'noticias' ? 'Gestión de Noticias' : 'Gestión de Productos';
+    document.getElementById('section-tutoriales').classList.toggle('hidden', name !== 'tutoriales');
+    const titulos = {
+      noticias: 'Gestión de Noticias',
+      productos: 'Gestión de Productos',
+      tutoriales: 'Gestión de Tutoriales',
+    };
+    document.getElementById('page-title').textContent = titulos[name] || '';
     if (name === 'noticias') loadNoticias();
-    else loadProductos();
+    else if (name === 'productos') loadProductos();
+    else loadTutoriales();
   }
 
   async function init() {
@@ -371,7 +510,6 @@
     document.getElementById('btn-save-producto-draft').addEventListener('click', () => saveProducto('draft'));
     document.getElementById('btn-save-producto-publish').addEventListener('click', () => saveProducto('published'));
     document.getElementById('productos-search').addEventListener('input', debounce(loadProductos, 250));
-    document.getElementById('producto-area').addEventListener('change', toggleEspecie);
 
     document.getElementById('noticias-tbody').addEventListener('click', async (e) => {
       const edit = e.target.closest('[data-edit-noticia]');
@@ -390,6 +528,22 @@
       if (del && confirm('¿Eliminar este producto?')) {
         await AdminAPI.deleteProducto(del.dataset.delProducto);
         loadProductos();
+      }
+    });
+
+    document.getElementById('btn-new-tutorial').addEventListener('click', () => openTutorialEditor(null));
+    document.getElementById('btn-save-tutorial-draft').addEventListener('click', () => saveTutorial('draft'));
+    document.getElementById('btn-save-tutorial-publish').addEventListener('click', () => saveTutorial('published'));
+    document.getElementById('tutoriales-search').addEventListener('input', debounce(loadTutoriales, 250));
+    document.getElementById('tutorial-youtube-url').addEventListener('input', debounce(updateTutorialPreview, 300));
+
+    document.getElementById('tutoriales-tbody').addEventListener('click', async (e) => {
+      const edit = e.target.closest('[data-edit-tutorial]');
+      const del = e.target.closest('[data-del-tutorial]');
+      if (edit) openTutorialEditor(edit.dataset.editTutorial);
+      if (del && confirm('¿Eliminar este tutorial?')) {
+        await AdminAPI.deleteTutorial(del.dataset.delTutorial);
+        loadTutoriales();
       }
     });
 

@@ -6,6 +6,9 @@ $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $item = $id > 0 ? pub_producto($id) : null;
 $contactHref = 'contact.html';
 
+$nombre = $item ? campo_i18n($item, 'nombre') : '';
+$descripcion = $item ? campo_i18n($item, 'descripcion') : '';
+
 $area = $item['area_negocio'] ?? '';
 if ($area === 'Nutricion Animal') {
     $areaHref = 'nutricion-animal.php';
@@ -22,8 +25,8 @@ if ($area === 'Nutricion Animal') {
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="author" content="Insalcor"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta name="description" content="Insalcor - <?= e($item['nombre'] ?? 'Producto') ?>"/>
-    <title>Insalcor – <?= e($item['nombre'] ?? t('common.product_not_found')) ?></title>
+    <meta name="description" content="Insalcor - <?= e($nombre ?: 'Producto') ?>"/>
+    <title>Insalcor – <?= e($nombre ?: t('common.product_not_found')) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link href="assets/images/favicon/favicon.ico" rel="icon"/>
     <link rel="preconnect" href="https://fonts.gstatic.com"/>
@@ -73,8 +76,8 @@ if ($area === 'Nutricion Animal') {
               <div class="selected"><img src="assets/images/module-language/uy.png" alt=""/><span data-i18n="lang.name">Español</span><i class="fas fa-chevron-down"></i></div>
               <div class="lang-list">
                 <ul>
-                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="?lang=en" data-i18n="lang.name_en">Inglés</a></li>
-                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="?lang=es" data-i18n="lang.name_es">Español</a></li>
+                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="<?= e(lang_switch_url('en')) ?>" data-i18n="lang.name_en">Inglés</a></li>
+                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="<?= e(lang_switch_url('es')) ?>" data-i18n="lang.name_es">Español</a></li>
                 </ul>
               </div>
             </div>
@@ -112,8 +115,8 @@ if ($area === 'Nutricion Animal') {
               <div class="selected"><img src="assets/images/module-language/uy.png" alt=""/><span data-i18n="lang.name">Español</span><i class="fas fa-chevron-down"></i></div>
               <div class="lang-list">
                 <ul>
-                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="?lang=en" data-i18n="lang.name_en">Inglés</a></li>
-                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="?lang=es" data-i18n="lang.name_es">Español</a></li>
+                  <li><img src="assets/images/module-language/en.png" alt=""/><a href="<?= e(lang_switch_url('en')) ?>" data-i18n="lang.name_en">Inglés</a></li>
+                  <li><img src="assets/images/module-language/uy.png" alt=""/><a href="<?= e(lang_switch_url('es')) ?>" data-i18n="lang.name_es">Español</a></li>
                 </ul>
               </div>
             </div>
@@ -129,7 +132,7 @@ if ($area === 'Nutricion Animal') {
           <div class="hero-content">
             <div class="row">
               <div class="col-12 col-lg-8">
-                <h1 class="hero-title"><?= e($item['nombre'] ?? t('common.product_not_found')) ?></h1>
+                <h4 class="hero-title"><?= e($nombre ?: t('common.product_not_found')) ?></h4>
                 <?php if ($item): ?><h2 class="hero-desc"><?= e($item['area_negocio']) ?></h2><?php endif; ?>
               </div>
               <div class="col-12">
@@ -137,7 +140,7 @@ if ($area === 'Nutricion Animal') {
                   <li class="breadcrumb-item"><a href="index.html" data-i18n="blog.breadcrumb_home">Inicio</a></li>
                   <?php if ($item): ?>
                   <li class="breadcrumb-item"><a href="<?= e($areaHref) ?>"><?= e($item['area_negocio']) ?></a></li>
-                  <li class="breadcrumb-item active"><a href="javascript:void(0)"><?= e($item['nombre']) ?></a></li>
+                  <li class="breadcrumb-item active"><a href="javascript:void(0)"><?= e($nombre) ?></a></li>
                   <?php endif; ?>
                 </ol>
               </div>
@@ -156,15 +159,15 @@ if ($area === 'Nutricion Animal') {
           <div class="row">
             <div class="col-12 col-lg-6">
               <div class="product-img">
-                <img class="img-fluid" src="<?= e($img) ?>" alt="<?= e($item['nombre']) ?>"/>
+                <img class="img-fluid" src="<?= e($img) ?>" alt="<?= e($nombre) ?>"/>
                 <a class="img-popup" href="<?= e($img) ?>"></a>
               </div>
             </div>
             <div class="col-12 col-lg-6">
               <div class="product-content">
-                <div class="product-title"><h3><?= e($item['nombre']) ?></h3></div>
-                <div class="product-category"><span><?= e(t('common.category')) ?>: <?= e($item['categoria'] ?: '—') ?></span></div>
-                <div class="product-desc rich-content"><?= $item['descripcion'] ?></div>
+                <div class="product-title"><h3><?= e($nombre) ?></h3></div>
+                <div class="product-category"><span><?= e(t('common.category')) ?>: <?= e(!empty($item['especies']) ? implode(', ', $item['especies']) : '—') ?></span></div>
+                <div class="product-desc rich-content"><?= $descripcion ?></div>
                 <div class="product-action">
                   <?php if ($ficha): ?>
                     <a class="btn btn--secondary btn-radius-right" href="<?= e($ficha) ?>" target="_blank" rel="noopener"><?= e(t('common.tech_sheet')) ?></a>
