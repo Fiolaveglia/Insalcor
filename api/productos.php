@@ -184,6 +184,15 @@ if ($method === 'POST') {
 
     $especies = validar_especies($body['especies'] ?? ($body['especie'] ?? null));
 
+    // Traducción automática: si no se cargó a mano la versión en inglés,
+    // se genera sola a partir del español.
+    if (($data['nombre_en'] ?? '') === '') {
+        $data['nombre_en'] = auto_traducir($data['nombre']);
+    }
+    if (($data['descripcion_en'] ?? '') === '') {
+        $data['descripcion_en'] = auto_traducir_html($data['descripcion'] ?? '');
+    }
+
     db()->beginTransaction();
     try {
         $stmt = db()->prepare(
@@ -248,6 +257,15 @@ if ($method === 'PUT' || $method === 'PATCH') {
     // Las especies sólo se tocan si vienen en el body.
     $tocaEspecies = array_key_exists('especies', $body) || array_key_exists('especie', $body);
     $especies = validar_especies($body['especies'] ?? ($body['especie'] ?? null));
+
+    // Traducción automática: si el campo en inglés quedó vacío, se genera
+    // solo a partir del español (no pisa una traducción ya cargada a mano).
+    if ($nombreEn === '') {
+        $nombreEn = auto_traducir($nombre);
+    }
+    if ($descripcionEn === '') {
+        $descripcionEn = auto_traducir_html($descripcion);
+    }
 
     db()->beginTransaction();
     try {

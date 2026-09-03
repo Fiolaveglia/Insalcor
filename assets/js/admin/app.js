@@ -33,6 +33,26 @@
     document.getElementById(id).classList.add('hidden');
   }
 
+  /**
+   * Deshabilita los botones Guardar/Publicar de un formulario y les cambia
+   * el texto mientras se guarda — el guardado ahora puede tardar un par de
+   * segundos extra por la traducción automática al inglés.
+   */
+  function setSavingState(prefix, saving) {
+    const draftBtn = document.getElementById(`btn-save-${prefix}-draft`);
+    const publishBtn = document.getElementById(`btn-save-${prefix}-publish`);
+    [draftBtn, publishBtn].forEach((btn) => { btn.disabled = saving; });
+    if (saving) {
+      draftBtn.dataset.originalText = draftBtn.dataset.originalText || draftBtn.textContent;
+      publishBtn.dataset.originalText = publishBtn.dataset.originalText || publishBtn.textContent;
+      draftBtn.textContent = 'Guardando...';
+      publishBtn.textContent = 'Guardando...';
+    } else {
+      if (draftBtn.dataset.originalText) draftBtn.textContent = draftBtn.dataset.originalText;
+      if (publishBtn.dataset.originalText) publishBtn.textContent = publishBtn.dataset.originalText;
+    }
+  }
+
   function ensureQuills() {
     if (!noticiaQuill) {
       noticiaQuill = new Quill('#noticia-contenido-editor', {
@@ -205,11 +225,14 @@
       return;
     }
     try {
+      setSavingState('noticia', true);
       await AdminAPI.saveNoticia(payload, id || null);
       closeModal('modal-noticia');
       await loadNoticias();
     } catch (err) {
       alert(err.message);
+    } finally {
+      setSavingState('noticia', false);
     }
   }
 
@@ -305,11 +328,14 @@
       return;
     }
     try {
+      setSavingState('producto', true);
       await AdminAPI.saveProducto(payload, id || null);
       closeModal('modal-producto');
       await loadProductos();
     } catch (err) {
       alert(err.message);
+    } finally {
+      setSavingState('producto', false);
     }
   }
 
@@ -424,11 +450,14 @@
       return;
     }
     try {
+      setSavingState('tutorial', true);
       await AdminAPI.saveTutorial(payload, id || null);
       closeModal('modal-tutorial');
       await loadTutoriales();
     } catch (err) {
       alert(err.message);
+    } finally {
+      setSavingState('tutorial', false);
     }
   }
 

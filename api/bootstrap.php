@@ -174,3 +174,161 @@ function extraer_youtube_id(?string $url): ?string
     }
     return null;
 }
+
+/* ------------------------------------------------------ traducción automática */
+
+/**
+ * Traduce un fragmento de texto plano (sin HTML) del español al inglés
+ * usando la API pública y gratuita de MyMemory (no requiere API key).
+ * Devuelve null si falla (sin conexión, límite superado, respuesta rara,
+ * etc.) — nunca lanza una excepción, para no cortar el guardado del
+ * contenido si la traducción automática no está disponible en el momento.
+ *
+ * MyMemory acepta un máximo razonable de caracteres por consulta; los
+ * textos largos hay que partirlos antes de llamar a esta función
+ * (ver auto_traducir_fragmentos()).
+ */
+function traducir_mymemory_fragmento(string $texto, string $de = 'es', string $a = 'en'): ?string
+{
+    $texto = trim($texto);
+    if ($texto === '') {
+        return '';
+    }
+
+    $url = 'https://api.mymemory.translated.net/get?' . http_build_query([
+        'q' => $texto,
+        'langpair' => "$de|$a",
+    ]);
+
+    $context = stream_context_create([
+        'http' => ['timeout' => 8, 'ignore_errors' => true],
+        'https' => ['timeout' => 8, 'ignore_errors' => true],
+    ]);
+
+    $respuesta = @file_get_contents($url, false, $context);
+    if ($respuesta === false) {
+        return null;
+    }
+
+    $json = json_decode($respuesta, true);
+    $estado = (int) ($json['responseStatus'] ?? 0);
+    $traduccion = $json['responseData']['translatedText'] ?? null;
+
+    if ($estado !== 200 || !is_string($traduccion) || $traduccion === '') {
+        return null;
+    }
+    // MyMemory a veces devuelve un aviso de cuota como si fuera la traducción.
+    if (stripos($traduccion, 'MYMEMORY WARNING') !== false) {
+        return null;
+    }
+
+    return $traduccion;
+}
+
+/**
+ * Parte un texto en fragmentos de a lo sumo $max caracteres, cortando en
+ * límites de oración cuando se puede (para no cortar una idea a la mitad).
+ *
+ * @return string[]
+ */
+function dividir_en_fragmentos(string $texto, int $max = 480): array
+{
+    $texto = trim($texto);
+    if ($texto === '') {
+        return [];
+    }
+    if (mb_strlen($texto) <= $max) {
+        return [$texto];
+    }
+
+    $oraciones = preg_split('/(?<=[.!?])\s+/u', $texto) ?: [$texto];
+    $fragmentos = [];
+    $actual = '';
+    foreach ($oraciones as $oracion) {
+        if ($actual !== '' && mb_strlen($actual . ' ' . $oracion) > $max) {
+            $fragmentos[] = trim($actual);
+            $actual = $oracion;
+        } else {
+            $actual = $actual === '' ? $oracion : $actual . ' ' . $oracion;
+        }
+    }
+    if ($actual !== '') {
+        $fragmentos[] = trim($actual);
+    }
+
+    // Si una oración sola ya supera el límite, la cortamos a la fuerza.
+    $final = [];
+    foreach ($fragmentos as $f) {
+        if (mb_strlen($f) <= $max) {
+            $final[] = $f;
+            continue;
+        }
+        foreach (mb_str_split($f, $max) as $trozo) {
+            $final[] = $trozo;
+        }
+    }
+    return $final;
+}
+
+/**
+ * Traduce un texto plano (título, extracto, nombre de producto...) del
+ * español al inglés. Devuelve '' si no se pudo traducir (sin conexión,
+ * límite superado, etc.) — el llamador debe tratar '' como "dejar vacío,
+ * ya se completará a mano o en un guardado posterior".
+ */
+function auto_traducir(?string $texto): string
+{
+    $texto = trim((string) $texto);
+    if ($texto === '') {
+        return '';
+    }
+
+    $fragmentos = dividir_en_fragmentos($texto);
+    $traducidos = [];
+    foreach ($fragmentos as $fragmento) {
+        $t = traducir_mymemory_fragmento($fragmento);
+        if ($t === null) {
+            return ''; // preferimos no guardar una traducción a medias
+        }
+        $traducidos[] = $t;
+    }
+    return implode(' ', $traducidos);
+}
+
+/**
+ * Traduce contenido HTML simple (el que genera el editor Quill: párrafos,
+ * negrita, listas, links) del español al inglés. Traduce párrafo por
+ * párrafo como texto plano y los vuelve a envolver en <p>; el formato
+ * (negrita, listas, etc.) se pierde en la traducción automática — si hace
+ * falta conservarlo, el editor puede ajustar el campo en inglés a mano
+ * desde el admin.
+ */
+function auto_traducir_html(?string $html): string
+{
+    $html = trim((string) $html);
+    if ($html === '') {
+        return '';
+    }
+
+    $bloques = preg_split('~</p>|<br\s*/?>~i', $html) ?: [$html];
+    $parrafos = [];
+    foreach ($bloques as $bloque) {
+        $plano = trim(strip_tags($bloque));
+        if ($plano !== '') {
+            $parrafos[] = $plano;
+        }
+    }
+    if (!$parrafos) {
+        return '';
+    }
+
+    $traducidos = [];
+    foreach ($parrafos as $parrafo) {
+        $t = auto_traducir($parrafo);
+        if ($t === '') {
+            return ''; // preferimos no guardar una traducción a medias
+        }
+        $traducidos[] = '<p>' . htmlspecialchars($t, ENT_QUOTES, 'UTF-8') . '</p>';
+    }
+    return implode('', $traducidos);
+}

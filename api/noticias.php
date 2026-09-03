@@ -130,6 +130,18 @@ if ($method === 'POST') {
     require_csrf($body);
     $data = validate_noticia($body);
 
+    // Traducción automática: si no se cargó a mano la versión en inglés,
+    // se genera sola a partir del español.
+    if (($data['titulo_en'] ?? '') === '') {
+        $data['titulo_en'] = auto_traducir($data['titulo']);
+    }
+    if (($data['extracto_en'] ?? '') === '') {
+        $data['extracto_en'] = auto_traducir($data['extracto'] ?? '');
+    }
+    if (($data['contenido_en'] ?? '') === '') {
+        $data['contenido_en'] = auto_traducir_html($data['contenido'] ?? '');
+    }
+
     $publishedAt = $data['estado'] === 'published' ? now_sql() : null;
     $stmt = db()->prepare(
         'INSERT INTO noticias (titulo, titulo_en, extracto, extracto_en, contenido, contenido_en, imagen, categoria, estado, autor_id, published_at, updated_at)
@@ -182,6 +194,18 @@ if ($method === 'PUT' || $method === 'PATCH') {
     $imagen = $data['imagen'] ?? $row['imagen'];
     $categoria = $data['categoria'] ?? $row['categoria'];
     $estado = $data['estado'] ?? $row['estado'];
+
+    // Traducción automática: si el campo en inglés quedó vacío, se genera
+    // solo a partir del español (no pisa una traducción ya cargada a mano).
+    if ($tituloEn === '') {
+        $tituloEn = auto_traducir($titulo);
+    }
+    if ($extractoEn === '') {
+        $extractoEn = auto_traducir($extracto);
+    }
+    if ($contenidoEn === '') {
+        $contenidoEn = auto_traducir_html($contenido);
+    }
 
     $publishedAt = $row['published_at'];
     if ($estado === 'published' && !$publishedAt) {

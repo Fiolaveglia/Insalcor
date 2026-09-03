@@ -124,6 +124,16 @@ if ($method === 'POST') {
         json_error('La URL de YouTube es obligatoria');
     }
 
+    // Traducción automática: si no se cargó a mano la versión en inglés,
+    // se genera sola a partir del español. La descripción del tutorial es
+    // texto plano (no viene del editor Quill), por eso no se envuelve en <p>.
+    if (($data['titulo_en'] ?? '') === '') {
+        $data['titulo_en'] = auto_traducir($data['titulo']);
+    }
+    if (($data['descripcion_en'] ?? '') === '') {
+        $data['descripcion_en'] = auto_traducir($data['descripcion'] ?? '');
+    }
+
     $publishedAt = $data['estado'] === 'published' ? now_sql() : null;
     $stmt = db()->prepare(
         'INSERT INTO tutoriales (titulo, titulo_en, descripcion, descripcion_en, youtube_url, youtube_id, estado, autor_id, published_at, updated_at)
@@ -175,6 +185,15 @@ if ($method === 'PUT' || $method === 'PATCH') {
 
     if ($estado === 'published' && $youtubeId === '') {
         json_error('La URL de YouTube es obligatoria para publicar');
+    }
+
+    // Traducción automática: si el campo en inglés quedó vacío, se genera
+    // solo a partir del español (no pisa una traducción ya cargada a mano).
+    if ($tituloEn === '') {
+        $tituloEn = auto_traducir($titulo);
+    }
+    if ($descripcionEn === '') {
+        $descripcionEn = auto_traducir($descripcion);
     }
 
     $publishedAt = $row['published_at'];
