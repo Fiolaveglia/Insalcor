@@ -1,5 +1,17 @@
+<?php
+require __DIR__ . '/inc/public.php';
+i18n_begin();
+
+$detailBase = 'blog-single.php';
+$noticias = array_slice(pub_noticias(), 0, 6);
+
+// Con 3 o más noticias se muestra como carrusel (diseño original). Con
+// menos, el carrusel estira la única/las dos tarjetas para llenar el
+// espacio y se ve mal — en ese caso se muestra una grilla simple.
+$noticiasCarrusel = count($noticias) >= 3;
+?>
 <!DOCTYPE html>
-<html dir="ltr" lang="en-US">
+<html dir="ltr" lang="<?= e(current_lang()) ?>">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,7 +26,7 @@
     <link href="assets/css/style.css" rel="stylesheet"/>
     <link href="assets/css/search.css" rel="stylesheet"/>
   </head>
-  <body data-i18n-base="assets/i18n" data-lang="es">
+  <body data-i18n-base="assets/i18n" data-lang="es" data-api-root="." data-asset-prefix="" data-noticia-detail="blog-single.php">
 
     <div class="preloader">
       <div class="spinner">
@@ -44,7 +56,7 @@
       
       <!--   Header   -->
       <header class="header header-light header-topbar" id="navbar-spy">
-        <nav class="navbar navbar-expand-xl navbar-sticky" id="primary-menu"><a class="navbar-brand" href="index.html"><img class="logo logo-dark" src="assets/images/logo/logo-dark.png" alt="Insalcor"/><img class="logo logo-mobile" src="assets/images/logo/logo-mobile.png" alt="Medisch Logo"/></a>
+        <nav class="navbar navbar-expand-xl navbar-sticky" id="primary-menu"><a class="navbar-brand" href="index.php"><img class="logo logo-dark" src="assets/images/logo/logo-dark.png" alt="Insalcor"/><img class="logo logo-mobile" src="assets/images/logo/logo-mobile.png" alt="Medisch Logo"/></a>
           <div class="module-holder module-holder-phone">
             <!--  Search  -->
             <div class="module module-search float-left">
@@ -265,8 +277,8 @@
           <div class="row">
             <div class="col-sm-12 col-md-12 col-lg-12 ">
               <div class="heading heading-7 text--center">
-                <p id="areas">Conocé nuestras áreas de negocio</p>
-                <h2 class="section-head" style="color: #FFFF;">Nuestras áreas de negocio reflejan nuestro compromiso con la innovación y la calidad</h2>
+                <p id="areas" data-i18n="home.areas_label">Conocé nuestras áreas de negocio</p>
+                <h2 class="section-head" style="color: #FFFF;" data-i18n="home.areas_title">Nuestras áreas de negocio reflejan nuestro compromiso con la innovación y la calidad</h2>
               </div>
             </div>
           </div>
@@ -278,17 +290,17 @@
                 <div class="service-panel-holder">
                   <div class="service-content"> 
                     <div class="service-title">
-                      <h4><a href="/nutricion-animal.html">Nutrición Animal</a></h4>
+                      <h4><a href="/nutricion-animal.php" data-i18n="home.area_nutrition_title">Nutrición Animal</a></h4>
                     </div>
                     <div class="service-desc">
-                      <p>Ofrecemos una línea completa de <b>productos nutricionales</b> desarrollados para <b> cada especie animal</b>, con respaldo técnico, calidad garantizada y asesoramiento especializado.</p>
+                      <p data-i18n-html="home.area_nutrition_desc">Ofrecemos una línea completa de <b>productos nutricionales</b> desarrollados para <b> cada especie animal</b>, con respaldo técnico, calidad garantizada y asesoramiento especializado.</p>
                     </div>
-                  <div class="service-img"><a href="/nutricion-animal.html"></a><img src="assets/images/services/1.png" alt="Nutrición animal"/></div>
+                  <div class="service-img"><a href="/nutricion-animal.php"></a><img src="assets/images/services/1.png" alt="Nutrición animal"/></div>
                   </div>
                 </div>
                   
                 <div class="service-more">
-                    <a class="btn" href="/nutricion-animal.html"> <span>Ver más</span></a>
+                    <a class="btn" href="/nutricion-animal.php"> <span data-i18n="common.see_more">Ver más</span></a>
                   </div>
               </div>
             </div>
@@ -299,17 +311,17 @@
                 <div class="service-panel-holder">
                   <div class="service-content"> 
                     <div class="service-title">
-                      <h4><a href="pharma-vetpharma.php">Pharma y VetPharma</a></h4>
+                      <h4><a href="pharma-vetpharma.php" data-i18n="home.area_pharma_title">Pharma y VetPharma</a></h4>
                     </div>
                     <div class="service-desc">
-                      <p>Desarrollamos, representamos y distribuimos productos farmacéuticos para uso <b> humano y veterinario</b> , respaldados por <b>marcas internacionales</b>  y un equipo técnico <b>especializado</b> .</p>
+                      <p data-i18n-html="home.area_pharma_desc">Desarrollamos, representamos y distribuimos productos farmacéuticos para uso <b> humano y veterinario</b> , respaldados por <b>marcas internacionales</b>  y un equipo técnico <b>especializado</b> .</p>
                     </div>
                   <div class="service-img"><a href="pharma-vetpharma.php"></a><img src="assets/images/services/2.png" alt="P"/></div>
                   </div>
                 </div>
                   
                 <div class="service-more">
-                    <a class="btn" href="pharma-vetpharma.php"> <span class="line"> <span></span></span><span>Ver más</span></a>
+                    <a class="btn" href="pharma-vetpharma.php"> <span class="line"> <span></span></span><span data-i18n="common.see_more">Ver más</span></a>
                   </div>
               </div>
             </div>
@@ -326,7 +338,7 @@
             </div>
             <div class="row">
               <div class="col-12 col-lg-5">
-                <h2 class="heading-title">Principales Alianzas</h2>
+                <h2 class="heading-title"><?= e(t('about.alliances_title')) ?></h2>
               </div>
             </div>
           </div>
@@ -346,235 +358,30 @@
         <!-- End .container-->
       </section>
       
-      <!-- Ultimas novedades  -->
-
-
-<!-- COMENTADO PQ ME PARECE MEJOR QUE QUEDE UN CARRUSEL CON LAS NOVEDADES CORRIENDO PARA HACER MAS INTERACTIVA LA WEB Y DIFERENCIARLA DE LAS OTRAS QUE HEMOS HECHO -->
-
-<!-- 
-      <section class="blog blog-grid blog-grid-3" id="blog-2">
-        <div class="bg-section"> <img src="assets/images/background/pattern.png" alt="background"/></div>
-
-        <div class="container">
-          <div class="row"> 
-            <div class="col-12 col-lg-6 offset-lg-3">
-              <div class="heading heading-7 text-center">
-                <h2 class="heading-title">Conocé las últimas novedades</h2>
-              </div>
-            </div>
-          </div>
-          
-        <div class="row g-4 mt-4">
-            
-          <div class="col-12 col-md-6 col-lg-4">
-              <div class="blog-entry">
-                <div class="entry-img">
-                  <div class="entry-date">
-                    <div class="entry-content"><span class="day">20</span><span class="month">ene</span><span class="year">2025</span></div>
-                  </div>
-                    <a href="blog-single-sidebar.html"><img src="assets/images/blog/grid/1.jpg" alt="Título de noticia"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)" style="cursor: default;">Nutrición Animal</a>
-                    </div>
-                    <div class="divider"></div>
-                  </div>
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Titulo de noticia</a></h4>
-                  </div>
-                  <div class="entry-bio">
-                    <p>Lorem ipsum dolor sit amet consectetur. Turpis auctor pulvinar fringilla aliquet id. Mi est malesuada eu mattis. Elementum risus convallis pulvinar velit nulla mi rutrum. Id at tristique condimentum viverra vel nec vestibulum.</p>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver más</span></a></div>
-                </div>
-              </div>
-          </div>
-
-          <div class="col-12 col-md-6 col-lg-4">
-              <div class="blog-entry">
-                <div class="entry-img">
-                  <div class="entry-date">
-                    <div class="entry-content"><span class="day">20</span><span class="month">ene</span><span class="year">2025</span></div>
-                  </div>
-                    <a href="blog-single-sidebar.html"><img src="assets/images/blog/grid/1.jpg" alt="Título de noticia"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)" style="cursor: default;">Nutrición Animal</a>
-                    </div>
-                    <div class="divider"></div>
-                  </div>
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Titulo de noticia</a></h4>
-                  </div>
-                  <div class="entry-bio">
-                    <p>Lorem ipsum dolor sit amet consectetur. Turpis auctor pulvinar fringilla aliquet id. Mi est malesuada eu mattis. Elementum risus convallis pulvinar velit nulla mi rutrum. Id at tristique condimentum viverra vel nec vestibulum.</p>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver más</span></a></div>
-                </div>
-              </div>
-          </div>
-
-          <div class="col-12 col-md-6 col-lg-4">
-              <div class="blog-entry">
-                <div class="entry-img">
-                  <div class="entry-date">
-                    <div class="entry-content"><span class="day">20</span><span class="month">ene</span><span class="year">2025</span></div>
-                  </div>
-                    <a href="blog-single-sidebar.html"><img src="assets/images/blog/grid/1.jpg" alt="Título de noticia"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)" style="cursor: default;">Nutrición Animal</a>
-                    </div>
-                    <div class="divider"></div>
-                  </div>
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Titulo de noticia</a></h4>
-                  </div>
-                  <div class="entry-bio">
-                    <p>Lorem ipsum dolor sit amet consectetur. Turpis auctor pulvinar fringilla aliquet id. Mi est malesuada eu mattis. Elementum risus convallis pulvinar velit nulla mi rutrum. Id at tristique condimentum viverra vel nec vestibulum.</p>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver más</span></a></div>
-                </div>
-              </div>
-          </div>
-          </div>
-          <a class="btn btn--secondary btn-line" href="/blog.html">Ir a novedades</a>
-        </div>
-      </section> -->
-
-
-
-
-      <!-- Novedades Section      -->
+      <!-- Novedades Section -->
       <section class="blog grey-light-bg blog-grid blog-grid-3" id="blog-2">
         <div class="container">
-          <div class="row"> 
+          <div class="row">
             <div class="col-12 col-lg-6 offset-lg-3">
               <div class="heading heading-7 text-center">
-                <h2 class="heading-title">Conocé las últimas novedades</h2>
+                <h2 class="heading-title"><?= e(t('home.recent_news_title')) ?></h2>
               </div>
             </div>
           </div>
+          <?php if ($noticiasCarrusel): ?>
           <div class="carousel owl-carousel carousel-dots" data-slide="3" data-slide-rs="2" data-autoplay="true" data-nav="false" data-dots="true" data-space="30" data-loop="true" data-speed="200">
-            <div>
-              <div class="blog-entry" data-hover="">
-                <div class="entry-img">
-                  <div class="entry-date">
-                    <div class="entry-content"><span class="day">20</span><span class="month">Ene</span><span class="year">2025</span></div>
-                  </div>
-                   <a href="blog-single-sidebar.html"><img src="assets/images/blog/grid/1.jpg" alt=""/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)">Nutrición Animal</a>
-                    </div>
-                    <!-- <div class="divider"></div>
-                    <div class="entry-author"> 
-                      <p>Lorem Ipsum</p>
-                    </div> -->
-                  </div>
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Titulo de la noticia</a></h4>
-                  </div>
-                  <div class="entry-bio">
-                    <p>Lorem ipsum dolor sit amet consectetur. Turpis auctor pulvinar fringilla aliquet id. Mi est malesuada eu mattis. Elementum risus convallis pulvinar velit nulla mi rutrum. Id at tristique condimentum viverra vel nec vestibulum.</p>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver Más</span></a></div>
-                </div>
-              </div>
-              <!-- End .Card-->
-           
+            <?php foreach ($noticias as $item) { echo render_noticia_slide($item, $detailBase); } ?>
           </div>
-           <div>
-              <div class="blog-entry" data-hover="">
-                <div class="entry-img">
-                  <div class="entry-date">
-                    <div class="entry-content"><span class="day">20</span><span class="month">Ene</span><span class="year">2025</span></div>
-                  </div>
-                   <a href="blog-single-sidebar.html"><img src="assets/images/blog/grid/1.jpg" alt="6 tips to protect your mental health when sick"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)">Nutrición Animal</a>
-                    </div>
-                  </div>
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Título de la noticia</a></h4>
-                  </div>
-                  <div class="entry-bio">
-                    <p>Lorem ipsum dolor sit amet consectetur. Turpis auctor pulvinar fringilla aliquet id. Mi est malesuada eu mattis. Elementum risus convallis pulvinar velit nulla mi rutrum. Id at tristique condimentum viverra vel nec vestibulum.</p>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver Más</span></a></div>
-                </div>
-              </div>
-              <!-- End .Card-->
-           
+          <?php elseif ($noticias): ?>
+          <div class="row g-4 mt-4">
+            <?php foreach ($noticias as $item) { echo render_noticia_card($item, $detailBase); } ?>
           </div>
-           <div>
-              <div class="blog-entry" data-hover="">
-                <div class="entry-img">
-                  <div class="entry-date">
-                    <div class="entry-content"><span class="day">20</span><span class="month">Ene</span><span class="year">2025</span></div>
-                  </div>
-                   <a href="blog-single-sidebar.html"><img src="assets/images/blog/grid/1.jpg" alt="6 tips to protect your mental health when sick"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)">Nutrición Animal</a>
-                    </div>
-                  </div>
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Título de la noticia</a></h4>
-                  </div>
-                  <div class="entry-bio">
-                    <p>Lorem ipsum dolor sit amet consectetur. Turpis auctor pulvinar fringilla aliquet id. Mi est malesuada eu mattis. Elementum risus convallis pulvinar velit nulla mi rutrum. Id at tristique condimentum viverra vel nec vestibulum.</p>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver Más</span></a></div>
-                </div>
-              </div>
-              <!-- End .Card-->
-           
-          </div>
-           <div>
-              <div class="blog-entry" data-hover="">
-                <div class="entry-img">
-                  <div class="entry-date">
-                    <div class="entry-content"><span class="day">20</span><span class="month">Ene</span><span class="year">2025</span></div>
-                  </div>
-                   <a href="blog-single-sidebar.html"><img src="assets/images/blog/grid/1.jpg" alt="6 tips to protect your mental health when sick"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)">Nutrición Animal</a>
-                    </div>
-                  </div>
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Título de la noticia</a></h4>
-                  </div>
-                  <div class="entry-bio">
-                    <p>Lorem ipsum dolor sit amet consectetur. Turpis auctor pulvinar fringilla aliquet id. Mi est malesuada eu mattis. Elementum risus convallis pulvinar velit nulla mi rutrum. Id at tristique condimentum viverra vel nec vestibulum.</p>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver Más</span></a></div>
-                </div>
-              </div>
-              <!-- End .Card-->
-           
-          </div>
-          <!-- End .carousel-->
-           
+          <?php else: ?>
+          <p class="text-center"><?= e(t('common.no_news')) ?></p>
+          <?php endif; ?>
         </div>
         <!-- Button -->
-         <a class="btn btn--secondary btn-line btn-news" href="/blog.html">Ir a Novedades</a>
+        <a class="btn btn--secondary btn-line btn-news" href="/blog.php"><?= e(t('home.news_cta')) ?></a>
       </section>
 
       <!-- Nuestras Oficinas   -->
@@ -617,7 +424,7 @@
         <!-- Texto oficinas -->
         <div class="col-lg-5 p-0">
             <div class="heading heading-light heading-11">
-              <h2 class="heading-title">Nuestras Oficinas</h2>
+              <h2 class="heading-title"><?= e(t('contact.offices_title')) ?></h2>
 
               <!-- Uruguay -->
               <div class="office-item">
@@ -716,14 +523,14 @@
           <div class="row align-items-center mb-60">
             <div class="col-12 col-lg-5">
               <div class="heading heading-8 heading-light">
-                <h2 class="heading-title">¿Querés conocer más sobre nuestras soluciones?</h2>
-                <p class="paragraph">Nuestro equipo técnico y comercial está listo para asesorarte en cada paso.</p>
+                <h2 class="heading-title" data-i18n="cta.title">¿Querés conocer más sobre nuestras soluciones?</h2>
+                <p class="paragraph" data-i18n="cta.desc">Nuestro equipo técnico y comercial está listo para asesorarte en cada paso.</p>
               </div>
             </div>
             <div class="col-12 col-lg-6">
               <!--Pendiente cambiar clase video-->
               <div class="video" id="video1">
-                <a class="btn btn--white btn-line" href="https://api.whatsapp.com/send/?phone=59895144852&text=Hola%20quisiera%20asesoramiento%20comercial." target="_blank"><i class="fab fa-whatsapp"></i>Contactanos</a>
+                <a class="btn btn--white btn-line" href="https://api.whatsapp.com/send/?phone=59895144852&text=Hola%20quisiera%20asesoramiento%20comercial." target="_blank"><i class="fab fa-whatsapp"></i><span data-i18n="common.contact_us">Contactanos</span></a>
               </div>
             </div>
           </div>
@@ -741,19 +548,19 @@
               <div class="col-md-4 col-lg-4 mb-4 mb-lg-0">
                 <div class="footer-widget footer-brand">
                   <div class="footer-logo mb-4">
-                    <a href="index.html">
+                    <a href="index.php">
                       <img src="assets/images/logo/logo-white.png" alt="Insalcor">
                     </a>
                   </div>
 
-                  <h5 class="footer-title">SECCIONES PRINCIPALES</h5>
+                  <h5 class="footer-title" data-i18n="footer.sections_title">SECCIONES PRINCIPALES</h5>
                   <ul class="footer-menu">
-                    <li><a href="/nosotros.html">Nosotros</a></li>
-                    <li><a href="/nutricion-animal.html">Nutrición Animal</a></li>
-                    <li><a href="pharma-vetpharma.php">Pharma</a></li>
-                    <li><a href="pharma-vetpharma.php">VetPharma</a></li>
-                    <li><a href="/blog.html">Novedades</a></li>
-                    <li><a href="/contact.html">Contacto</a></li>
+                    <li><a href="/nosotros.html" data-i18n="footer.about">Nosotros</a></li>
+                    <li><a href="/nutricion-animal.php" data-i18n="footer.nutrition">Nutrición Animal</a></li>
+                    <li><a href="pharma-vetpharma.php" data-i18n="footer.pharma">Pharma</a></li>
+                    <li><a href="pharma-vetpharma.php" data-i18n="footer.vetpharma">VetPharma</a></li>
+                    <li><a href="/blog.php" data-i18n="footer.news">Novedades</a></li>
+                    <li><a href="/contact.html" data-i18n="footer.contact">Contacto</a></li>
                   </ul>
                 </div>
               </div>
@@ -761,7 +568,7 @@
               <!-- Columna centro: Nuestras oficinas -->
               <div class="col-md-8 col-lg-4 mb-4 mb-lg-0">
                 <div class="footer-widget offices-widget">
-                  <h6 class="footer-title">NUESTRAS OFICINAS</h6>
+                  <h6 class="footer-title" data-i18n="footer.offices_title">NUESTRAS OFICINAS</h6>
 
                   <!-- Uruguay -->
                   <div class="office-block">
@@ -833,13 +640,11 @@
               <!-- Columna derecha: redes sociales -->
               <div class="col-md-4 col-lg-4">
                 <div class="footer-widget footer-social">
-                  <h5 class="footer-title">
-                    SEGUÍ NUESTRAS REDES Y<br>
+                  <h5 class="footer-title" data-i18n-html="footer.social_title">SEGUÍ NUESTRAS REDES Y<br>
                     CONOCÉ LAS ÚLTIMAS<br>
-                    NOVEDADES
-                  </h5>
+                    NOVEDADES</h5>
 
-                  <h6 class="social-title">Nutrición Animal</h6>
+                  <h6 class="social-title" data-i18n="footer.nutrition">Nutrición Animal</h6>
                   <ul class="footer-social-list">
                     <li>
                       <a href="https://www.instagram.com/insalcor_nutrition_/" aria-label="Instagram">
@@ -853,7 +658,7 @@
                     </li>
                   </ul>
                   
-                  <h6 class="social-title mt-30">Pharma y VetPharma</h6>
+                  <h6 class="social-title mt-30" data-i18n="nav.pharma">Pharma y VetPharma</h6>
                   <ul class="footer-social-list">
                     <li>
                       <a href="https://www.instagram.com/insalcorpharma/" aria-label="Instagram">
@@ -880,7 +685,7 @@
             <div class="row align-items-center">
               <div class="col-md-6">
                 <p class="mb-0 footer-copy">
-                  Copyright © Insalcor <span class="current-year"></span>. Todos los derechos reservados.
+                  <span data-i18n="footer.copyright_prefix">Copyright © Insalcor</span> <span class="current-year"></span><span data-i18n="footer.copyright_suffix">. Todos los derechos reservados.</span>
                 </p>
               </div>
               <div class="col-md-6 text-md-right mt-2 mt-md-0">

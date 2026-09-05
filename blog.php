@@ -60,7 +60,7 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
       
       <!--   Header   -->
       <header class="header header-light header-topbar" id="navbar-spy">
-        <nav class="navbar navbar-expand-xl navbar-sticky" id="primary-menu"><a class="navbar-brand" href="index.html"><img class="logo logo-dark" src="assets/images/logo/logo-dark.png" alt="Insalcor"/><img class="logo logo-mobile" src="assets/images/logo/logo-mobile.png" alt="Medisch Logo"/></a>
+        <nav class="navbar navbar-expand-xl navbar-sticky" id="primary-menu"><a class="navbar-brand" href="index.php"><img class="logo logo-dark" src="assets/images/logo/logo-dark.png" alt="Insalcor"/><img class="logo logo-mobile" src="assets/images/logo/logo-mobile.png" alt="Medisch Logo"/></a>
           <div class="module-holder module-holder-phone">
             <!--  Search  -->
             <div class="module module-search float-left">
@@ -135,7 +135,7 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
               </div>
               <div class="col-12"> 
                 <ol class="breadcrumb d-flex justify-content-center align--bottom">
-                  <li class="breadcrumb-item"><a href="index.html" data-i18n="blog.breadcrumb_home">Inicio</a></li>
+                  <li class="breadcrumb-item"><a href="index.php" data-i18n="blog.breadcrumb_home">Inicio</a></li>
                   <li class="breadcrumb-item active"><a href="blog.php" data-i18n="blog.breadcrumb_news">Novedades</a></li>
                 </ol>
               </div>
@@ -197,14 +197,14 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
           <div class="row align-items-center mb-60">
             <div class="col-12 col-lg-5">
               <div class="heading heading-8 heading-light">
-                <h2 class="heading-title">¿Querés conocer más sobre nuestras soluciones?</h2>
-                <p class="paragraph">Nuestro equipo técnico y comercial está listo para asesorarte en cada paso.</p>
+                <h2 class="heading-title" data-i18n="cta.title">¿Querés conocer más sobre nuestras soluciones?</h2>
+                <p class="paragraph" data-i18n="cta.desc">Nuestro equipo técnico y comercial está listo para asesorarte en cada paso.</p>
               </div>
             </div>
             <div class="col-12 col-lg-6">
               <!--Pendiente cambiar clase video-->
               <div class="video" id="video1">
-                <a class="btn btn--white btn-line" href="https://api.whatsapp.com/send/?phone=59895144852&text=Hola%20quisiera%20asesoramiento%20comercial." target="_blank"><i class="fab fa-whatsapp"></i>Contactanos</a>
+                <a class="btn btn--white btn-line" href="https://api.whatsapp.com/send/?phone=59895144852&text=Hola%20quisiera%20asesoramiento%20comercial." target="_blank"><i class="fab fa-whatsapp"></i><span data-i18n="common.contact_us">Contactanos</span></a>
               </div>
             </div>
           </div>
@@ -222,19 +222,19 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
               <div class="col-md-4 col-lg-4 mb-4 mb-lg-0">
                 <div class="footer-widget footer-brand">
                   <div class="footer-logo mb-4">
-                    <a href="index.html">
+                    <a href="index.php">
                       <img src="assets/images/logo/logo-white.png" alt="Insalcor">
                     </a>
                   </div>
 
-                  <h5 class="footer-title">SECCIONES PRINCIPALES</h5>
+                  <h5 class="footer-title" data-i18n="footer.sections_title">SECCIONES PRINCIPALES</h5>
                   <ul class="footer-menu">
-                    <li><a href="/nosotros.html">Nosotros</a></li>
-                    <li><a href="/nutricion-animal.php">Nutrición Animal</a></li>
-                    <li><a href="pharma-vetpharma.php">Pharma</a></li>
-                    <li><a href="pharma-vetpharma.php">VetPharma</a></li>
-                    <li><a href="/blog.php">Novedades</a></li>
-                    <li><a href="/contact.html">Contacto</a></li>
+                    <li><a href="/nosotros.html" data-i18n="footer.about">Nosotros</a></li>
+                    <li><a href="/nutricion-animal.php" data-i18n="footer.nutrition">Nutrición Animal</a></li>
+                    <li><a href="pharma-vetpharma.php" data-i18n="footer.pharma">Pharma</a></li>
+                    <li><a href="pharma-vetpharma.php" data-i18n="footer.vetpharma">VetPharma</a></li>
+                    <li><a href="/blog.php" data-i18n="footer.news">Novedades</a></li>
+                    <li><a href="/contact.html" data-i18n="footer.contact">Contacto</a></li>
                   </ul>
                 </div>
               </div>
@@ -242,7 +242,7 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
               <!-- Columna centro: Nuestras oficinas -->
               <div class="col-md-8 col-lg-4 mb-4 mb-lg-0">
                 <div class="footer-widget offices-widget">
-                  <h6 class="footer-title">NUESTRAS OFICINAS</h6>
+                  <h6 class="footer-title" data-i18n="footer.offices_title">NUESTRAS OFICINAS</h6>
 
                   <!-- Uruguay -->
                   <div class="office-block">
@@ -314,13 +314,11 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
               <!-- Columna derecha: redes sociales -->
               <div class="col-md-4 col-lg-4">
                 <div class="footer-widget footer-social">
-                  <h5 class="footer-title">
-                    SEGUÍ NUESTRAS REDES Y<br>
+                  <h5 class="footer-title" data-i18n-html="footer.social_title">SEGUÍ NUESTRAS REDES Y<br>
                     CONOCÉ LAS ÚLTIMAS<br>
-                    NOVEDADES
-                  </h5>
+                    NOVEDADES</h5>
 
-                  <h6 class="social-title">Nutrición Animal</h6>
+                  <h6 class="social-title" data-i18n="footer.nutrition">Nutrición Animal</h6>
                   <ul class="footer-social-list">
                     <li>
                       <a href="https://www.instagram.com/insalcor_nutrition_/" aria-label="Instagram">
@@ -334,7 +332,7 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
                     </li>
                   </ul>
                   
-                  <h6 class="social-title mt-30">Pharma y VetPharma</h6>
+                  <h6 class="social-title mt-30" data-i18n="nav.pharma">Pharma y VetPharma</h6>
                   <ul class="footer-social-list">
                     <li>
                       <a href="https://www.instagram.com/insalcorpharma/" aria-label="Instagram">
@@ -360,7 +358,7 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
             <div class="row align-items-center">
               <div class="col-md-6">
                 <p class="mb-0 footer-copy">
-                  Copyright © Insalcor <span class="current-year"></span>. Todos los derechos reservados.
+                  <span data-i18n="footer.copyright_prefix">Copyright © Insalcor</span> <span class="current-year"></span><span data-i18n="footer.copyright_suffix">. Todos los derechos reservados.</span>
                 </p>
               </div>
               <div class="col-md-6 text-md-right mt-2 mt-md-0">
@@ -387,6 +385,7 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
     <script src="assets/js/vendor/jquery-3.6.0.min.js"></script>
     <script src="assets/js/vendor.min.js"></script>
     <script src="assets/js/functions.js"></script>
+    <script src="assets/js/i18n.js"></script>
     <script src="assets/js/search.js"></script>
 </body>
 </html>

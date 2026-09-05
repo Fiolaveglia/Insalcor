@@ -7,6 +7,27 @@ header('X-Content-Type-Options: nosniff');
 
 const AREAS = ['Nutricion Animal', 'Pharma', 'VetPharma'];
 const ESPECIES = ['Aves', 'Porcinos', 'Ganadería', 'Mascotas', 'Lechería', 'Equinos', 'Ovinos'];
+
+// Sólo para mostrar en inglés en el sitio público — el valor que se guarda
+// y se usa como filtro (?especie=...) sigue siendo siempre el de ESPECIES.
+const ESPECIES_EN = [
+    'Aves' => 'Poultry',
+    'Porcinos' => 'Swine',
+    'Ganadería' => 'Cattle',
+    'Mascotas' => 'Pets',
+    'Lechería' => 'Dairy',
+    'Equinos' => 'Equine',
+    'Ovinos' => 'Sheep',
+];
+
+// Sólo para mostrar en inglés (ej. la categoría de una noticia) — el valor
+// que se guarda en la base sigue siendo siempre el de AREAS.
+const AREAS_EN = [
+    'Nutricion Animal' => 'Animal Nutrition',
+    'Pharma' => 'Pharma',
+    'VetPharma' => 'VetPharma',
+];
+
 const ESTADOS = ['draft', 'published'];
 
 /**

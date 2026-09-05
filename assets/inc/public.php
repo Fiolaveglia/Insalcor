@@ -81,6 +81,19 @@ function especie_options(): array
     return $out;
 }
 
+/**
+ * Etiqueta traducida de un área de negocio (Nutricion Animal/Pharma/VetPharma)
+ * para mostrar en tarjetas de noticias, etc. El valor guardado en la base
+ * nunca cambia; sólo cambia lo que se muestra.
+ */
+function area_label(string $area): string
+{
+    if (current_lang() === 'en') {
+        return AREAS_EN[$area] ?? $area;
+    }
+    return $area;
+}
+
 function i18n_dict(): array
 {
     static $dict = null;
@@ -487,14 +500,8 @@ function render_pagination(int $totalItems, int $perPage, int $page, string $par
     }
     $page = max(1, min($page, $totalPages));
 
-    // Cuántos números de página se muestran a la vez (además de "Siguiente").
-    // La ventana se desliza para mantener la página actual visible.
-    $ventana = 4;
-    $inicio = max(1, min($page - intdiv($ventana - 1, 2), $totalPages - $ventana + 1));
-    $fin = min($totalPages, $inicio + $ventana - 1);
-
     $html = '<div class="row"><div class="col-12 clearfix text--center"><ul class="pagination">';
-    for ($i = $inicio; $i <= $fin; $i++) {
+    for ($i = 1; $i <= $totalPages; $i++) {
         $cls = $i === $page ? ' class="current"' : '';
         $html .= '<li><a' . $cls . ' href="' . e(page_url($i, $param)) . '">' . $i . '</a></li>';
     }
@@ -504,6 +511,7 @@ function render_pagination(int $totalItems, int $perPage, int $page, string $par
     $html .= '</ul></div></div>';
     return $html;
 }
+
 /**
  * A single noticia formatted as an owl-carousel slide, matching the
  * "Artículos y Novedades Recientes" markup on the area pages.
@@ -525,7 +533,7 @@ function render_noticia_slide(array $item, string $detailBase): string
                 </div>
                 <div class="entry-content">
                   <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)">' . e($item['categoria']) . '</a></div>
+                    <div class="entry-category"><a href="javascript:void(0)">' . e(area_label($item['categoria'])) . '</a></div>
                   </div>
                   <div class="entry-title">
                     <h4><a href="' . e($href) . '">' . $titulo . '</a></h4>
@@ -557,7 +565,7 @@ function render_noticia_card(array $item, string $detailBase): string
           </div>
           <div class="entry-content">
             <div class="entry-meta">
-              <div class="entry-category"><a href="javascript:void(0)">' . e($item['categoria']) . '</a></div>
+              <div class="entry-category"><a href="javascript:void(0)">' . e(area_label($item['categoria'])) . '</a></div>
             </div>
             <div class="entry-title">
               <h4><a href="' . e($href) . '">' . $titulo . '</a></h4>
