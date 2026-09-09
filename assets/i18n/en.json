@@ -110,5 +110,18 @@
   "cta.title": "Want to know more about our solutions?",
   "cta.desc": "Our technical and commercial team is ready to advise you every step of the way.",
   "home.recent_news_title": "Discover the latest news",
-  "home.news_cta": "Go to News"
+  "home.news_cta": "Go to News",
+  "search.hero_title": "Search results",
+  "search.hero_desc": "Search across our products and news",
+  "search.breadcrumb": "Search",
+  "search.results_for": "Results for “{q}”",
+  "search.count": "{n} result(s)",
+  "search.products_title": "Products",
+  "search.news_title": "News",
+  "search.empty_query": "Type at least {min} characters to search.",
+  "search.no_results": "No results found for “{q}”.",
+  "search.no_results_hint": "Try different words.",
+  "search.submit": "Search",
+  "search.view_all": "View all results ({n})",
+  "search.no_suggestions": "No results"
 }

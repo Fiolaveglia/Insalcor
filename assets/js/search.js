@@ -1,272 +1,200 @@
 /**
- * Sistema de búsqueda - Insalcor
- * Agrega funcionalidad al buscador existente
- * VERSIÓN PARA search.php en carpeta /php/
+ * Buscador del header (ícono de lupa arriba a la derecha).
+ *
+ * Busca productos (nombre y descripción) y noticias (título, extracto y
+ * contenido), en los dos idiomas. El trabajo pesado lo hace
+ * buscar.php: acá sólo se abre/cierra el modal, se muestran las sugerencias
+ * en vivo (buscar.php?ajax=1) y se manda el formulario a la página de
+ * resultados (buscar.php?q=...).
+ *
+ * El idioma NO se pasa por la URL: buscar.php lo resuelve con la cookie
+ * `insalcor_lang`, la misma que usan el resto de las páginas y assets/js/i18n.js.
  */
 
-(function($) {
+(function ($) {
     'use strict';
 
-    // Configuración
-    const searchConfig = {
-        minChars: 3,  // Mínimo de caracteres para buscar
-        delay: 500,   // Delay antes de buscar (milisegundos)
-        maxResults: 5 // Máximo de resultados en sugerencias
+    var config = {
+        endpoint: 'buscar.php',
+        minChars: 2,   // igual que BUSCADOR_MIN_CHARS en inc/public.php
+        delay: 300,    // ms de espera antes de pedir sugerencias
+        maxResults: 5
     };
 
-    let searchTimeout;
+    var timer = null;
+    var pending = null;   // request en vuelo, para poder cancelarla
+    var lastQuery = '';
 
-    /**
-     * Inicializa el sistema de búsqueda
-     */
-    function initSearch() {
-        const $searchForm = $('.module-fullscreen .form-search');
-        const $searchInput = $searchForm.find('input[type="text"]');
-        
-        if ($searchForm.length === 0 || $searchInput.length === 0) {
-            console.log('⚠️ Formulario de búsqueda no encontrado');
+    /** Textos del dropdown; los toma del diccionario si i18n.js ya cargó. */
+    function t(key, fallback, vars) {
+        var value = fallback;
+        // I18n se declara con `const` en i18n.js: es global léxica, no window.I18n.
+        if (typeof I18n !== 'undefined' && typeof I18n.t === 'function') {
+            var translated = I18n.t(key, vars);
+            if (translated && translated !== key) {
+                return translated;
+            }
+        }
+        if (vars) {
+            Object.keys(vars).forEach(function (k) {
+                value = value.replace('{' + k + '}', vars[k]);
+            });
+        }
+        return value;
+    }
+
+    function escapeHtml(text) {
+        var div = document.createElement('div');
+        div.textContent = text == null ? '' : text;
+        return div.innerHTML;
+    }
+
+    function resultsUrl(query) {
+        return config.endpoint + '?q=' + encodeURIComponent(query);
+    }
+
+    function init() {
+        // Sólo el formulario del modal del header: la página de resultados
+        // tiene el suyo, que se manda solo (action="buscar.php").
+        var $form = $('.module-fullscreen .form-search');
+        var $input = $form.find('input[type="text"]');
+
+        if (!$form.length || !$input.length) {
             return;
         }
 
-        console.log('🔍 Sistema de búsqueda inicializado');
+        // Que funcione también sin JS / si algo falla más abajo.
+        $form.attr('action', config.endpoint).attr('method', 'get');
+        $input.attr('name', 'q');
 
-        // Prevenir submit del formulario por defecto
-        $searchForm.on('submit', function(e) {
-            e.preventDefault();
-            performSearch();
-        });
+        var $suggestions = $('<div class="search-suggestions"></div>');
+        $form.append($suggestions);
 
-        // Búsqueda en tiempo real (opcional)
-        $searchInput.on('keyup', function(e) {
-            // Si presiona Enter, buscar inmediatamente
-            if (e.keyCode === 13) {
-                performSearch();
+        $form.on('submit', function (e) {
+            var query = $.trim($input.val());
+            if (query.length < config.minChars) {
+                e.preventDefault();
+                $input.focus();
                 return;
             }
-
-            // Limpiar timeout anterior
-            clearTimeout(searchTimeout);
-
-            const query = $(this).val().trim();
-
-            // Si hay menos de 3 caracteres, no buscar
-            if (query.length < searchConfig.minChars) {
-                return;
-            }
-
-            // Buscar después del delay
-            searchTimeout = setTimeout(function() {
-                performSearch();
-            }, searchConfig.delay);
+            // Deja que el navegador mande el form a buscar.php?q=...
         });
 
-        // Detectar tecla ESC para cerrar
-        $searchInput.on('keydown', function(e) {
-            if (e.keyCode === 27) { // ESC
-                $('.module-fullscreen .module-cancel').click();
-            }
-        });
+        $input.on('input', function () {
+            var query = $.trim($(this).val());
+            clearTimeout(timer);
 
-        // Auto-focus cuando se abre el buscador
-        $('.module-search .module-icon').on('click', function() {
-            setTimeout(function() {
-                $searchInput.focus();
-            }, 300);
-        });
-    }
-
-    /**
-     * Realiza la búsqueda
-     */
-    function performSearch() {
-        const $searchInput = $('.module-fullscreen .form-search input[type="text"]');
-        const query = $searchInput.val().trim();
-
-        if (query.length < searchConfig.minChars) {
-            alert('Por favor ingresa al menos ' + searchConfig.minChars + ' caracteres');
-            return;
-        }
-
-        console.log('🔍 Buscando:', query);
-
-        // Obtener idioma actual
-        const currentLang = getCurrentLanguage();
-
-        // ACTUALIZADO: Redirigir a php/search.php
-        const searchUrl = 'php/search.php?q=' + encodeURIComponent(query) + '&lang=' + currentLang;
-        window.location.href = searchUrl;
-    }
-
-    /**
-     * Obtiene el idioma actual
-     */
-    function getCurrentLanguage() {
-        // Intentar obtener de localStorage
-        const savedLang = localStorage.getItem('insalcor-lang');
-        if (savedLang) {
-            return savedLang;
-        }
-
-        // Detectar de la URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const langParam = urlParams.get('lang');
-        if (langParam) {
-            return langParam;
-        }
-
-        // Detectar si estamos en carpeta /en/
-        if (window.location.pathname.includes('/en/')) {
-            return 'en';
-        }
-
-        // Por defecto: español
-        return 'es';
-    }
-
-    /**
-     * Búsqueda con sugerencias en tiempo real (opcional - avanzado)
-     */
-    function initLiveSearch() {
-        const $searchInput = $('.module-fullscreen .form-search input[type="text"]');
-        
-        // Crear contenedor para sugerencias si no existe
-        if ($('.search-suggestions').length === 0) {
-            $searchInput.parent().append('<div class="search-suggestions"></div>');
-        }
-
-        const $suggestions = $('.search-suggestions');
-
-        $searchInput.on('keyup', function(e) {
-            // Ignorar teclas especiales
-            if ([13, 27, 38, 40].includes(e.keyCode)) {
+            if (query.length < config.minChars) {
+                hideSuggestions();
                 return;
             }
-
-            clearTimeout(searchTimeout);
-
-            const query = $(this).val().trim();
-
-            if (query.length < searchConfig.minChars) {
-                $suggestions.hide().empty();
-                return;
-            }
-
-            // Buscar después del delay
-            searchTimeout = setTimeout(function() {
+            timer = setTimeout(function () {
                 fetchSuggestions(query);
-            }, searchConfig.delay);
+            }, config.delay);
         });
 
-        // Cerrar sugerencias al hacer click fuera
-        $(document).on('click', function(e) {
+        $input.on('keydown', function (e) {
+            if (e.key === 'Escape' || e.keyCode === 27) {
+                if ($suggestions.is(':visible')) {
+                    hideSuggestions();
+                } else {
+                    $('.module-fullscreen .module-cancel').trigger('click');
+                }
+            }
+        });
+
+        // Foco automático al abrir el buscador; al cerrarlo, limpiar.
+        $('.module-search .module-icon').on('click', function () {
+            setTimeout(function () { $input.focus(); }, 300);
+        });
+        $('.module-fullscreen .module-cancel').on('click', function () {
+            hideSuggestions();
+        });
+
+        $(document).on('click', function (e) {
             if (!$(e.target).closest('.form-search').length) {
-                $suggestions.hide();
+                hideSuggestions();
             }
+        });
+
+        // Si cambia el idioma, el texto cacheado del dropdown queda viejo.
+        $(document).on('i18n:changed', function () {
+            hideSuggestions();
+            lastQuery = '';
         });
     }
 
-    /**
-     * Obtiene sugerencias vía AJAX
-     */
+    function hideSuggestions() {
+        $('.search-suggestions').hide().empty();
+    }
+
     function fetchSuggestions(query) {
-        const currentLang = getCurrentLanguage();
-        
-        $.ajax({
-            url: 'php/search.php', // ACTUALIZADO
+        if (query === lastQuery) {
+            return;
+        }
+        lastQuery = query;
+
+        if (pending) {
+            pending.abort();
+        }
+        pending = $.ajax({
+            url: config.endpoint,
             method: 'GET',
-            data: {
-                q: query,
-                ajax: 1,
-                lang: currentLang
-            },
-            dataType: 'json',
-            success: function(data) {
-                displaySuggestions(data);
-            },
-            error: function(xhr, status, error) {
-                console.error('Error en búsqueda:', error);
+            data: { q: query, ajax: '1' },
+            dataType: 'json'
+        }).done(function (data) {
+            // Descarta respuestas viejas que llegaron fuera de orden.
+            if (!data || data.q !== query) {
+                return;
             }
+            render(data, query);
+        }).fail(function (xhr, status) {
+            if (status !== 'abort') {
+                hideSuggestions();
+            }
+        }).always(function () {
+            pending = null;
         });
     }
 
-    /**
-     * Muestra las sugerencias
-     */
-    function displaySuggestions(data) {
-        const $suggestions = $('.search-suggestions');
-        $suggestions.empty();
+    function group(title, items) {
+        if (!items || !items.length) {
+            return '';
+        }
+        var html = '<div class="suggestion-group"><h4>' + escapeHtml(title) + '</h4>';
+        items.slice(0, config.maxResults).forEach(function (item) {
+            html += '<a href="' + escapeHtml(item.url) + '" class="suggestion-item">';
+            html += '<strong>' + escapeHtml(item.titulo) + '</strong>';
+            if (item.categoria) {
+                html += '<span class="suggestion-category">' + escapeHtml(item.categoria) + '</span>';
+            }
+            html += '</a>';
+        });
+        return html + '</div>';
+    }
 
-        const totalResults = data.total || 0;
+    function render(data, query) {
+        var $suggestions = $('.search-suggestions');
+        var total = data.total || 0;
 
-        if (totalResults === 0) {
-            $suggestions.hide();
+        if (!total) {
+            $suggestions
+                .html('<div class="no-suggestions"><p>' + escapeHtml(t('search.no_suggestions', 'Sin resultados')) + '</p></div>')
+                .show();
             return;
         }
 
-        let html = '<div class="suggestions-wrapper">';
-
-        // Productos
-        if (data.products && data.products.length > 0) {
-            html += '<div class="suggestion-group">';
-            html += '<h4>Productos</h4>';
-            
-            data.products.slice(0, searchConfig.maxResults).forEach(function(item) {
-                html += '<a href="product-single.php?slug=' + item.slug + '&lang=' + getCurrentLanguage() + '" class="suggestion-item">';
-                html += '<strong>' + escapeHtml(item.name) + '</strong>';
-                if (item.category) {
-                    html += '<span class="suggestion-category">' + escapeHtml(item.category) + '</span>';
-                }
-                html += '</a>';
-            });
-            
-            html += '</div>';
-        }
-
-        // Noticias
-        if (data.blog && data.blog.length > 0) {
-            html += '<div class="suggestion-group">';
-            html += '<h4>Noticias</h4>';
-            
-            data.blog.slice(0, searchConfig.maxResults).forEach(function(item) {
-                html += '<a href="blog.php?slug=' + item.slug + '&lang=' + getCurrentLanguage() + '" class="suggestion-item">';
-                html += '<strong>' + escapeHtml(item.name) + '</strong>';
-                if (item.category) {
-                    html += '<span class="suggestion-category">' + escapeHtml(item.category) + '</span>';
-                }
-                html += '</a>';
-            });
-            
-            html += '</div>';
-        }
-
-        html += '<div class="suggestion-footer">';
-        html += '<a href="php/search.php?q=' + encodeURIComponent($('.module-fullscreen .form-search input[type="text"]').val()) + '&lang=' + getCurrentLanguage() + '">'; // ACTUALIZADO
-        html += 'Ver todos los resultados (' + totalResults + ')';
-        html += '</a>';
-        html += '</div>';
-
+        var html = '<div class="suggestions-wrapper">';
+        html += group(t('search.products_title', 'Productos'), data.productos);
+        html += group(t('search.news_title', 'Noticias'), data.noticias);
+        html += '<div class="suggestion-footer"><a href="' + escapeHtml(resultsUrl(query)) + '">'
+            + escapeHtml(t('search.view_all', 'Ver todos los resultados ({n})', { n: total }))
+            + '</a></div>';
         html += '</div>';
 
         $suggestions.html(html).show();
     }
 
-    /**
-     * Escapa HTML para prevenir XSS
-     */
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    /**
-     * Inicialización cuando el DOM esté listo
-     */
-    $(document).ready(function() {
-        initSearch();
-        
-        // Descomentar para habilitar sugerencias en tiempo real
-        // initLiveSearch();
-    });
+    $(document).ready(init);
 
 })(jQuery);

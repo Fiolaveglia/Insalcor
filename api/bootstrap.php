@@ -20,8 +20,16 @@ const ESPECIES_EN = [
     'Ovinos' => 'Sheep',
 ];
 
-// Sólo para mostrar en inglés (ej. la categoría de una noticia) — el valor
-// que se guarda en la base sigue siendo siempre el de AREAS.
+// Cómo se MUESTRA cada área (ej. la categoría de una noticia, el área de un
+// producto). El valor que se guarda en la base es siempre el de AREAS, sin
+// acento; estos mapas sólo definen la etiqueta que ve el usuario, así que
+// "Nutricion Animal" se escribe bien en pantalla en los dos idiomas.
+const AREAS_ES = [
+    'Nutricion Animal' => 'Nutrición Animal',
+    'Pharma' => 'Pharma',
+    'VetPharma' => 'VetPharma',
+];
+
 const AREAS_EN = [
     'Nutricion Animal' => 'Animal Nutrition',
     'Pharma' => 'Pharma',

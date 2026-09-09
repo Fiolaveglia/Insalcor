@@ -66,6 +66,51 @@ function campo_i18n(array $row, string $campo): string
 }
 
 /**
+ * Valor de AREAS al que corresponde $area, ignorando acentos y mayúsculas.
+ * Devuelve null si no es un área conocida: `noticias.categoria` es texto libre
+ * y todavía hay filas viejas ("Comunidad", "Institucional") anteriores a que
+ * la API validara el campo contra AREAS.
+ */
+function area_canonica(string $area): ?string
+{
+    $buscada = normalizar_texto($area);
+    foreach (AREAS as $canonica) {
+        if (normalizar_texto($canonica) === $buscada) {
+            return $canonica;
+        }
+    }
+    return null;
+}
+
+/**
+ * Etiqueta de un área de negocio para mostrar en pantalla, en el idioma
+ * activo. El valor guardado en la base nunca cambia; sólo cambia lo que ve
+ * el usuario. Un valor que no es un área (una categoría vieja de noticia) se
+ * devuelve tal cual, sin inventarle traducción.
+ */
+function area_label(string $area): string
+{
+    $canonica = area_canonica($area);
+    if ($canonica === null) {
+        return $area;
+    }
+    $mapa = current_lang() === 'en' ? AREAS_EN : AREAS_ES;
+    return $mapa[$canonica] ?? $canonica;
+}
+
+/**
+ * Etiqueta de una especie para mostrar en pantalla. Igual que con las áreas,
+ * el valor guardado (el de ESPECIES) es siempre el mismo.
+ */
+function especie_label(string $especie): string
+{
+    if (current_lang() === 'en') {
+        return ESPECIES_EN[$especie] ?? $especie;
+    }
+    return $especie;
+}
+
+/**
  * Opciones [valor => etiqueta] para el filtro de "Categorías" (especies).
  * El valor SIEMPRE es el de ESPECIES (el que se guarda en la base y se usa
  * en el filtro ?especie=...); sólo la etiqueta que ve el usuario cambia
@@ -73,10 +118,9 @@ function campo_i18n(array $row, string $campo): string
  */
 function especie_options(): array
 {
-    $en = current_lang() === 'en';
     $out = [];
     foreach (ESPECIES as $especie) {
-        $out[$especie] = $en ? (ESPECIES_EN[$especie] ?? $especie) : $especie;
+        $out[$especie] = especie_label($especie);
     }
     return $out;
 }
@@ -319,6 +363,209 @@ function pub_tutorial(int $id): ?array
     return $row ?: null;
 }
 
+/* ------------------------------------------------- buscador del header */
+
+/**
+ * Mínimo de caracteres del buscador del header. Debajo de esto no se busca
+ * (una consulta de 1 letra devolvería medio catálogo y no le sirve a nadie).
+ */
+const BUSCADOR_MIN_CHARS = 2;
+
+/**
+ * Término tipeado en el buscador, ya limpio. Devuelve '' cuando no alcanza
+ * el mínimo: el llamador lo trata como "todavía no hay búsqueda".
+ */
+function termino_busqueda(string $param = 'q'): string
+{
+    $q = trim((string) ($_GET[$param] ?? ''));
+    // Colapsa espacios repetidos para que "sal   mineral" siga matcheando.
+    $q = (string) preg_replace('/\s+/u', ' ', $q);
+    return mb_strlen($q) >= BUSCADOR_MIN_CHARS ? $q : '';
+}
+
+/**
+ * Acentos que se ignoran al comparar textos: "Nutrición" tiene que
+ * encontrarse tipeando "nutricion", y "Nutrición Animal" guardado en una
+ * noticia vieja tiene que resolver al área "Nutricion Animal". Se listan las
+ * dos cajas porque el lower() de SQLite sólo baja ASCII (a 'Á' no le hace nada).
+ */
+const TEXTO_ACENTOS = [
+    'á' => 'a', 'à' => 'a', 'ä' => 'a', 'â' => 'a', 'ã' => 'a',
+    'é' => 'e', 'è' => 'e', 'ë' => 'e', 'ê' => 'e',
+    'í' => 'i', 'ì' => 'i', 'ï' => 'i', 'î' => 'i',
+    'ó' => 'o', 'ò' => 'o', 'ö' => 'o', 'ô' => 'o', 'õ' => 'o',
+    'ú' => 'u', 'ù' => 'u', 'ü' => 'u', 'û' => 'u',
+    'ñ' => 'n', 'ç' => 'c',
+    'Á' => 'a', 'À' => 'a', 'Ä' => 'a', 'Â' => 'a', 'Ã' => 'a',
+    'É' => 'e', 'È' => 'e', 'Ë' => 'e', 'Ê' => 'e',
+    'Í' => 'i', 'Ì' => 'i', 'Ï' => 'i', 'Î' => 'i',
+    'Ó' => 'o', 'Ò' => 'o', 'Ö' => 'o', 'Ô' => 'o', 'Õ' => 'o',
+    'Ú' => 'u', 'Ù' => 'u', 'Ü' => 'u', 'Û' => 'u',
+    'Ñ' => 'n', 'Ç' => 'c',
+];
+
+/** Minúsculas y sin acentos: la forma canónica para comparar dos textos. */
+function normalizar_texto(?string $texto): string
+{
+    return strtr(mb_strtolower(trim((string) $texto), 'UTF-8'), TEXTO_ACENTOS);
+}
+
+/**
+ * Expresión SQL que normaliza una columna igual que normalizar_texto().
+ * Se arma con lower() + replace() anidados en vez de registrar una función
+ * SQL propia porque PDO::sqliteCreateFunction() está deprecada desde PHP 8.5.
+ * Los literales son constantes del código, nunca entrada del usuario.
+ */
+function sql_normalizado(string $columna): string
+{
+    $expr = 'lower(' . $columna . ')';
+    foreach (TEXTO_ACENTOS as $con => $sin) {
+        $expr = "replace($expr, '$con', '$sin')";
+    }
+    return $expr;
+}
+
+/**
+ * Patrón LIKE del término. Escapa con '!' los comodines de SQL para que un
+ * % o un _ tipeado por el usuario se busque como carácter literal.
+ */
+function like_busqueda(string $q): string
+{
+    $normalizado = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], normalizar_texto($q));
+    return '%' . $normalizado . '%';
+}
+
+/**
+ * Campos en los que mira el buscador, del más relevante al menos: primero el
+ * nombre/título, después el resumen, y al final el cuerpo del artículo. El
+ * orden de esta lista ES el orden de relevancia de los resultados.
+ *
+ * El segundo valor marca los campos que guardan HTML (los del editor): esos
+ * se verifican aparte sobre el texto sin etiquetas, así buscar "br" o "href"
+ * no devuelve todos los artículos.
+ */
+const BUSCADOR_CAMPOS_PRODUCTOS = [
+    ['nombre', false],
+    ['nombre_en', false],
+    ['descripcion', true],
+    ['descripcion_en', true],
+];
+
+const BUSCADOR_CAMPOS_NOTICIAS = [
+    ['titulo', false],
+    ['titulo_en', false],
+    ['extracto', false],
+    ['extracto_en', false],
+    ['contenido', true],
+    ['contenido_en', true],
+];
+
+/**
+ * Corre la búsqueda sobre una tabla: arma el OR de todos los campos, y
+ * después descarta y ordena en PHP con ordenar_por_relevancia().
+ *
+ * @param array<int, array{0: string, 1: bool}> $campos
+ * @return array<int, array<string, mixed>>
+ */
+function buscar_en(string $tabla, array $campos, string $q, string $orden): array
+{
+    $condiciones = [];
+    $params = [];
+    $like = like_busqueda($q);
+    foreach ($campos as [$campo, $_esHtml]) {
+        $condiciones[] = sql_normalizado($campo) . " LIKE ? ESCAPE '!'";
+        $params[] = $like;
+    }
+
+    $sql = sprintf(
+        "SELECT * FROM %s WHERE estado = 'published' AND (%s) ORDER BY %s",
+        $tabla,
+        implode(' OR ', $condiciones),
+        $orden
+    );
+    $stmt = db()->prepare($sql);
+    $stmt->execute($params);
+
+    return ordenar_por_relevancia($stmt->fetchAll(), $campos, $q);
+}
+
+/**
+ * Ordena las filas por el campo en el que coincidió el término (un producto
+ * que se llama así va antes que uno que sólo lo menciona en la descripción),
+ * manteniendo el orden que traía la consulta entre las de igual relevancia.
+ *
+ * De paso descarta las filas cuya única coincidencia estaba dentro del HTML
+ * y no en el texto visible.
+ *
+ * @param array<int, array<string, mixed>> $filas
+ * @param array<int, array{0: string, 1: bool}> $campos
+ * @return array<int, array<string, mixed>>
+ */
+function ordenar_por_relevancia(array $filas, array $campos, string $q): array
+{
+    $termino = normalizar_texto($q);
+    $conRelevancia = [];
+
+    foreach ($filas as $posicion => $fila) {
+        $relevancia = null;
+        foreach ($campos as $nivel => [$campo, $esHtml]) {
+            $valor = (string) ($fila[$campo] ?? '');
+            if ($valor === '') {
+                continue;
+            }
+            if ($esHtml) {
+                $valor = strip_tags(html_entity_decode($valor, ENT_QUOTES, 'UTF-8'));
+            }
+            if (str_contains(normalizar_texto($valor), $termino)) {
+                $relevancia = $nivel;
+                break;
+            }
+        }
+        // Sólo coincidía en el marcado, no en lo que el usuario lee.
+        if ($relevancia === null) {
+            continue;
+        }
+        $conRelevancia[] = ['relevancia' => $relevancia, 'posicion' => $posicion, 'fila' => $fila];
+    }
+
+    usort(
+        $conRelevancia,
+        static fn(array $a, array $b): int =>
+            [$a['relevancia'], $a['posicion']] <=> [$b['relevancia'], $b['posicion']]
+    );
+
+    return array_column($conRelevancia, 'fila');
+}
+
+/**
+ * Productos publicados que coinciden con el término, por nombre o
+ * descripción, en cualquiera de los dos idiomas. Se busca siempre en todos
+ * los campos, sin importar el idioma en el que esté navegando el usuario.
+ *
+ * @return array<int, array<string, mixed>>
+ */
+function buscar_productos(string $q): array
+{
+    if ($q === '') {
+        return [];
+    }
+    return buscar_en('productos', BUSCADOR_CAMPOS_PRODUCTOS, $q, 'nombre COLLATE NOCASE, id');
+}
+
+/**
+ * Noticias publicadas que coinciden con el término, por título, extracto o
+ * contenido, en cualquiera de los dos idiomas.
+ *
+ * @return array<int, array<string, mixed>>
+ */
+function buscar_noticias(string $q): array
+{
+    if ($q === '') {
+        return [];
+    }
+    return buscar_en('noticias', BUSCADOR_CAMPOS_NOTICIAS, $q, 'COALESCE(published_at, created_at) DESC, id DESC');
+}
+
 /* ------------------------------------------------- sidebar filter helpers */
 
 /** Read the active sidebar filters from the query string. */
@@ -525,7 +772,7 @@ function render_noticia_slide(array $item, string $detailBase): string
                 </div>
                 <div class="entry-content">
                   <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)">' . e($item['categoria']) . '</a></div>
+                    <div class="entry-category"><a href="javascript:void(0)">' . e(area_label($item['categoria'])) . '</a></div>
                   </div>
                   <div class="entry-title">
                     <h4><a href="' . e($href) . '">' . $titulo . '</a></h4>
@@ -557,7 +804,7 @@ function render_noticia_card(array $item, string $detailBase): string
           </div>
           <div class="entry-content">
             <div class="entry-meta">
-              <div class="entry-category"><a href="javascript:void(0)">' . e($item['categoria']) . '</a></div>
+              <div class="entry-category"><a href="javascript:void(0)">' . e(area_label($item['categoria'])) . '</a></div>
             </div>
             <div class="entry-title">
               <h4><a href="' . e($href) . '">' . $titulo . '</a></h4>

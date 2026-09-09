@@ -52,9 +52,9 @@ if ($area === 'Nutricion Animal') {
           <div class="container">
             <div class="row">
               <div class="col-sm-12 col-md-12 col-lg-8 offset-lg-2">
-                <form class="form-search">
-                  <input class="form-control" type="text" placeholder="Buscar"/>
-                  <button></button>
+                <form class="form-search" action="buscar.php" method="get" role="search">
+                  <input class="form-control" type="text" name="q" placeholder="Buscar" data-i18n-placeholder="common.search_placeholder"/>
+                  <button type="submit" aria-label="Buscar" data-i18n-aria="common.search"></button>
                 </form>
               </div>
             </div>
@@ -133,13 +133,13 @@ if ($area === 'Nutricion Animal') {
             <div class="row">
               <div class="col-12 col-lg-8">
                 <h4 class="hero-title"><?= e($nombre ?: t('common.product_not_found')) ?></h4>
-                <?php if ($item): ?><h2 class="hero-desc"><?= e($item['area_negocio']) ?></h2><?php endif; ?>
+                <?php if ($item): ?><h2 class="hero-desc"><?= e(area_label($item['area_negocio'])) ?></h2><?php endif; ?>
               </div>
               <div class="col-12">
                 <ol class="breadcrumb d-flex justify-content-center align--bottom">
                   <li class="breadcrumb-item"><a href="index.php" data-i18n="blog.breadcrumb_home">Inicio</a></li>
                   <?php if ($item): ?>
-                  <li class="breadcrumb-item"><a href="<?= e($areaHref) ?>"><?= e($item['area_negocio']) ?></a></li>
+                  <li class="breadcrumb-item"><a href="<?= e($areaHref) ?>"><?= e(area_label($item['area_negocio'])) ?></a></li>
                   <li class="breadcrumb-item active"><a href="javascript:void(0)"><?= e($nombre) ?></a></li>
                   <?php endif; ?>
                 </ol>
@@ -166,7 +166,7 @@ if ($area === 'Nutricion Animal') {
             <div class="col-12 col-lg-6">
               <div class="product-content">
                 <div class="product-title"><h3><?= e($nombre) ?></h3></div>
-                <div class="product-category"><span><?= e(t('common.category')) ?>: <?= e(!empty($item['especies']) ? implode(', ', $item['especies']) : '—') ?></span></div>
+                <div class="product-category"><span><?= e(t('common.category')) ?>: <?= e(!empty($item['especies']) ? implode(', ', array_map('especie_label', $item['especies'])) : '—') ?></span></div>
                 <div class="product-desc rich-content"><?= $descripcion ?></div>
                 <div class="product-action">
                   <?php if ($ficha): ?>

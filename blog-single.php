@@ -44,9 +44,9 @@ $contenido = $item ? campo_i18n($item, 'contenido') : '';
           <div class="container">
             <div class="row">
               <div class="col-sm-12 col-md-12 col-lg-8 offset-lg-2">
-                <form class="form-search">
-                  <input class="form-control" type="text" placeholder="Buscar"/>
-                  <button></button>
+                <form class="form-search" action="buscar.php" method="get" role="search">
+                  <input class="form-control" type="text" name="q" placeholder="Buscar" data-i18n-placeholder="common.search_placeholder"/>
+                  <button type="submit" aria-label="Buscar" data-i18n-aria="common.search"></button>
                 </form>
               </div>
             </div>
@@ -126,7 +126,7 @@ $contenido = $item ? campo_i18n($item, 'contenido') : '';
               <div class="col-12 col-lg-8">
                 <h1 class="hero-title"><?= e($titulo ?: t('common.article_not_found')) ?></h1>
                 <?php if ($item && $item['categoria']): ?>
-                <h2 class="hero-desc"><?= e($item['categoria']) ?> · <?= e($d['day']) ?> <?= e($d['month']) ?> <?= e($d['year']) ?></h2>
+                <h2 class="hero-desc"><?= e(area_label($item['categoria'])) ?> · <?= e($d['day']) ?> <?= e($d['month']) ?> <?= e($d['year']) ?></h2>
                 <?php endif; ?>
               </div>
               <div class="col-12">
@@ -157,7 +157,7 @@ $contenido = $item ? campo_i18n($item, 'contenido') : '';
                 <?php endif; ?>
                 <div class="article-body">
                   <div class="entry-meta mb-3">
-                    <span class="entry-category"><?= e($item['categoria']) ?></span>
+                    <span class="entry-category"><?= e(area_label($item['categoria'])) ?></span>
                     <span class="ms-2 text-muted"><?= e($d['day']) ?> <?= e($d['month']) ?> <?= e($d['year']) ?></span>
                   </div>
                   <h1 class="entry-title mb-3"><?= e($titulo) ?></h1>

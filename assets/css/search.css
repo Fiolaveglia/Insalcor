@@ -196,3 +196,28 @@
   border-color: var(--global--color-gray-light, #e5e7eb);
 }
 
+
+/* Página de resultados (buscar.php) */
+.search-page-form {
+  margin-bottom: 50px;
+}
+
+.search-page-form .form-control {
+  height: 60px;
+  padding-left: 20px;
+}
+
+/* El término tal cual lo tipeó el usuario: sin la capitalización que
+   .heading-title aplica al resto de los títulos del sitio. */
+.search-heading .heading-title {
+  text-transform: none;
+}
+
+.search-summary {
+  margin-bottom: 0;
+  color: #6b7280;
+}
+
+.search-hint {
+  color: #6b7280;
+}

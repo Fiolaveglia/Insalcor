@@ -1,20 +1,51 @@
 <?php
+/**
+ * Página de resultados del buscador del header.
+ *
+ * Busca PRODUCTOS por nombre y NOTICIAS por título (en el idioma activo y en
+ * el otro, así "poultry" encuentra igual al producto cargado en español).
+ * Devuelve JSON con ?ajax=1 para las sugerencias en vivo de assets/js/search.js.
+ */
 require __DIR__ . '/inc/public.php';
+
+$q = termino_busqueda();
+$productos = buscar_productos($q);
+$noticias = buscar_noticias($q);
+$total = count($productos) + count($noticias);
+
+$productoDetailBase = 'product-single.php';
+$noticiaDetailBase = 'blog-single.php';
+
+// Sugerencias en vivo del buscador (dropdown): JSON acotado, sin HTML.
+if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
+    // $campo: 'nombre' en productos, 'titulo' en noticias. $etiqueta: la
+    // columna que se muestra debajo del título (área de negocio en ambos).
+    $mapear = static function (array $rows, string $campo, string $etiqueta, string $base): array {
+        return array_map(static fn(array $r): array => [
+            'id' => (int) $r['id'],
+            'titulo' => campo_i18n($r, $campo),
+            'categoria' => area_label((string) ($r[$etiqueta] ?? '')),
+            'url' => $base . '?id=' . (int) $r['id'],
+        ], $rows);
+    };
+    json_response([
+        'q' => $q,
+        'total' => $total,
+        'productos' => $mapear(array_slice($productos, 0, 5), 'nombre', 'area_negocio', $productoDetailBase),
+        'noticias' => $mapear(array_slice($noticias, 0, 5), 'titulo', 'categoria', $noticiaDetailBase),
+    ]);
+}
+
 i18n_begin();
 
-$detailBase = 'blog-single.php';
-$noticias = pub_noticias();
-$tutorialDetailBase = 'tutorial-single.php';
-$tutoriales = pub_tutoriales();
+// Paginado: cada sección lleva su propio número de página, igual que en blog.php.
+$productosPorPagina = 9;
+$paginaProductos = current_page('page_productos');
+$productosPagina = array_slice($productos, ($paginaProductos - 1) * $productosPorPagina, $productosPorPagina);
 
-// Paginado: 6 por página, cada sección con su propio número de página.
 $noticiasPorPagina = 6;
-$paginaNoticias = current_page();
+$paginaNoticias = current_page('page_noticias');
 $noticiasPagina = array_slice($noticias, ($paginaNoticias - 1) * $noticiasPorPagina, $noticiasPorPagina);
-
-$tutorialesPorPagina = 6;
-$paginaTutoriales = current_page('page_tutoriales');
-$tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorialesPorPagina, $tutorialesPorPagina);
 ?>
 <!DOCTYPE html>
 <html dir="ltr" lang="<?= e(current_lang()) ?>">
@@ -22,10 +53,11 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Novedades - Insalcor</title>
+    <title><?= e(t('search.hero_title')) ?> - Insalcor</title>
     <meta name="description" content="Insalcor ofrece soluciones integrales en insumos, seguridad industrial, limpieza, mantenimiento y servicios para empresas. Compromiso, calidad y atención personalizada.">
     <meta name="keywords" content="Insalcor, insumos industriales, seguridad industrial, limpieza, mantenimiento, equipos de protección personal, servicios empresariales, Uruguay">
     <meta name="author" content="Insalcor">
+    <meta name="robots" content="noindex,follow">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link href="assets/images/favicon/favicon.ico" rel="icon"/>
     <link href="assets/css/vendor.min.css" rel="stylesheet"/>
@@ -96,7 +128,7 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
           
                 </ul>
               </li>
-              <li class="nav-item active"><a href="blog.php"><span data-i18n="nav.news">NOVEDADES</span></a>
+              <li class="nav-item"><a href="blog.php"><span data-i18n="nav.news">NOVEDADES</span></a>
               </li>
               <li class="nav-item" id="contact"><a href="contact.html"><span data-i18n="nav.contact">CONTACTO</span></a></li>
             </ul>
@@ -121,75 +153,108 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
             </div>
           </nav>
       </header>
-      
       <!--  Page Title Section -->
       <section class="hero bg-overlay bg-overlay-dark">
         <div class="bg-section"> <img src="assets/images/heros/novedades/img1.png" alt="background"/></div>
-        <div class="container"> 
-          <div class="hero-content"> 
-            <div class="row"> 
-              <div class="col-12 col-lg-5">
-                <h1 class="hero-title" data-i18n="blog.hero_title">Blog & Novedades</h1>
-                <h2 class="hero-desc" data-i18n="blog.hero_desc">Encontrá contenido técnico, novedades institucionales y tutoriales prácticos</h2>
-                <!-- <div class="hero-action"> <a class="btn btn--white btn-line btn-line-after btn-line-inversed" href="#"> <span>Posible CTA</span><span class="line"><span></span></span></a><a class="btn btn--transparent btn-line btn-line-after" href="#"> <span>Posible CTA</span><span class="line"><span></span></span></a></div> -->
+        <div class="container">
+          <div class="hero-content">
+            <div class="row">
+              <div class="col-12 col-lg-6">
+                <h1 class="hero-title"><?= e(t('search.hero_title')) ?></h1>
+                <h2 class="hero-desc"><?= e(t('search.hero_desc')) ?></h2>
               </div>
-              <div class="col-12"> 
+              <div class="col-12">
                 <ol class="breadcrumb d-flex justify-content-center align--bottom">
                   <li class="breadcrumb-item"><a href="index.php" data-i18n="blog.breadcrumb_home">Inicio</a></li>
-                  <li class="breadcrumb-item active"><a href="blog.php" data-i18n="blog.breadcrumb_news">Novedades</a></li>
+                  <li class="breadcrumb-item active"><a href="buscar.php"><?= e(t('search.breadcrumb')) ?></a></li>
                 </ol>
               </div>
             </div>
           </div>
         </div>
       </section>
-        
-        
-      <!--  Blog Section  -->
-      <section class="blog blog-grid" id="blog">
+
+      <!--  Resultados  -->
+      <section class="blog blog-grid" id="resultados">
+        <div class="container">
+
+          <!-- Buscador de la propia página, para refinar sin reabrir el modal -->
+          <div class="row">
+            <div class="col-12 col-lg-8 offset-lg-2">
+              <form class="form-search search-page-form" action="buscar.php" method="get" role="search">
+                <input class="form-control" type="text" name="q" value="<?= e($_GET['q'] ?? '') ?>"
+                       placeholder="<?= e(t('common.search_placeholder')) ?>"
+                       <?php /* Sólo se enfoca si todavía no hay búsqueda: con resultados en
+                                pantalla, el autofoco saltearía el encabezado al cargar. */ ?>
+                       aria-label="<?= e(t('search.submit')) ?>"<?= $q === '' ? ' autofocus' : '' ?>/>
+                <button type="submit" aria-label="<?= e(t('search.submit')) ?>"><i class="fas fa-search"></i></button>
+              </form>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12 col-lg-8 offset-lg-2">
+              <div class="heading heading-7 text--center search-heading">
+                <?php if ($q === ''): ?>
+                  <p class="search-summary"><?= e(t('search.empty_query', ['min' => BUSCADOR_MIN_CHARS])) ?></p>
+                <?php else: ?>
+                  <h2 class="heading-title"><?= e(t('search.results_for', ['q' => $q])) ?></h2>
+                  <p class="search-summary"><?= e(t('search.count', ['n' => $total])) ?></p>
+                <?php endif; ?>
+              </div>
+            </div>
+          </div>
+
+          <?php if ($q !== '' && $total === 0): ?>
+            <div class="row">
+              <div class="col-12 text--center">
+                <p><?= e(t('search.no_results', ['q' => $q])) ?></p>
+                <p class="search-hint"><?= e(t('search.no_results_hint')) ?></p>
+              </div>
+            </div>
+          <?php endif; ?>
+
+        </div>
+      </section>
+
+      <?php if ($productos): ?>
+      <!--  Productos encontrados  -->
+      <section class="products products-grid pt-0" id="resultados-productos">
         <div class="container">
           <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-6 offset-lg-3">
-              <div class="heading heading-7 text--center">
-                <h2 class="heading-title" data-i18n="blog.title">Noticias y Novedades</h2>
+            <div class="col-12">
+              <div class="heading heading-7">
+                <h3 class="heading-title"><?= e(t('search.products_title')) ?> (<?= count($productos) ?>)</h3>
               </div>
             </div>
           </div>
           <div class="row">
-            <?php if ($noticiasPagina) {
-                foreach ($noticiasPagina as $item) { echo render_noticia_card($item, $detailBase); }
-            } else { ?>
-              <div class="col-12"><p class="text-center"><?= e(t('common.no_news')) ?></p></div>
-            <?php } ?>
+            <?php foreach ($productosPagina as $item) { echo render_product_card($item, $productoDetailBase); } ?>
           </div>
-          <?= render_pagination(count($noticias), $noticiasPorPagina, $paginaNoticias) ?>
+          <?= render_pagination(count($productos), $productosPorPagina, $paginaProductos, 'page_productos') ?>
         </div>
       </section>
+      <?php endif; ?>
 
-      <!--  Tutoriales Section  -->
-      <section class="blog blog-grid" id="blog">
+      <?php if ($noticias): ?>
+      <!--  Noticias encontradas  -->
+      <section class="blog blog-grid pt-0" id="resultados-noticias">
         <div class="container">
           <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-6 offset-lg-3">
-              <div class="heading heading-7 text--center">
-                <h2 class="heading-title" data-i18n="blog.tutorials_title">Tutoriales</h2>
-                <p class="title-sub-heading" data-i18n="blog.tutorials_sub">Todo lo que necesitás saber, en nuestros tutoriales</p>
+            <div class="col-12">
+              <div class="heading heading-7">
+                <h3 class="heading-title"><?= e(t('search.news_title')) ?> (<?= count($noticias) ?>)</h3>
               </div>
             </div>
           </div>
           <div class="row">
-            <?php if ($tutorialesPagina) {
-                foreach ($tutorialesPagina as $item) { echo render_tutorial_card($item, $tutorialDetailBase); }
-            } else { ?>
-              <div class="col-12"><p class="text-center">No hay tutoriales publicados.</p></div>
-            <?php } ?>
+            <?php foreach ($noticiasPagina as $item) { echo render_noticia_card($item, $noticiaDetailBase); } ?>
           </div>
-          <?= render_pagination(count($tutoriales), $tutorialesPorPagina, $paginaTutoriales, 'page_tutoriales') ?>
+          <?= render_pagination(count($noticias), $noticiasPorPagina, $paginaNoticias, 'page_noticias') ?>
         </div>
       </section>
+      <?php endif; ?>
 
-      
-      
       <!-- CTA Section -->
       <section class="cta cta-5" id="cta-5">
         <div class="bg-section"> <img src="assets/images/background/wavy-pattern.png" alt="background"/></div>

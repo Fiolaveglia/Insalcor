@@ -51,9 +51,9 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
           <div class="container">
             <div class="row">
               <div class="col-sm-12 col-md-12 col-lg-8 offset-lg-2">
-                <form class="form-search">
-                  <input class="form-control" type="text" placeholder="Buscar"/>
-                  <button></button>
+                <form class="form-search" action="buscar.php" method="get" role="search">
+                  <input class="form-control" type="text" name="q" placeholder="Buscar" data-i18n-placeholder="common.search_placeholder"/>
+                  <button type="submit" aria-label="Buscar" data-i18n-aria="common.search"></button>
                 </form>
               </div>
             </div>
