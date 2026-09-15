@@ -471,26 +471,7 @@ $(".slider-carousel").each(function() {
     $sliderAmount.val("$" + $sliderRange.slider("values", 0) + " - $" + $sliderRange.slider("values", 1));
 
     /* ------------------  AJAX CONTACT FORM  ------------------ */
-
-    var contactForm = $(".contactForm"),
-        contactResult = $('.contact-result');
-    contactForm.validate({
-        debug: false,
-        submitHandler: function(contactForm) {
-            $(contactResult, contactForm).html('Por favor espere...');
-            $.ajax({
-                type: "POST",
-                url: "assets/php/contact.php",
-                data: $(contactForm).serialize(),
-                timeout: 20000,
-                success: function(msg) {
-                    $(contactResult, contactForm).html('<div class="alert alert-success" role="alert"><strong>Gracias. Te responderemos a la brevedad.</strong></div>').delay(3000).fadeOut(2000);
-                },
-                error: $('.thanks').show()
-            });
-            return false;
-        }
-    });
+    /* El envío se maneja más abajo ("ENVÍO AJAX DEL FORMULARIO"). */
 
 
     /* ------------------  PARALLAX FOOTER ------------------ */
@@ -742,7 +723,7 @@ $(".slider-carousel").each(function() {
             
             console.log('Enviando formulario...');
             
-            var $submitButton = $form.find('button[type="submit"]');
+            var $submitButton = $form.find('button');
             var $resultDiv = $form.find('.contact-result');
             var originalButtonText = $submitButton.text();
             
@@ -780,9 +761,13 @@ $(".slider-carousel").each(function() {
                         }, 5000);
                     }
                 },
-                error: function() {
+                error: function(xhr) {
                     console.log('Error al enviar');
-                    $resultDiv.html('<div class="alert alert-danger" role="alert">Error al enviar el mensaje. Por favor intenta nuevamente.</div>');
+                    // Validaciones y fallos de envío vuelven con su propio mensaje.
+                    var body = xhr.responseText || '';
+                    $resultDiv.html(body.indexOf('alert-danger') !== -1
+                        ? body
+                        : '<div class="alert alert-danger" role="alert">Error al enviar el mensaje. Por favor intenta nuevamente.</div>');
                 },
                 complete: function() {
                     // Rehabilitar botón

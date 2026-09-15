@@ -6,3 +6,8 @@ RewriteRule ^pharma-vetpharma\.html$ pharma-vetpharma.php [R=301,L]
 RewriteRule ^product-single\.html$ product-single.php [R=301,L]
 # Legacy English mirror -> same page (i18n JSON)
 RewriteRule ^en/(.*)$ /$1 [R=301,L]
+
+# Never serve environment files
+<Files ".env*">
+    Require all denied
+</Files>

@@ -156,6 +156,10 @@
                           <div class="col-12"> 
                             <textarea class="form-control" name="contact-message" cols="30" rows="2" placeholder="Mensaje" data-i18n-placeholder="contact.message" required=""></textarea>
                           </div>
+                          <!-- Honeypot anti-spam: oculto para personas, los bots lo completan -->
+                          <div style="position:absolute;left:-9999px" aria-hidden="true">
+                            <input type="text" name="contact-website" tabindex="-1" autocomplete="off"/>
+                          </div>
                           <div class="col-12">
                             <button class="btn btn--secondary btn-line btn-line-before btn--block" data-i18n="contact.send">Enviar</button>
                           </div>

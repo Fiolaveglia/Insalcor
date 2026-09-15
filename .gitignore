@@ -4,3 +4,6 @@ data/insalcor.sqlite-*
 data/insalcor.sqlite.bak-*
 uploads/images/
 uploads/docs/
+
+# Local environment (SMTP credentials, contact recipient)
+.env
