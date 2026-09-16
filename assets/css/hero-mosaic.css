@@ -1,0 +1,101 @@
+/*------------------------------------*\
+	#Hero mosaico (Home)
+	No toca .slide / .slide-content / .slide-headline / .slide-list / .btn:
+	esas siguen 100% manejadas por style.css, tal como estaban. Esta hoja
+	solo define el fondo tipo colage que reemplaza a la única imagen que
+	tenía cada slide del carrusel.
+
+	IMPORTANTE: este div NO lleva la clase "bg-section". El sitio tiene un
+	script (functions.js) que a todo ".bg-section" le busca una única
+	imagen hija directa, la pasa a background-image del .slide padre, y
+	BORRA el .bg-section del DOM. Como acá hay 6 imágenes dentro de sub-
+	divs (.tile), ese script no encuentra nada válido y de paso borra
+	todo el mosaico. Por eso usamos una clase propia (.bg-section-mosaic)
+	y lo posicionamos nosotros mismos, absoluto, llenando el .slide.
+\*------------------------------------*/
+
+/* .slide no tiene position propio en style.css (position:static por
+   defecto). Se lo damos acá, sólo para este hero, para poder anclar el
+   mosaico de fondo detrás del texto. */
+#slider-2 .slide {
+  position: relative;
+  /* z-index explícito (no "auto") para que .slide cree su propio
+     contexto de apilamiento. Sin esto, el z-index:-1 del mosaico de
+     abajo se "escapa" mucho más arriba en el árbol (hasta el contexto
+     de apilamiento del <body>) y termina renderizando detrás de TODA
+     la página, no solo detrás del texto de este hero. */
+  z-index: 0;
+}
+
+.bg-section-mosaic {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 3px;
+  background: #0f1636;
+}
+
+.bg-section-mosaic .tile {
+  position: relative;
+  overflow: hidden;
+}
+
+.bg-section-mosaic .tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Tiles de apoyo: opacadas/grises para que resalten las 2 destacadas */
+.bg-section-mosaic .tile--support img {
+  filter: grayscale(0.25) saturate(0.75) brightness(0.72);
+}
+
+.bg-section-mosaic .tile--support::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 22, 54, 0.45);
+}
+
+/* Ubicación de cada tile en la grilla de 12x6 */
+.bg-section-mosaic .tile-1 { grid-area: 1 / 1 / 4 / 5; }
+.bg-section-mosaic .tile-2 { grid-area: 4 / 1 / 7 / 5; }
+.bg-section-mosaic .tile-3 { grid-area: 1 / 5 / 5 / 9; }
+.bg-section-mosaic .tile-4 { grid-area: 5 / 5 / 7 / 9; }
+.bg-section-mosaic .tile-5 { grid-area: 1 / 9 / 5 / 13; }
+.bg-section-mosaic .tile-6 { grid-area: 5 / 9 / 7 / 13; }
+
+/* Scrim adicional para que el texto blanco se lea bien sobre el colage */
+.bg-section-mosaic::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    rgba(9, 14, 40, 0.72) 0%,
+    rgba(9, 14, 40, 0.56) 34%,
+    rgba(9, 14, 40, 0.22) 60%,
+    rgba(9, 14, 40, 0.05) 100%
+  );
+}
+
+/* En mobile el texto pasa a quedar centrado (lo hace style.css), así que
+   acá cambiamos a un scrim tipo viñeta en vez del degradé horizontal. */
+@media screen and (max-width: 991.98px) {
+  .bg-section-mosaic::before {
+    background: radial-gradient(
+      120% 100% at 50% 42%,
+      rgba(9, 14, 40, 0.32) 0%,
+      rgba(9, 14, 40, 0.68) 55%,
+      rgba(9, 14, 40, 0.85) 100%
+    );
+  }
+}

@@ -25,6 +25,7 @@ $noticiasCarrusel = count($noticias) >= 3;
     <link href="assets/css/vendor.min.css" rel="stylesheet"/>
     <link href="assets/css/style.css" rel="stylesheet"/>
     <link href="assets/css/search.css" rel="stylesheet"/>
+    <link href="assets/css/hero-mosaic.css" rel="stylesheet"/>
   </head>
   <body data-i18n-base="assets/i18n" data-lang="es" data-api-root="." data-asset-prefix="" data-noticia-detail="blog-single.php">
 
@@ -118,133 +119,33 @@ $noticiasCarrusel = count($noticias) >= 3;
         </nav>
       </header>
       
-      <!--   Slider   -->
-<!--   Slider   -->
+      <!--   Hero mosaico   -->
 <section class="slider slider-2" id="slider-2">
   <div class="container-fluid pr-0 pl-0">
-    <div class="slider-carousel owl-carousel carousel-navs" data-slide="1" data-slide-rs="1" data-autoplay="true" data-nav="true" data-dots="false" data-space="0" data-loop="true" data-speed="800" data-slider-id="#custom-carousel">
-      
-      <!-- Slide 1 -->
-      <div class="slide bg-overlay bg-overlay-dark-slider">
-        <div class="bg-section"><img src="assets/images/heros/home/1.jpg" alt="Background"/></div>
-        <div class="container">
-          <div class="slide-content">
-            <div class="row">
-              <div class="col-12 col-lg-7">
-                <h1 class="slide-headline" data-i18n="home.slide_headline">Tecnología, experiencia y compromiso en salud y nutrición</h1>
-              </div>
-              <div class="col-12 col-lg-6">
-                <div class="slide-list">
-                  <a class="btn btn--primary btn-line" href="nutricion-animal.php" data-i18n="home.cta_nutrition"> Nutrición Animal</a>
-                  <a class="btn btn--white" href="pharma-vetpharma.php" data-i18n="home.cta_pharma">Pharma y VetPharma</a>
-                </div>
+    <div class="slide bg-overlay bg-overlay-dark-slider">
+      <div class="bg-section-mosaic">
+        <div class="tile tile--support tile-1"><img src="assets/images/heros/home/mosaic/deposito.jpg" alt=""/></div>
+        <div class="tile tile--support tile-2"><img src="assets/images/heros/home/mosaic/montacargas.jpg" alt=""/></div>
+        <div class="tile tile--featured tile-3"><img src="assets/images/heros/home/mosaic/vacas.jpg" alt="Ganado en Insalcor"/></div>
+        <div class="tile tile--support tile-4"><img src="assets/images/heros/home/mosaic/cerdos.jpg" alt=""/></div>
+        <div class="tile tile--featured tile-5"><img src="assets/images/heros/home/mosaic/laboratorio.jpg" alt="Laboratorio Pharma"/></div>
+        <div class="tile tile--support tile-6"><img src="assets/images/heros/home/mosaic/gallinas.jpg" alt=""/></div>
+      </div>
+      <div class="container">
+        <div class="slide-content">
+          <div class="row">
+            <div class="col-12 col-lg-7">
+              <h1 class="slide-headline" data-i18n="home.slide_headline">Tecnología, experiencia y compromiso en salud y nutrición</h1>
+            </div>
+            <div class="col-12 col-lg-6">
+              <div class="slide-list">
+                <a class="btn btn--primary btn-line" href="nutricion-animal.php" data-i18n="home.cta_nutrition"> Nutrición Animal</a>
+                <a class="btn btn--white" href="pharma-vetpharma.php" data-i18n="home.cta_pharma">Pharma y VetPharma</a>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
-      <!-- Slide 2 -->
-      <div class="slide bg-overlay bg-overlay-dark-slider">
-        <div class="bg-section"><img src="assets/images/heros/home/2.jpg" alt="Background"/></div>
-        <div class="container">
-          <div class="slide-content">
-            <div class="row">
-              <div class="col-12 col-lg-7">
-                <h1 class="slide-headline" data-i18n="home.slide_headline">Tecnología, experiencia y compromiso en salud y nutrición</h1>
-              </div>
-              <div class="col-12 col-lg-6">
-                <div class="slide-list">
-                  <a class="btn btn--primary btn-line" href="nutricion-animal.php" data-i18n="home.cta_nutrition"> Nutrición Animal</a>
-                  <a class="btn btn--white" href="pharma-vetpharma.php" data-i18n="home.cta_pharma">Pharma y VetPharma</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 3 -->
-      <div class="slide bg-overlay bg-overlay-dark-slider">
-        <div class="bg-section"><img src="assets/images/heros/home/4.png" alt="Background"/></div>
-        <div class="container">
-          <div class="slide-content">
-            <div class="row">
-              <div class="col-12 col-lg-7">
-                <h1 class="slide-headline" data-i18n="home.slide_headline">Tecnología, experiencia y compromiso en salud y nutrición</h1>
-              </div>
-              <div class="col-12 col-lg-6">
-                <div class="slide-list">
-                  <a class="btn btn--primary btn-line" href="nutricion-animal.php" data-i18n="home.cta_nutrition"> Nutrición Animal</a>
-                  <a class="btn btn--white" href="pharma-vetpharma.php" data-i18n="home.cta_pharma">Pharma y VetPharma</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- Slide 4 -->
-      <div class="slide bg-overlay bg-overlay-dark-slider">
-        <div class="bg-section"><img src="assets/images/heros/home/6.jpg" alt="Background"/></div>
-        <div class="container">
-          <div class="slide-content">
-            <div class="row">
-              <div class="col-12 col-lg-7">
-                <h1 class="slide-headline" data-i18n="home.slide_headline">Tecnología, experiencia y compromiso en salud y nutrición</h1>
-              </div>
-              <div class="col-12 col-lg-6">
-                <div class="slide-list">
-                  <a class="btn btn--primary btn-line" href="nutricion-animal.php" data-i18n="home.cta_nutrition"> Nutrición Animal</a>
-                  <a class="btn btn--white" href="pharma-vetpharma.php" data-i18n="home.cta_pharma">Pharma y VetPharma</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 5 -->
-      <div class="slide bg-overlay bg-overlay-dark-slider">
-        <div class="bg-section"><img src="assets/images/heros/home/7.jpg" alt="Background"/></div>
-        <div class="container">
-          <div class="slide-content">
-            <div class="row">
-              <div class="col-12 col-lg-7">
-                <h1 class="slide-headline" data-i18n="home.slide_headline">Tecnología, experiencia y compromiso en salud y nutrición</h1>
-              </div>
-              <div class="col-12 col-lg-6">
-                <div class="slide-list">
-                  <a class="btn btn--primary btn-line" href="nutricion-animal.php" data-i18n="home.cta_nutrition"> Nutrición Animal</a>
-                  <a class="btn btn--white" href="pharma-vetpharma.php" data-i18n="home.cta_pharma">Pharma y VetPharma</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 6 -->
-      <div class="slide bg-overlay bg-overlay-dark-slider">
-        <div class="bg-section"><img src="assets/images/heros/home/8.jpg" alt="Background"/></div>
-        <div class="container">
-          <div class="slide-content">
-            <div class="row">
-              <div class="col-12 col-lg-7">
-                <h1 class="slide-headline" data-i18n="home.slide_headline">Tecnología, experiencia y compromiso en salud y nutrición</h1>
-              </div>
-              <div class="col-12 col-lg-6">
-                <div class="slide-list">
-                  <a class="btn btn--primary btn-line" href="nutricion-animal.php" data-i18n="home.cta_nutrition"> Nutrición Animal</a>
-                  <a class="btn btn--white" href="pharma-vetpharma.php" data-i18n="home.cta_pharma">Pharma y VetPharma</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 </section>      
