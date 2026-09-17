@@ -15,11 +15,11 @@
         <strong>INSALCOR</strong>
         <span>Admin Panel</span>
       </div>
-      <button class="nav-item active" data-section="noticias" type="button">
-        <i class="fa-regular fa-newspaper"></i> Noticias
-      </button>
       <button class="nav-item" data-section="productos" type="button">
         <i class="fa-regular fa-image"></i> Productos
+      </button>
+      <button class="nav-item active" data-section="noticias" type="button">
+        <i class="fa-regular fa-newspaper"></i> Noticias
       </button>
       <button class="nav-item" data-section="tutoriales" type="button">
         <i class="fa-brands fa-youtube"></i> Tutoriales

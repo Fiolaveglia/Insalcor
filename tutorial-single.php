@@ -11,6 +11,10 @@ if ($item) {
 }
 $titulo = $item ? campo_i18n($item, 'titulo') : '';
 $descripcion = $item ? campo_i18n($item, 'descripcion') : '';
+
+// URL absoluta de esta página, para los links de compartir.
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$shareUrl = $item ? $scheme . '://' . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['REQUEST_URI'] ?? '') : '';
 ?>
 <!DOCTYPE html>
 <html dir="ltr" lang="<?= e(current_lang()) ?>">
@@ -117,42 +121,61 @@ $descripcion = $item ? campo_i18n($item, 'descripcion') : '';
       </header>
 
       <!--  Tutorial  -->
-      <section class="blog" style="padding:60px 0">
+      <section class="blog article-detail-section">
         <div class="container">
           <div class="row">
-            <div class="col-12 col-lg-8 offset-lg-2">
+            <div class="col-12">
+              <?php if ($item): ?>
+              <ol class="article-detail-breadcrumb">
+                <li><a href="index.php" data-i18n="blog.breadcrumb_home">Inicio</a></li>
+                <li><a href="blog.php" data-i18n="blog.breadcrumb_news">Novedades</a></li>
+                <li class="active"><?= e($titulo) ?></li>
+              </ol>
+              <?php endif; ?>
+
               <?php if ($item): ?>
               <article class="blog-entry blog-single" style="padding:0;overflow:hidden">
-                <?php if ($item['youtube_id']): ?>
-                <div class="entry-img" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden">
-                  <iframe
-                    src="https://www.youtube.com/embed/<?= e($item['youtube_id']) ?>"
-                    title="<?= e($titulo) ?>"
-                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen
-                  ></iframe>
-                </div>
-                <?php endif; ?>
                 <div class="article-body">
-                  <div class="entry-meta mb-3">
+                  <div class="article-detail-meta">
                     <span class="entry-category">Tutorial</span>
-                    <span class="ms-2 text-muted"><?= e($d['day']) ?> <?= e($d['month']) ?> <?= e($d['year']) ?></span>
+                    <span class="divider"></span>
+                    <span><?= e($d['day']) ?> <?= e($d['month']) ?> <?= e($d['year']) ?></span>
                   </div>
-                  <h4 class="entry-title mb-3"><?= e($titulo) ?></h4>
+                  <h1 class="article-detail-title"><?= e($titulo) ?></h1>
+
+                  <?php if ($item['youtube_id']): ?>
+                  <div class="entry-video-wrap">
+                    <div class="entry-video">
+                      <iframe
+                        src="https://www.youtube.com/embed/<?= e($item['youtube_id']) ?>"
+                        title="<?= e($titulo) ?>"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                      ></iframe>
+                    </div>
+                  </div>
+                  <?php endif; ?>
+
                   <?php if ($descripcion): ?>
                   <div class="entry-content rich-content"><?= $descripcion ?></div>
                   <?php endif; ?>
                   <?php if ($item['youtube_url']): ?>
                   <p class="mt-4"><a class="btn btn--secondary btn-line" href="<?= e($item['youtube_url']) ?>" target="_blank" rel="noopener"><i class="fab fa-youtube"></i> Ver en YouTube</a></p>
                   <?php endif; ?>
+
+                  <div class="article-detail-share">
+                    <span class="article-detail-share__label" data-i18n="Compartir">Compartir</span>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($shareUrl) ?>" target="_blank" rel="noopener" aria-label="Compartir en Facebook" style="background-color: #0D1F61;"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com/intent/tweet?url=<?= urlencode($shareUrl) ?>&text=<?= urlencode($titulo) ?>" target="_blank" rel="noopener" aria-label="Compartir en X" style="background-color: #F47A3F;"><i class="fab fa-x-twitter"></i></a>
+                    <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?= urlencode($shareUrl) ?>" target="_blank" rel="noopener" aria-label="Compartir en LinkedIn" style="background-color: #3B6EB2;"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://wa.me/?text=<?= urlencode($titulo . ' ' . $shareUrl) ?>" target="_blank" rel="noopener" aria-label="Compartir en WhatsApp" style="background-color: #ADC438;"><i class="fab fa-whatsapp"></i></a>
+                  </div>
                 </div>
               </article>
+              <p class="mt-4"><a class="article-detail-back" href="blog.php">&larr; <span data-i18n="common.back_news">Volver a Novedades</span></a></p>
               <?php else: ?>
               <p class="text-center"><?= e(t('common.article_not_found')) ?></p>
-              <?php endif; ?>
-
-              <p class="mt-5"><a class="btn btn--secondary btn-line" href="blog.php">&larr; <span data-i18n="common.back_news">Volver a Novedades</span></a></p>
+              <?php endif; ?>   
             </div>
           </div>
         </div>

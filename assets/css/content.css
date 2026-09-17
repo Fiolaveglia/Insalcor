@@ -5,18 +5,307 @@
  * blockquotes, links and alignment classes render as intended.
  */
 
-.rich-content {
-  padding-top: 4px;
+/* Breadcrumb chiquito arriba de la tarjeta, en vez del botón "Volver"
+   que quedaba desubicado ahí. */
+.article-detail-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+  font-family: var(--global--font-body);
+  font-size: 13px;
+  color: #9a9eae;
+}
+.article-detail-breadcrumb li {
+  display: flex;
+  align-items: center;
+}
+.article-detail-breadcrumb li + li::before {
+  content: "/";
+  margin: 0 8px;
+  color: #c7cad6;
+}
+.article-detail-breadcrumb a {
+  color: #9a9eae;
+  text-decoration: none;
+}
+.article-detail-breadcrumb a:hover {
+  color: var(--global--color-primary);
+}
+.article-detail-breadcrumb li.active {
+  color: var(--global--color-primary);
+  font-weight: 600;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 575.98px) {
+  .article-detail-breadcrumb li.active {
+    max-width: 160px;
+  }
+}
+
+/* Link "Volver a Novedades" de abajo del artículo (antes era un botón
+   grande arriba de la tarjeta). */
+.article-detail-back {
+  display: inline-block;
+  color: var(--global--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+.article-detail-back:hover {
+  color: var(--global--color-secondary);
+}
+
+/* Todas las imágenes de producto de la grilla (Nutrición Animal, Pharma,
+   VetPharma) del mismo tamaño, recortadas parejo. Rectangular vertical
+   (más alta que ancha), porque las fotos de producto son bolsas/cajas
+   paradas: con una proporción más ancha (4:3) quedaban cortadas feo. */
+.product-item .product-img {
+  aspect-ratio: 3 / 4;
+}
+.product-item .product-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Producto sin imagen cargada: en vez de la foto genérica, texto +
+   accesos directos a Ficha técnica / Consultar, centrado y con el
+   mismo "peso" visual que una card con foto. */
+.product-item.product-item--no-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 340px;
+  border: 1px solid #e5e7ef;
+  border-radius: 8px;
+  background: #fafbfc;
+}
+.product-item--no-image .product-content {
+  padding: 28px 24px;
+  text-align: center;
+}
+.product-item--no-image .product-title {
+  margin-bottom: 18px;
+}
+.product-actions-inline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.product-actions-inline .btn {
+  font-size: 13px;
+  padding: 10px 18px;
+}
+
+/* Widget "productos recientes" (sidebar) sin imagen: al no renderizarse
+   el <div class="product-img">, el título queda solo, alineado a la
+   izquierda del widget sin necesitar ningún ajuste extra. */
+   dos lados (antes usaba el tratamiento de foto a todo el ancho, que
+   para un video quedaba cortado y con el borde desparejo). */
+.entry-video-wrap {
+  max-width: 640px;
+  margin: 0 auto 28px;
+}
+.entry-video {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #000;
+}
+.entry-video iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.article-detail-share {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 36px;
+  padding-top: 26px;
+  border-top: 1px solid #edeef3;
+}
+.article-detail-share__label {
+  font-family: var(--global--font-secondary);
+  font-weight: 600;
+  color: var(--global--color-heading);
+  margin-right: 4px;
+}
+.article-detail-share a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--global--color-primary);
+  color: #fff;
+  text-decoration: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.article-detail-share a:hover {
+  transform: translateY(-2px);
+  opacity: 0.85;
+  color: #fff;
+}
+
+/*------------------------------------*\
+	#Detalle de noticia / tutorial
+	Tarjeta blanca prolija sobre fondo gris claro, sin el hero-foto
+	grande de antes. Todo esto es nuevo (antes .article-body sólo tenía
+	el padding de abajo).
+\*------------------------------------*/
+
+/* Fondo gris claro de la página, para que la tarjeta blanca resalte */
+.article-detail-section {
+  background: #f4f5f8;
+  padding: 50px 0 70px;
+}
+@media (max-width: 575.98px) {
+  .article-detail-section {
+    padding: 30px 0 50px;
+  }
+}
+
+/* La tarjeta en sí */
+.blog-single .blog-entry {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 28px rgba(20, 30, 70, 0.08);
 }
 
 /* Blog single: full-bleed image at the card top, padded text below. */
 .blog-single .article-body {
-  padding: 30px 34px 40px;
+  padding: 40px 48px 48px;
 }
 @media (max-width: 575.98px) {
   .blog-single .article-body {
-    padding: 24px 20px 32px;
+    padding: 26px 22px 34px;
   }
+}
+
+/* Volver a llevarle el radio del borde a la imagen destacada, ya que
+   ahora vive dentro de una tarjeta con esquinas redondeadas. */
+.blog-single .entry-img,
+.blog-single .entry-img iframe {
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+}
+
+/* Categoría + fecha: chip prolijo, no el estilo pensado para el listado */
+.article-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-family: var(--global--font-body);
+  font-size: 14px;
+  color: #8a8fa3;
+}
+.article-detail-meta .entry-category {
+  color: var(--global--color-secondary);
+  font-weight: 600;
+}
+.article-detail-meta .divider {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #c7cad6;
+  flex: none;
+}
+
+/* Título grande, navy, sin el estilo "h4 de card de listado" */
+.article-detail-title {
+  font-family: var(--global--font-secondary);
+  color: var(--global--color-primary);
+  font-weight: 700;
+  font-size: 2.1rem;
+  line-height: 1.25;
+  margin-bottom: 14px;
+  text-transform: none;
+}
+@media (max-width: 767.98px) {
+  .article-detail-title {
+    font-size: 1.6rem;
+  }
+}
+
+/* Subtítulo (extracto): gris, más liviano, separado del título */
+.article-detail-subtitle {
+  color: #7d8194;
+  font-size: 1.08rem;
+  font-style: italic;
+  line-height: 1.5;
+  margin-bottom: 30px;
+  padding-bottom: 26px;
+  border-bottom: 1px solid #edeef3;
+}
+
+/*------------------------------------*\
+	#Galería / Compartir dentro del texto
+	No son una función del template: el admin las escribe a mano dentro
+	del contenido de cada noticia. Estas reglas genéricas hacen que
+	cualquier tanda de imágenes o de íconos de redes que se escriban ahí
+	se vean prolijas, sin depender de una noticia puntual.
+\*------------------------------------*/
+
+/* Varias imágenes seguidas dentro de un mismo párrafo -> fila con wrap,
+   en vez de una gigante atrás de otra. */
+.entry-content p:has(img + img),
+.product-desc p:has(img + img) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.entry-content p:has(img + img) img,
+.product-desc p:has(img + img) img {
+  width: calc(33.333% - 7px);
+  height: 140px;
+  object-fit: cover;
+  margin: 0;
+  flex: none;
+}
+@media (max-width: 575.98px) {
+  .entry-content p:has(img + img) img,
+  .product-desc p:has(img + img) img {
+    width: calc(50% - 5px);
+    height: 110px;
+  }
+}
+
+/* Íconos de redes (fa-brands) puestos a mano -> botón circular */
+.entry-content a:has(> i.fab),
+.entry-content a:has(> i.fa-brands),
+.product-desc a:has(> i.fab),
+.product-desc a:has(> i.fa-brands) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  margin: 0 6px 6px 0;
+  border-radius: 50%;
+  background: var(--global--color-primary);
+  color: #fff !important;
+  text-decoration: none !important;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.entry-content a:has(> i.fab):hover,
+.entry-content a:has(> i.fa-brands):hover,
+.product-desc a:has(> i.fab):hover,
+.product-desc a:has(> i.fa-brands):hover {
+  transform: translateY(-2px);
+  opacity: 0.85;
 }
 
 .rich-content,

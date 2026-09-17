@@ -12,6 +12,10 @@ if ($item) {
 $titulo = $item ? campo_i18n($item, 'titulo') : '';
 $extracto = $item ? campo_i18n($item, 'extracto') : '';
 $contenido = $item ? campo_i18n($item, 'contenido') : '';
+
+// URL absoluta de esta página, para los links de compartir.
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$shareUrl = $item ? $scheme . '://' . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['REQUEST_URI'] ?? '') : '';
 ?>
 <!DOCTYPE html>
 <html dir="ltr" lang="<?= e(current_lang()) ?>">
@@ -117,35 +121,19 @@ $contenido = $item ? campo_i18n($item, 'contenido') : '';
           </nav>
       </header>
 
-      <!--  Page Title Section -->
-      <section class="hero bg-overlay bg-overlay-dark">
-        <div class="bg-section"> <img src="assets/images/heros/novedades/img1.png" alt="background"/></div>
-        <div class="container">
-          <div class="hero-content">
-            <div class="row">
-              <div class="col-12 col-lg-8">
-                <h1 class="hero-title"><?= e($titulo ?: t('common.article_not_found')) ?></h1>
-                <?php if ($item && $item['categoria']): ?>
-                <h2 class="hero-desc"><?= e(area_label($item['categoria'])) ?> · <?= e($d['day']) ?> <?= e($d['month']) ?> <?= e($d['year']) ?></h2>
-                <?php endif; ?>
-              </div>
-              <div class="col-12">
-                <ol class="breadcrumb d-flex justify-content-center align--bottom">
-                  <li class="breadcrumb-item"><a href="index.php" data-i18n="blog.breadcrumb_home">Inicio</a></li>
-                  <li class="breadcrumb-item"><a href="blog.php" data-i18n="blog.breadcrumb_news">Novedades</a></li>
-                  <?php if ($item): ?><li class="breadcrumb-item active"><a href="javascript:void(0)"><?= e($titulo) ?></a></li><?php endif; ?>
-                </ol>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <!--  Article  -->
-      <section class="blog" style="padding:60px 0">
+      <section class="blog article-detail-section">
         <div class="container">
           <div class="row">
-            <div class="col-12 col-lg-8 offset-lg-2">
+            <div class="col-12">
+              <?php if ($item): ?>
+              <ol class="article-detail-breadcrumb">
+                <li><a href="index.php" data-i18n="blog.breadcrumb_home">Inicio</a></li>
+                <li><a href="blog.php" data-i18n="blog.breadcrumb_news">Novedades</a></li>
+                <li class="active"><?= e($titulo) ?></li>
+              </ol>
+              <?php endif; ?>
+
               <?php if ($item):
                   $img = asset($item['imagen']);
               ?>
@@ -156,20 +144,30 @@ $contenido = $item ? campo_i18n($item, 'contenido') : '';
                 </div>
                 <?php endif; ?>
                 <div class="article-body">
-                  <div class="entry-meta mb-3">
+                  <?php if ($item['categoria']): ?>
+                  <div class="article-detail-meta">
                     <span class="entry-category"><?= e(area_label($item['categoria'])) ?></span>
-                    <span class="ms-2 text-muted"><?= e($d['day']) ?> <?= e($d['month']) ?> <?= e($d['year']) ?></span>
+                    <span class="divider"></span>
+                    <span><?= e($d['day']) ?> <?= e($d['month']) ?> <?= e($d['year']) ?></span>
                   </div>
-                  <h1 class="entry-title mb-3"><?= e($titulo) ?></h1>
-                  <?php if ($extracto): ?><p class="entry-bio lead mb-4"><?= e($extracto) ?></p><?php endif; ?>
+                  <?php endif; ?>
+                  <h1 class="article-detail-title"><?= e($titulo) ?></h1>
+                  <?php if ($extracto): ?><p class="article-detail-subtitle"><?= e($extracto) ?></p><?php endif; ?>
                   <div class="entry-content rich-content"><?= $contenido ?></div>
+
+                  <div class="article-detail-share">
+                    <span class="article-detail-share__label" data-i18n="Compartir">Compartir</span>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($shareUrl) ?>" target="_blank" rel="noopener" aria-label="Compartir en Facebook" style="background-color: #0D1F61;"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com/intent/tweet?url=<?= urlencode($shareUrl) ?>&text=<?= urlencode($titulo) ?>" target="_blank" rel="noopener" aria-label="Compartir en X" style="background-color: #F47A3F;"><i class="fab fa-x-twitter"></i></a>
+                    <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?= urlencode($shareUrl) ?>" target="_blank" rel="noopener" aria-label="Compartir en LinkedIn" style="background-color: #3B6EB2;"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://wa.me/?text=<?= urlencode($titulo . ' ' . $shareUrl) ?>" target="_blank" rel="noopener" aria-label="Compartir en WhatsApp" style="background-color: #ADC438;"><i class="fab fa-whatsapp"></i></a>
+                  </div>
                 </div>
               </article>
+              <p class="mt-4"><a class="article-detail-back" href="blog.php">&larr; <span data-i18n="common.back_news">Volver a Novedades</span></a></p>
               <?php else: ?>
               <p class="text-center"><?= e(t('common.article_not_found')) ?></p>
               <?php endif; ?>
-
-              <p class="mt-5"><a class="btn btn--secondary btn-line" href="blog.php">&larr; <span data-i18n="common.back_news">Volver a Novedades</span></a></p>
             </div>
           </div>
         </div>

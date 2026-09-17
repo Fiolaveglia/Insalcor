@@ -153,10 +153,11 @@ if ($area === 'Nutricion Animal') {
       <section class="single-product" id="single-product" style="padding:60px 0">
         <div class="container">
           <?php if ($item):
-              $img = asset($item['imagen']) ?: asset('assets/images/products/full/1.png');
+              $img = asset($item['imagen']);
               $ficha = $item['ficha_tecnica'] ? asset($item['ficha_tecnica']) : '';
           ?>
           <div class="row">
+            <?php if ($img): ?>
             <div class="col-12 col-lg-6">
               <div class="product-img">
                 <img class="img-fluid" src="<?= e($img) ?>" alt="<?= e($nombre) ?>"/>
@@ -164,6 +165,9 @@ if ($area === 'Nutricion Animal') {
               </div>
             </div>
             <div class="col-12 col-lg-6">
+            <?php else: ?>
+            <div class="col-12">
+            <?php endif; ?>
               <div class="product-content">
                 <div class="product-title"><h3><?= e($nombre) ?></h3></div>
                 <div class="product-category"><span><?= e(t('common.category')) ?>: <?= e(!empty($item['especies']) ? implode(', ', array_map('especie_label', $item['especies'])) : '—') ?></span></div>

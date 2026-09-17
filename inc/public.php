@@ -636,10 +636,12 @@ function area_counts(string $area, string $col): array
 
 function render_product_card(array $item, string $detailBase): string
 {
-    $img = asset($item['imagen']) ?: asset('assets/images/products/grid/1.png');
+    $img = asset($item['imagen']);
     $href = $detailBase . '?id=' . (int) $item['id'];
     $nombre = e(campo_i18n($item, 'nombre'));
-    return '
+
+    if ($img) {
+        return '
       <div class="col-12 col-md-6 col-lg-4" data-product-card>
         <div class="product-item">
           <div class="product-img">
@@ -652,16 +654,41 @@ function render_product_card(array $item, string $detailBase): string
           </div>
         </div>
       </div>';
+    }
+
+    // Sin imagen cargada: nada de foto genérica. Solo el texto de la
+    // card y el botón de Ver detalle (mismo que el de las cards con foto).
+    return '
+      <div class="col-12 col-md-6 col-lg-4" data-product-card>
+        <div class="product-item product-item--no-image">
+          <div class="product-content">
+            <div class="product-title"><a class="js-open-product" href="' . e($href) . '">' . $nombre . '</a></div>
+            <div class="product-actions-inline">
+              <a class="btn btn--secondary btn-sm js-open-product" href="' . e($href) . '"><i class="fas fa-eye"></i> ' . e(t('common.view_details')) . '</a>
+            </div>
+          </div>
+        </div>
+      </div>';
 }
 
 function render_recent_product(array $item, string $detailBase): string
 {
-    $img = asset($item['imagen']) ?: asset('assets/images/products/thumb/1.jpg');
+    $img = asset($item['imagen']);
     $href = $detailBase . '?id=' . (int) $item['id'];
-    return '
+    $nombre = e(campo_i18n($item, 'nombre'));
+
+    if ($img) {
+        return '
         <div class="product">
-          <div class="product-img"><img src="' . e($img) . '" alt="product"/></div>
-          <div class="product-desc"><div class="product-title"><a class="js-open-product" href="' . e($href) . '">' . e(campo_i18n($item, 'nombre')) . '</a></div></div>
+          <div class="product-img"><img src="' . e($img) . '" alt="' . $nombre . '"/></div>
+          <div class="product-desc"><div class="product-title"><a class="js-open-product" href="' . e($href) . '">' . $nombre . '</a></div></div>
+        </div>';
+    }
+
+    // Sin imagen: sólo el texto, sin la miniatura genérica.
+    return '
+        <div class="product product--no-image">
+          <div class="product-desc"><div class="product-title"><a class="js-open-product" href="' . e($href) . '">' . $nombre . '</a></div></div>
         </div>';
 }
 
@@ -853,7 +880,7 @@ function render_tutorial_card(array $item, string $detailBase): string
             </div>
             <div class="entry-bio"><p>' . e($resumen) . '</p></div>
             <div class="entry-more">
-              <a class="btn btn--white btn-line btn-line-before btn-line-inversed tutorial" href="' . e($href) . '">
+              <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="' . e($href) . '">
                 <div class="line"><span></span></div><span>' . e(t('common.see_more')) . '</span>
               </a>
             </div>

@@ -36,6 +36,7 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
     <link href="assets/css/vendor.min.css" rel="stylesheet"/>
     <link href="assets/css/style.css" rel="stylesheet"/>
     <link href="assets/css/search.css" rel="stylesheet"/>
+    <link href="assets/css/content.css" rel="stylesheet"/>
   </head>
   <body data-i18n-base="assets/i18n" data-lang="es" data-api-root="." data-asset-prefix="" data-product-detail="product-single.php">
     <div class="preloader">
