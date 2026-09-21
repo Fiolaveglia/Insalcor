@@ -31,6 +31,7 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
     <link href="assets/css/vendor.min.css" rel="stylesheet"/>
     <link href="assets/css/style.css" rel="stylesheet"/>
     <link href="assets/css/search.css" rel="stylesheet"/>
+    <link href="assets/css/content.css" rel="stylesheet"/>
   </head>
   
   <body data-i18n-base="assets/i18n" data-lang="es" data-api-root="." data-asset-prefix="" data-noticia-detail="blog-single.php">

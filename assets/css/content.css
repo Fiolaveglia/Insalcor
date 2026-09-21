@@ -59,6 +59,37 @@
   color: var(--global--color-secondary);
 }
 
+/* Cards de noticias (listado blog.php): títulos y extractos de largo
+   variable hacían que unas cards quedaran más altas que otras. Se
+   recortan a un número fijo de líneas (con "…") y el botón "Ver más"
+   queda siempre a la misma altura, alineado abajo. */
+.blog-entry {
+  height: calc(100% - 80px); /* descuenta el margin-top/bottom de 40px de .blog-entry */
+  display: flex;
+  flex-direction: column;
+}
+.blog-entry > .entry-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.blog-entry .entry-title h4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 56px; /* 2 líneas a line-height:28px, aunque el título sea corto */
+}
+.blog-entry .entry-bio p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 48px; /* 2 líneas a line-height:24px */
+}
+.blog-entry .entry-more {
+  margin-top: auto;
+}
 /* Todas las imágenes de producto de la grilla (Nutrición Animal, Pharma,
    VetPharma) del mismo tamaño, recortadas parejo. Rectangular vertical
    (más alta que ancha), porque las fotos de producto son bolsas/cajas
@@ -105,6 +136,8 @@
 /* Widget "productos recientes" (sidebar) sin imagen: al no renderizarse
    el <div class="product-img">, el título queda solo, alineado a la
    izquierda del widget sin necesitar ningún ajuste extra. */
+
+/* Video del tutorial: más chico, centrado, con el mismo margen a los
    dos lados (antes usaba el tratamiento de foto a todo el ancho, que
    para un video quedaba cortado y con el borde desparejo). */
 .entry-video-wrap {
@@ -367,7 +400,6 @@
 .entry-content a,
 .product-desc a {
   color: #2b57d6;
-  text-decoration: underline;
 }
 .entry-content a:hover,
 .product-desc a:hover {

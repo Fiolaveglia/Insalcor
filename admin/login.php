@@ -30,9 +30,9 @@ require_once __DIR__ . '/_init.php';
         </div>
         <button class="btn btn-primary btn-block" type="submit">Ingresar</button>
       </form>
-<?php if (REGISTRO_HABILITADO): ?>
+<!-- <?php if (REGISTRO_HABILITADO): ?>
       <p class="auth-footer">¿No tenés cuenta? <a href="register.php">Registrarse</a></p>
-<?php endif; ?>
+<?php endif; ?> -->
     </div>
   </div>
   <script src="../assets/js/admin/api.js"></script>

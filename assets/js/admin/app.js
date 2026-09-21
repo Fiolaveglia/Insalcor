@@ -3,8 +3,6 @@
 
   let noticiaQuill = null;
   let productoQuill = null;
-  let noticiaQuillEn = null;
-  let productoQuillEn = null;
   let currentUser = null;
 
   function assetUrl(path) {
@@ -65,20 +63,6 @@
       productoQuill = new Quill('#producto-descripcion-editor', {
         theme: 'snow',
         placeholder: 'Descripción del producto...',
-        modules: { toolbar: [['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link'], ['clean']] },
-      });
-    }
-    if (!noticiaQuillEn) {
-      noticiaQuillEn = new Quill('#noticia-contenido-en-editor', {
-        theme: 'snow',
-        placeholder: 'Full content...',
-        modules: { toolbar: [['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link'], ['clean']] },
-      });
-    }
-    if (!productoQuillEn) {
-      productoQuillEn = new Quill('#producto-descripcion-en-editor', {
-        theme: 'snow',
-        placeholder: 'Product description...',
         modules: { toolbar: [['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link'], ['clean']] },
       });
     }
@@ -176,13 +160,10 @@
     ensureQuills();
     document.getElementById('noticia-id').value = '';
     document.getElementById('noticia-titulo').value = '';
-    document.getElementById('noticia-titulo-en').value = '';
     document.getElementById('noticia-extracto').value = '';
-    document.getElementById('noticia-extracto-en').value = '';
     document.getElementById('noticia-categoria').value = '';
     document.getElementById('noticia-imagen').value = '';
     noticiaQuill.setContents([]);
-    noticiaQuillEn.setContents([]);
     setImagePreview('noticia-preview', '');
     document.getElementById('modal-noticia-title').textContent = 'Nueva Noticia';
   }
@@ -195,14 +176,11 @@
       document.getElementById('modal-noticia-title').textContent = 'Editar Noticia';
       document.getElementById('noticia-id').value = item.id;
       document.getElementById('noticia-titulo').value = item.titulo;
-      document.getElementById('noticia-titulo-en').value = item.titulo_en || '';
       document.getElementById('noticia-extracto').value = item.extracto;
-      document.getElementById('noticia-extracto-en').value = item.extracto_en || '';
       document.getElementById('noticia-categoria').value = item.categoria;
       document.getElementById('noticia-imagen').value = item.imagen || '';
       setImagePreview('noticia-preview', item.imagen);
       noticiaQuill.root.innerHTML = item.contenido || '';
-      noticiaQuillEn.root.innerHTML = item.contenido_en || '';
     }
     openModal('modal-noticia');
   }
@@ -211,13 +189,10 @@
     const id = document.getElementById('noticia-id').value;
     const payload = {
       titulo: document.getElementById('noticia-titulo').value.trim(),
-      titulo_en: document.getElementById('noticia-titulo-en').value.trim(),
       extracto: document.getElementById('noticia-extracto').value.trim(),
-      extracto_en: document.getElementById('noticia-extracto-en').value.trim(),
       categoria: document.getElementById('noticia-categoria').value.trim(),
       imagen: document.getElementById('noticia-imagen').value,
       contenido: noticiaQuill.root.innerHTML,
-      contenido_en: noticiaQuillEn.root.innerHTML,
       estado,
     };
     if (!payload.titulo) {
@@ -277,14 +252,12 @@
     ensureQuills();
     document.getElementById('producto-id').value = '';
     document.getElementById('producto-nombre').value = '';
-    document.getElementById('producto-nombre-en').value = '';
     document.getElementById('producto-area').value = 'Nutricion Animal';
     setEspecies([]);
     document.getElementById('producto-imagen').value = '';
     document.getElementById('producto-ficha').value = '';
     document.getElementById('producto-ficha-file').value = '';
     productoQuill.setContents([]);
-    productoQuillEn.setContents([]);
     setImagePreview('producto-preview', '');
     document.getElementById('modal-producto-title').textContent = 'Nuevo Producto';
   }
@@ -297,14 +270,12 @@
       document.getElementById('modal-producto-title').textContent = 'Editar Producto';
       document.getElementById('producto-id').value = item.id;
       document.getElementById('producto-nombre').value = item.nombre;
-      document.getElementById('producto-nombre-en').value = item.nombre_en || '';
       document.getElementById('producto-area').value = item.area_negocio;
       setEspecies(item.especies);
       document.getElementById('producto-imagen').value = item.imagen || '';
       document.getElementById('producto-ficha').value = item.ficha_tecnica || '';
       setImagePreview('producto-preview', item.imagen);
       productoQuill.root.innerHTML = item.descripcion || '';
-      productoQuillEn.root.innerHTML = item.descripcion_en || '';
     }
     openModal('modal-producto');
   }
@@ -314,13 +285,11 @@
     const area = document.getElementById('producto-area').value;
     const payload = {
       nombre: document.getElementById('producto-nombre').value.trim(),
-      nombre_en: document.getElementById('producto-nombre-en').value.trim(),
       area_negocio: area,
       especies: getEspecies(),
       imagen: document.getElementById('producto-imagen').value,
       ficha_tecnica: document.getElementById('producto-ficha').value.trim(),
       descripcion: productoQuill.root.innerHTML,
-      descripcion_en: productoQuillEn.root.innerHTML,
       estado,
     };
     if (!payload.nombre) {
@@ -407,10 +376,8 @@
   function resetTutorialForm() {
     document.getElementById('tutorial-id').value = '';
     document.getElementById('tutorial-titulo').value = '';
-    document.getElementById('tutorial-titulo-en').value = '';
     document.getElementById('tutorial-youtube-url').value = '';
     document.getElementById('tutorial-descripcion').value = '';
-    document.getElementById('tutorial-descripcion-en').value = '';
     updateTutorialPreview();
     document.getElementById('modal-tutorial-title').textContent = 'Nuevo Tutorial';
   }
@@ -422,10 +389,8 @@
       document.getElementById('modal-tutorial-title').textContent = 'Editar Tutorial';
       document.getElementById('tutorial-id').value = item.id;
       document.getElementById('tutorial-titulo').value = item.titulo;
-      document.getElementById('tutorial-titulo-en').value = item.titulo_en || '';
       document.getElementById('tutorial-youtube-url').value = item.youtube_url || '';
       document.getElementById('tutorial-descripcion').value = item.descripcion || '';
-      document.getElementById('tutorial-descripcion-en').value = item.descripcion_en || '';
       updateTutorialPreview();
     }
     openModal('modal-tutorial');
@@ -435,10 +400,8 @@
     const id = document.getElementById('tutorial-id').value;
     const payload = {
       titulo: document.getElementById('tutorial-titulo').value.trim(),
-      titulo_en: document.getElementById('tutorial-titulo-en').value.trim(),
       youtube_url: document.getElementById('tutorial-youtube-url').value.trim(),
       descripcion: document.getElementById('tutorial-descripcion').value.trim(),
-      descripcion_en: document.getElementById('tutorial-descripcion-en').value.trim(),
       estado,
     };
     if (!payload.titulo) {
@@ -576,7 +539,7 @@
       }
     });
 
-    showSection('noticias');
+    showSection('productos');
   }
 
   function debounce(fn, ms) {

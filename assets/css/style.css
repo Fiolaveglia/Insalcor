@@ -6976,6 +6976,13 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 .heading.heading-15 .heading-desc {
   margin-bottom: 42px;
 }
+@media screen and (max-width: 991.98px) {
+  .heading.heading-15 .heading-desc {
+    margin-bottom: 0;
+  }
+}
+
+
 
 .heading.heading-16 {
   margin-top: 93px;
@@ -7143,6 +7150,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
   .slider .slide .slide-content .slide-headline {
     font-size: 32px;
     line-height: 1.4;
+    margin-top: 20px
   }
 }
 
@@ -7440,7 +7448,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 @media screen and (max-width: 767.98px) {
   .slider.slider-2 .slide {
     height: auto;
-    padding-bottom: 180px;
+    padding-bottom: 60px;
   }
 }
 
@@ -8571,8 +8579,7 @@ background-color: #F9F9F9;
   font-weight: 500;
   line-height: 28px;
   margin-bottom: 0;
-  text-transform: capitalize;
-}
+  }
 
 .blog-entry .entry-title a {
   color: var(--global--color-heading);
@@ -15393,12 +15400,6 @@ background-color: #F9F9F9;
   overflow: visible;
 }
 
-@media screen and (max-width:991.98px) {
-  .features-bar {
-    padding-bottom: 100px;
-  }
-}
-
 .features-bar .features-holder {
   position: relative;
   z-index: 55;
@@ -15414,6 +15415,7 @@ background-color: #F9F9F9;
     box-shadow: 0px 5px 83px 0px rgba(9, 29, 62, 0.15);
   }
 }
+
 
 .features-bar .features-holder .feature-panel {
   padding: 28px 40px 40px;
@@ -17923,6 +17925,9 @@ background-color: #F9F9F9;
     text-align: center;
     margin-bottom: 25px;
   }
+  .title-sec > h2.section-head {
+    text-align: center;
+  }
 }
 
 @media screen and (min-width: 992px) {
@@ -18278,6 +18283,10 @@ background-color: #F9F9F9;
   .cta .prief-set p {
     text-align: center;
   }
+  .img-equipo {
+   width: 80%;
+   height: 100%;
+  }
 }
 
 .cta .prief-set .advantages-list {
@@ -18605,6 +18614,15 @@ background-color: #F9F9F9;
   -ms-border-radius: 15px 0 0 15px;
   -o-border-radius: 15px 0 0 15px;
 }
+@media screen and (max-width: 991.98px) {
+  .ventajas-panel:first-child {
+    border-radius: 15px 15px 0 0;
+    -webkit-border-radius:  15px 15px 0 0;
+    -moz-border-radius:  15px 15px 0 0;
+    -ms-border-radius:  15px 15px 0 0;
+    -o-border-radius:  15px 15px 0 0;
+  }
+}
 .ventajas-panel:last-child {
   border-radius: 0 15px 15px 0;
   -webkit-border-radius: 0 15px 15px 0;
@@ -18613,11 +18631,16 @@ background-color: #F9F9F9;
   -o-border-radius: 0 15px 15px 0;
 }
 
-@media screen and (max-width:991.98px) {
-  .cta.cta-3 {
-    padding-top: 90px;
+@media screen and (max-width: 991.98px) {
+  .ventajas-panel:last-child {
+    border-radius:  0 0 15px 15px;
+    -webkit-border-radius:  0 0 15px 15px;
+    -moz-border-radius:  0 0 15px 15px;
+    -ms-border-radius:  0 0 15px 15px;
+    -o-border-radius:  0 0 15px 15px;
   }
 }
+
 
 .cta.cta-4 {
   padding-top: 130px;
@@ -18662,6 +18685,7 @@ background-color: #F9F9F9;
   .cta.cta-5 {
     padding-left: 30px;
     padding-right: 30px;
+    max-height: 500px;
   }
 }
 
@@ -20285,8 +20309,10 @@ background-color: #F9F9F9;
 
   }
   .office-divider {
-    margin-left: 60px;
-  }
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 80% !important;
+  } 
 }
 
 /* Mosaico fotos */ 
@@ -20388,6 +20414,13 @@ background-color: #F9F9F9;
   position: relative;
   color: var(--global--color-white);
 }
+@media screen and (max-width: 767.98px) {
+  footer {
+    margin-top: 0 !important; 
+    
+  }
+}
+
 
 .footer::after {
   content: '';
@@ -20417,6 +20450,7 @@ h6.social-title {
 @media screen and (max-width: 767.98px) {
   .footer::after {
     width: calc(100% - 40px);
+    
   }
 }
 .insalcor-footer {
@@ -20468,6 +20502,8 @@ h6.social-title {
   margin-bottom: 15px;
 }
 
+
+
 .office-country {
   display: flex;
   align-items: center;
@@ -20477,6 +20513,12 @@ h6.social-title {
   color: var(--global--color-white);
   font-size: 14px;
   margin-bottom: 15px;
+}
+
+@media screen and (max-width: 767.98px) {
+  .office-country, .office-list li {
+    justify-content: center;
+  }
 }
 
 .flag-icon {
@@ -20580,6 +20622,9 @@ h6.social-title {
 @media (max-width: 767.98px) {
   .footer-title {
     margin-top: 20px;
+  }
+  .footer-social-list {
+    justify-content: center;
   }
 }
 

@@ -154,19 +154,6 @@
           <label>Contenido</label>
           <div id="noticia-contenido-editor"></div>
         </div>
-        <div style="font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:.5px;color:#6b7280;border-top:1px solid #e5e7eb;padding-top:16px;margin-top:8px;margin-bottom:4px">English <span class="hint" style="text-transform:none;font-weight:400;letter-spacing:normal">(se completa solo al Guardar/Publicar con una traducción automática — revisá y ajustá si hace falta)</span></div>
-        <div class="form-group">
-          <label for="noticia-titulo-en">Título (Inglés)</label>
-          <input id="noticia-titulo-en" type="text" placeholder="News title">
-        </div>
-        <div class="form-group">
-          <label for="noticia-extracto-en">Extracto (Inglés)</label>
-          <textarea id="noticia-extracto-en" rows="2" placeholder="Short summary..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>Contenido (Inglés)</label>
-          <div id="noticia-contenido-en-editor"></div>
-        </div>
         <div class="form-group">
           <label>Imagen</label>
           <div class="dropzone" id="noticia-dropzone">
@@ -222,15 +209,6 @@
           <label>Descripción</label>
           <div id="producto-descripcion-editor"></div>
         </div>
-        <div style="font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:.5px;color:#6b7280;border-top:1px solid #e5e7eb;padding-top:16px;margin-top:8px;margin-bottom:4px">English <span class="hint" style="text-transform:none;font-weight:400;letter-spacing:normal">(se completa solo al Guardar/Publicar con una traducción automática — revisá y ajustá si hace falta)</span></div>
-        <div class="form-group">
-          <label for="producto-nombre-en">Nombre (Inglés)</label>
-          <input id="producto-nombre-en" type="text" placeholder="Product name">
-        </div>
-        <div class="form-group">
-          <label>Descripción (Inglés)</label>
-          <div id="producto-descripcion-en-editor"></div>
-        </div>
         <div class="form-group">
           <label>Imagen</label>
           <div class="dropzone" id="producto-dropzone">
@@ -279,15 +257,6 @@
         <div class="form-group">
           <label for="tutorial-descripcion">Descripción</label>
           <textarea id="tutorial-descripcion" rows="4" placeholder="Texto de detalle del tutorial..."></textarea>
-        </div>
-        <div style="font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:.5px;color:#6b7280;border-top:1px solid #e5e7eb;padding-top:16px;margin-top:8px;margin-bottom:4px">English <span class="hint" style="text-transform:none;font-weight:400;letter-spacing:normal">(se completa solo al Guardar/Publicar con una traducción automática — revisá y ajustá si hace falta)</span></div>
-        <div class="form-group">
-          <label for="tutorial-titulo-en">Título (Inglés)</label>
-          <input id="tutorial-titulo-en" type="text" placeholder="Ej: How to use A-Max Ultra">
-        </div>
-        <div class="form-group">
-          <label for="tutorial-descripcion-en">Descripción (Inglés)</label>
-          <textarea id="tutorial-descripcion-en" rows="4" placeholder="Tutorial detail text..."></textarea>
         </div>
       </div>
       <div class="modal-footer">
