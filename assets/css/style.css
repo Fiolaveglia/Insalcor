@@ -21361,10 +21361,18 @@ body.modal-open .search-box{
 
 @media (max-width: 767.98px){
 
+  /* la imagen de la primera card sobresale 50px hacia arriba: sin compensarlo
+     quedaban 16px contra el slider, contra los 70px que hay abajo */
+  .segment-switch{
+    padding-top: 124px;
+  }
+
   .segment-switch__wrap{
     flex-direction: column;
     align-items: center;
-    gap: 22px;
+    /* la imagen de cada card sobresale 50px hacia arriba (top: -55px), asi que
+       el gap tiene que compensarlos para que queden 22px reales entre cards */
+    gap: 72px;
   }
 
   .segment-card{
