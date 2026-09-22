@@ -126,7 +126,18 @@ const I18n = (() => {
       el.addEventListener('click', (e) => {
         e.preventDefault();
         const next = el.getAttribute('data-set-lang');
-        if (next && next !== lang) setLang(next);
+        if (!next || next === lang) return;
+        // El texto fijo del chrome (menú, botones) se traduce al instante acá
+        // en el cliente, pero el contenido que viene de la base (noticias,
+        // productos, tutoriales) sólo se traduce en el servidor al renderizar
+        // la página (campo_i18n() en PHP). Por eso, además de cambiar el
+        // idioma acá, navegamos con ?lang= para que el servidor también
+        // vuelva a renderizar todo en el idioma correcto — preservando
+        // cualquier otro parámetro que ya tuviera la URL (?id=, ?q=, etc.).
+        const url = new URL(location.href);
+        url.searchParams.set('lang', next);
+        writeCookie(COOKIE_KEY, next);
+        location.href = url.toString();
       });
     });
   }

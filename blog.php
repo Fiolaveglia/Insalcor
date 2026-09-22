@@ -85,7 +85,7 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
           <!-- Navbar -->
           <div class="collapse navbar-collapse" id="navbarContent">
             <ul class="navbar-nav ">
-              <li class="nav-item"><a href="#"><span data-i18n="nav.home">INICIO</span></a>
+              <li class="nav-item"><a href="index.php"><span data-i18n="nav.home">INICIO</span></a>
               </li>
               <li class="nav-item"><a href="./nosotros.html"><span data-i18n="nav.about">NOSOTROS</span></a>
               </li>
