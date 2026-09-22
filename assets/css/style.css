@@ -8170,8 +8170,30 @@ h2.title-size {
   }
 }
 
+
 .hero.hero-5 .hero-content {
   padding-top: 165px;
+}
+@media screen and (max-width: 767.98px) {
+  /* titulo centrado verticalmente: el padding-top de 165px lo dejaba arriba de
+     todo y el de 64px no entraba en pantalla (se cortaba la ultima letra) */
+  .hero.hero-5 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .hero.hero-5 .hero-content {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .hero.hero-5 h2.title-size {
+    font-size: clamp(32px, 11vw, 64px);
+    margin-bottom: 0;
+  }
 }
 
 .hero.hero-5 .hero-content .hero-desc {
