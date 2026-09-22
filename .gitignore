@@ -7,3 +7,13 @@ uploads/docs/
 
 # Local environment (SMTP credentials, contact recipient)
 .env
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Editores
+.vscode/

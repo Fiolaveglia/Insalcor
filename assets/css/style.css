@@ -7225,6 +7225,9 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 
 @media screen and (max-width: 767.98px) {
   .slider .slide .slide-content .slide-action .btn {
+    /* .btn trae margin: 0 auto; con margin-right en 0 los botones se iban
+       a la derecha en vez de centrarse */
+    margin-left: 0;
     margin-right: 0;
     margin-bottom: 15px;
     height: 50px;
@@ -14441,6 +14444,21 @@ background-color: #F9F9F9;
  height: 750px; 
 }
 
+@media screen and (max-width: 991.98px) {
+  /* apilados, los avatares no entran en los 750px fijos: la seccion terminaba
+     antes que las imagenes y se superponia con la siguiente */
+  .about.about-4 .avatars-holder {
+    height: auto;
+  }
+  /* mismo aire abajo de la ultima imagen que arriba de la primera (70px) */
+  .about.about-4 {
+    padding-bottom: 70px;
+  }
+  .about.about-4 .avatars-holder .block-bottom .row > div:last-child .avatar {
+    margin-bottom: 0;
+  }
+}
+
 .about.about-4 .avatars-holder .avatar {
   display: -webkit-inline-box;
   display: -ms-inline-flexbox;
@@ -18287,6 +18305,11 @@ background-color: #F9F9F9;
    width: 80%;
    height: 100%;
   }
+  /* Presencia Regional: el margin-bottom de .img-equipo se colapsa fuera de la
+     columna, asi que el aire entre el mapa y la imagen siguiente va como padding */
+  .cta.cta-3 .row + .row > div:first-child {
+    padding-bottom: 40px;
+  }
 }
 
 .cta .prief-set .advantages-list {
@@ -20268,7 +20291,7 @@ background-color: #F9F9F9;
   margin-bottom: 6px;
 }
 
-.office-list i {
+.offices-section .office-list i {
   margin-right: 10px;
   margin-top: 3px;
   color: var(--global--color-primary);
@@ -20303,10 +20326,23 @@ background-color: #F9F9F9;
 }
 
 @media only screen and (max-width: 991px) {
-  .office-item {
-    margin-left: 40px;
-    text-align: left;
-
+  /* Seccion Nuestras Oficinas: texto centrado en mobile/tablet */
+  .offices-section .heading-title,
+  .offices-section .office-item {
+    text-align: center;
+  }
+  .offices-section .office-country,
+  .offices-section .office-list li {
+    justify-content: center;
+    text-align: center;
+  }
+  .offices-section .heading {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  /* Iconos ocultos en mobile (no ocupan espacio, el texto queda centrado) */
+  .offices-section .office-list i {
+    display: none;
   }
   .office-divider {
     margin-left: auto !important;
@@ -20625,6 +20661,30 @@ h6.social-title {
   }
   .footer-social-list {
     justify-content: center;
+  }
+
+  /* copyright y creditos en la misma linea (abajo de 768 las columnas se apilan) */
+  .insalcor-footer-bottom .row {
+    flex-wrap: nowrap;
+  }
+  .insalcor-footer-bottom .row > [class*="col-"] {
+    width: auto;
+    flex: 0 1 auto;
+    margin-top: 0 !important;
+  }
+  .insalcor-footer-bottom .row > [class*="col-"]:first-child {
+    flex: 1 1 auto;
+  }
+  .insalcor-footer-bottom .footer-credits {
+    text-align: right;
+    white-space: nowrap;
+  }
+  .insalcor-footer-bottom .footer-copy,
+  .insalcor-footer-bottom .footer-credits a {
+    font-size: 11px;
+  }
+  .insalcor-footer-bottom .credits-divider {
+    margin: 0 5px;
   }
 }
 
@@ -21085,6 +21145,30 @@ h6.social-title {
 
   .footer .footer-widget .footer-widget-title h5 {
     margin-bottom: 15px;
+  }
+}
+
+/* Union CTA -> footer en mobile: en desktop el CTA se superpone al footer
+   (margin-bottom: -119px), y ese padding sobra cuando las secciones se apilan */
+@media screen and (max-width: 991.98px) {
+  /* el margin de .mb-60 se colapsa fuera de la seccion si no hay padding:
+     va como padding para que el fondo del CTA llegue hasta el footer */
+  .cta.cta-5 .row.mb-60 {
+    margin-bottom: 0 !important;
+  }
+
+  /* mismo aire arriba y abajo del contenido (padding-top es 70px) */
+  .cta.cta-5 {
+    padding-bottom: 70px;
+  }
+
+  /* .mt-60 solo aplica entre 768 y 991 y deja una franja blanca sobre el footer */
+  .footer.mt-60 {
+    margin-top: 0;
+  }
+
+  .footer .footer-widget.footer-brand {
+    padding-top: 0;
   }
 }
 

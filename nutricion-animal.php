@@ -581,7 +581,7 @@ $productosPagina = array_slice($productos, ($paginaActual - 1) * $productosPorPa
               </div>
             </div>
             <div class="col-12 col-lg-6">
-              <div class="video" id="video1">
+              <div class="cta-contacto">
                 <a class="btn btn--white btn-line" href="https://api.whatsapp.com/send/?phone=59895144852&text=Hola%20quisiera%20asesoramiento%20comercial." target="_blank"><i class="fab fa-whatsapp"></i><span data-i18n="common.contact_us">Contactanos</span></a>
               </div>
             </div>
