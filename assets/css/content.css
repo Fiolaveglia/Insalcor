@@ -434,3 +434,13 @@
 .ql-align-center { text-align: center; }
 .ql-align-right { text-align: right; }
 .ql-align-justify { text-align: justify; }
+
+/* "Pharma y VetPharma": keep the "y" lowercase (theme capitalizes every word) */
+[data-i18n="nav.pharma"],
+[data-i18n="home.area_pharma_title"] { text-transform: none; }
+
+/* Home areas title: avoid leaving "la calidad" alone on the last line */
+[data-i18n="home.areas_title"] { text-wrap: balance; }
+
+/* Home news title: sentence case ("Conocé las últimas novedades") */
+#blog-2 .heading-title { text-transform: none; }

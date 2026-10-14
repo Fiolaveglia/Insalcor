@@ -217,7 +217,7 @@ $noticiasCarrusel = count($noticias) >= 3;
                       <h4><a href="pharma-vetpharma.php" data-i18n="home.area_pharma_title">Pharma y VetPharma</a></h4>
                     </div>
                     <div class="service-desc">
-                      <p data-i18n-html="home.area_pharma_desc">Desarrollamos, representamos y distribuimos productos farmacéuticos para uso <b> humano y veterinario</b> , respaldados por <b>marcas internacionales</b>  y un equipo técnico <b>especializado</b> .</p>
+                      <p data-i18n-html="home.area_pharma_desc">Desarrollamos, representamos y distribuimos excipientes y principios activos para productos de uso <b>humano y veterinario</b>.</p>
                     </div>
                   <div class="service-img"><a href="pharma-vetpharma.php"></a><img src="assets/images/services/2.png" alt="P"/></div>
                   </div>
@@ -247,7 +247,6 @@ $noticiasCarrusel = count($noticias) >= 3;
           </div>
           <div class="carousel owl-carousel carousel-continuo" data-slide="6" data-slide-rs="2" data-autoplay="true" data-nav="false" data-dots="false" data-space="30" data-loop="true" data-speed="600">
             <div class="alliance"><img class="img-fluid" src="assets/images/alliances/1.png" alt="Alianzas"/></div>
-            <div class="alliance"><img class="img-fluid" src="assets/images/alliances/2.png" alt="Alianzas"/></div>
             <div class="alliance"><img class="img-fluid" src="assets/images/alliances/3.png" alt="Alianzas"/></div>
             <div class="alliance"><img class="img-fluid" src="assets/images/alliances/4.png" alt="Alianzas"/></div>
             <div class="alliance"><img class="img-fluid" src="assets/images/alliances/5.png" alt="Alianzas"/></div>
