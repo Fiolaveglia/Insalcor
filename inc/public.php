@@ -122,6 +122,13 @@ function especie_options(): array
     foreach (ESPECIES as $especie) {
         $out[$especie] = especie_label($especie);
     }
+    // Orden alfabético por el nombre que se muestra (respeta tildes: Ganadería, Lechería)
+    if (class_exists('Collator')) {
+        $collator = new Collator(current_lang() === 'en' ? 'en' : 'es');
+        uasort($out, [$collator, 'compare']);
+    } else {
+        uasort($out, 'strcasecmp');
+    }
     return $out;
 }
 

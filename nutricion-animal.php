@@ -338,7 +338,7 @@ $productosPagina = array_slice($productos, ($paginaActual - 1) * $productosPorPa
                 <!-- Categorías -->
                 <div class="widget especie">
                   <div class="widget-title">
-                    <h5 data-i18n="shop.categories">Categorías</h5>
+                    <h5 data-i18n="shop.species">Especies</h5>
                   </div>
                   <div class="widget-content">
                     <?= render_filter_list($area, 'especie', $especieOptions) ?>
@@ -446,7 +446,7 @@ $productosPagina = array_slice($productos, ($paginaActual - 1) * $productosPorPa
           <?php endif; ?>
         </div>
         <!-- Button -->
-         <a class="btn btn--secondary btn-line btn-news" href="/blog.php">Ir a Novedades</a>
+         <a class="btn btn--secondary btn-line btn-news" href="/blog.php">Ir a novedades</a>
       </section>
 
 

@@ -354,7 +354,7 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
           <?php endif; ?>
         </div>
         <!-- Button -->
-         <a class="btn btn--secondary btn-line btn-news" href="/blog.php">Ir a Novedades</a>
+         <a class="btn btn--secondary btn-line btn-news" href="/blog.php">Ir a novedades</a>
       </section>
 
       <!-- Ultimas novedades  -->

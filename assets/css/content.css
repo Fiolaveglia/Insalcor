@@ -110,7 +110,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 340px;
+  /* Misma proporción que las fotos (3:4) para que todas las cards midan igual */
+  aspect-ratio: 3 / 4;
   border: 1px solid #e5e7ef;
   border-radius: 8px;
   background: #fafbfc;
