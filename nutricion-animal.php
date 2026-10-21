@@ -655,8 +655,8 @@ $productosPagina = array_slice($productos, ($paginaActual - 1) * $productosPorPa
                     <ul class="office-list">
                       <li>
                         <i class="fas fa-map-marker-alt"></i>
-                        General Las Heras 1735<br>
-                        Vicente López - Buenos Aires, Argentina
+                        Luis Sullivan 3224<br>
+                        B1618DVU Buenos Aires, Argentina
                       </li>
                       <li>
                         <i class="fas fa-envelope"></i>
@@ -698,12 +698,12 @@ $productosPagina = array_slice($productos, ($paginaActual - 1) * $productosPorPa
                   <h6 class="social-title" data-i18n="footer.nutrition">Nutrición Animal</h6>
                   <ul class="footer-social-list">
                     <li>
-                      <a href="https://www.instagram.com/insalcor_nutrition_/" aria-label="Instagram">
+                      <a href="https://www.instagram.com/insalcor_nutrition_/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                         <i class="fab fa-instagram"></i>
                       </a>
                     </li>
                     <li>
-                      <a href="https://www.facebook.com/profile.php?id=61580200547237" aria-label="Facebook">
+                      <a href="https://www.facebook.com/profile.php?id=61580200547237" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                         <i class="fab fa-facebook-f"></i>
                       </a>
                     </li>
@@ -712,12 +712,12 @@ $productosPagina = array_slice($productos, ($paginaActual - 1) * $productosPorPa
                   <h6 class="social-title mt-30" data-i18n="nav.pharma">Pharma y VetPharma</h6>
                   <ul class="footer-social-list">
                     <li>
-                      <a href="https://www.instagram.com/insalcorpharma/" aria-label="Instagram">
+                      <a href="https://www.instagram.com/insalcorpharma/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                         <i class="fab fa-instagram"></i>
                       </a>
                     </li>
                     <li>
-                      <a href="https://www.linkedin.com/company/insalcorr-pharma" aria-label="LinkedIn">
+                      <a href="https://www.linkedin.com/company/insalcorr-pharma" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                         <i class="fab fa-linkedin-in"></i>
                       </a>
                     </li>
