@@ -18980,6 +18980,26 @@ background-color: #F9F9F9;
   }
 }
 
+/* Desktop: igualar alto de las cards para que las imágenes queden alineadas */
+@media screen and (min-width: 992px) {
+  .services .service-card {
+    display: flex;
+    flex-direction: column;
+  }
+  .services .service-card .service-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .services .service-card .service-panel-holder {
+    flex: 1;
+  }
+  /* Misma distancia imagen-botón que texto-imagen (~33px) */
+  .services .service-card .service-more > a.btn {
+    margin-top: 173px;
+  }
+}
+
 .services .service-panel .service-panel-holder .service-img {
   position: relative;
   overflow: hidden;
