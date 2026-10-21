@@ -6667,7 +6667,7 @@ ul.dropdown-menu>li.has-dropdown>a:before {
 .heading .heading-title {
   /* font-family: var(--global--font-heading); */
   font-family: var(--global--font-heading-italic), sans-serif;
-  text-transform: capitalize;
+  text-transform: none;
   font-size: 40px;
   line-height: 55px;
   margin-bottom: 25px;

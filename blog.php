@@ -152,7 +152,7 @@ $tutorialesPagina = array_slice($tutoriales, ($paginaTutoriales - 1) * $tutorial
           <div class="row">
             <div class="col-sm-12 col-md-12 col-lg-6 offset-lg-3">
               <div class="heading heading-7 text--center">
-                <h2 class="heading-title" data-i18n="blog.title">Noticias y Novedades</h2>
+                <h2 class="heading-title" data-i18n="blog.title">Noticias y novedades</h2>
               </div>
             </div>
           </div>

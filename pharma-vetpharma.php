@@ -137,7 +137,7 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
                   <div class="row">
                     <div class="col-12 col-lg-7 title-sec">
                       <h1 class="slide-headline" data-i18n="pharma.hero_title">Pharma y VetPharma <span></span></h1>
-                      <h2 class="section-head" data-i18n="pharma.hero_tagline">Calidad, Innovación y Respaldo técnico</h2>
+                      <h2 class="section-head" data-i18n="pharma.hero_tagline">Calidad, innovación y respaldo técnico</h2>
                     </div>
                     <div class="col-12 col-lg-6">
                       <p class="slide-desc mt-40" data-i18n="pharma.hero_desc">Desarrollamos, representamos y distribuimos productos farmacéuticos  para uso humano y veterinario, respaldados por marcas internacionales y un equipo técnico especializado. </p>
@@ -337,7 +337,7 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
           <div class="row"> 
             <div class="col-12 col-lg-6 offset-lg-3">
               <div class="heading heading-7 text-center">
-                <h2 class="heading-title">Artículos y Novedades Recientes sobre <span class="color-segment">Pharma</span></h2>
+                <h2 class="heading-title">Artículos y novedades recientes sobre <span class="color-segment">Pharma</span></h2>
               </div>
             </div>
           </div>
@@ -365,7 +365,7 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
           <div class="row"> 
             <div class="col-12 col-lg-6 offset-lg-3">
               <div class="heading heading-7 text-center">
-                <h2 class="heading-title">Artículos y Novedades Recientes sobre <span class="color-segment">Pharma</span></h2>
+                <h2 class="heading-title">Artículos y novedades recientes sobre <span class="color-segment">Pharma</span></h2>
               </div>
             </div>
           </div>
@@ -573,7 +573,7 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
           <div class="row"> 
             <div class="col-12 col-lg-6 offset-lg-3">
               <div class="heading heading-7 text-center">
-                <h2 class="heading-title">Artículos y Novedades Recientes sobre <span class="color-segment">VetPharma</span></h2>
+                <h2 class="heading-title">Artículos y novedades recientes sobre <span class="color-segment">VetPharma</span></h2>
               </div>
             </div>
           </div>

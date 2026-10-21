@@ -309,7 +309,7 @@ $productosPagina = array_slice($productos, ($paginaActual - 1) * $productosPorPa
           <div class="row">
             <div class="col-sm-12 col-md-12 col-lg-6 offset-lg-3">
               <div class="heading heading-7 text--center">
-                <h2 class="heading-title" data-i18n="shop.our_products">Nuestros Productos</h2>
+                <h2 class="heading-title" data-i18n="shop.our_products">Nuestros productos</h2>
               </div>
             </div>
           </div>
@@ -430,7 +430,7 @@ $productosPagina = array_slice($productos, ($paginaActual - 1) * $productosPorPa
           <div class="row"> 
             <div class="col-12 col-lg-6 offset-lg-3">
               <div class="heading heading-7 text-center">
-                <h2 class="heading-title">Artículos y Novedades Recientes sobre <span class="color-segment">Nutrición Animal</span></h2>
+                <h2 class="heading-title">Artículos y novedades recientes sobre <span class="color-segment">nutrición animal</span></h2>
               </div>
             </div>
           </div>
@@ -465,7 +465,7 @@ $productosPagina = array_slice($productos, ($paginaActual - 1) * $productosPorPa
           <div class="row"> 
             <div class="col-12 col-lg-6 offset-lg-3">
               <div class="heading heading-7 text-center">
-                <h2 class="heading-title">Artículos y Novedades Recientes sobre Nutrición Animal</h2>
+                <h2 class="heading-title">Artículos y novedades recientes sobre nutrición animal</h2>
               </div>
             </div>
           </div>
