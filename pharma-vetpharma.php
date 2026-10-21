@@ -319,7 +319,6 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
           <!-- PENDIENTE A ACTUALIZAR LAS MARCAS Pharma -->
           <div class="carousel owl-carousel carousel-continuo" data-slide="6" data-slide-rs="2" data-autoplay="true" data-nav="false" data-dots="false" data-space="30" data-loop="true" data-speed="600">
             <div class="alliance"><img class="img-fluid" src="assets/images/alliances/1.png" alt="Alianzas"/></div>
-            <div class="alliance"><img class="img-fluid" src="assets/images/alliances/2.png" alt="Alianzas"/></div>
             <div class="alliance"><img class="img-fluid" src="assets/images/alliances/3.png" alt="Alianzas"/></div>
             <div class="alliance"><img class="img-fluid" src="assets/images/alliances/4.png" alt="Alianzas"/></div>
             <div class="alliance"><img class="img-fluid" src="assets/images/alliances/5.png" alt="Alianzas"/></div>
@@ -553,7 +552,6 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
           <!-- PENDIENTE A ACTUALIZAR LAS MARCAS de vetpharma -->
           <div class="carousel owl-carousel carousel-continuo" data-slide="6" data-slide-rs="2" data-autoplay="true" data-nav="false" data-dots="false" data-space="30" data-loop="true" data-speed="600">
             <div class="alliance"><img class="img-fluid" src="assets/images/alliances/1.png" alt="Alianzas"/></div>
-            <div class="alliance"><img class="img-fluid" src="assets/images/alliances/2.png" alt="Alianzas"/></div>
             <div class="alliance"><img class="img-fluid" src="assets/images/alliances/3.png" alt="Alianzas"/></div>
             <div class="alliance"><img class="img-fluid" src="assets/images/alliances/4.png" alt="Alianzas"/></div>
             <div class="alliance"><img class="img-fluid" src="assets/images/alliances/5.png" alt="Alianzas"/></div>

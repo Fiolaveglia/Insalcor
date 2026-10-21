@@ -21451,4 +21451,8 @@ body.modal-open .search-box{
 
 
 
+/* Sentence case for texts the theme capitalizes word by word */
+.heading [data-i18n="cta.title"],
+[data-i18n="nav.pharma"] { text-transform: none; }
+
 /*# sourceMappingURL=style.css.map */
