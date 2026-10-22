@@ -21270,6 +21270,14 @@ body.modal-open .search-box{
    Cards Pharma / VetPharma (layout real)
 ================================ */
 
+/* Misma distancia arriba (hero -> borde superior de las imágenes) y abajo
+   (borde inferior de las cards -> fin de la sección): 100px.
+   Arriba se suma lo que sobresale la imagen (90px). */
+.segment-switch{
+  padding-top: 190px;
+  padding-bottom: 100px;
+}
+
 /* contenedor */
 .segment-switch__wrap{
   display: flex;
@@ -21281,7 +21289,8 @@ body.modal-open .search-box{
 /* card base */
 .segment-card{
   position: relative;
-  width: 420px;
+  flex: 0 1 420px; /* 3 cards: se achican parejo si no entran a 420px */
+  min-width: 0;
   height: 280px;
   border-radius: 16px;
   background: #ffffff;
@@ -21337,7 +21346,6 @@ body.modal-open .search-box{
 
 .segment-card.is-active{
   background: #3f6fb3;
-  transform: translateY(-10px);
   box-shadow: 0 28px 60px rgba(0,0,0,.35);
   z-index: 2;
 }
@@ -21356,9 +21364,8 @@ body.modal-open .search-box{
   pointer-events: none;
 }
 
-/* card inactiva queda un poco más abajo */
+/* todas las cards a la misma altura (activa o no) */
 .segment-card:not(.is-active){
-  transform: translateY(8px);
   z-index: 1;
 }
 
@@ -21378,12 +21385,17 @@ body.modal-open .search-box{
 ================================ */
 @media (max-width: 991.98px){
 
+  /* imagen sobresale 70px */
+  .segment-switch{
+    padding-top: 170px;
+  }
+
   .segment-switch__wrap{
     gap: 28px;
   }
 
   .segment-card{
-    width: 360px;
+    flex-basis: 360px;
     height: 260px;
     padding-top: 95px;
   }
@@ -21407,7 +21419,8 @@ body.modal-open .search-box{
   /* la imagen de la primera card sobresale 50px hacia arriba: sin compensarlo
      quedaban 16px contra el slider, contra los 70px que hay abajo */
   .segment-switch{
-    padding-top: 124px;
+    padding-top: 125px; /* 70px + imagen que sobresale (55px) */
+    padding-bottom: 70px;
   }
 
   .segment-switch__wrap{
@@ -21419,6 +21432,7 @@ body.modal-open .search-box{
   }
 
   .segment-card{
+    flex: none;
     width: 100%;
     max-width: 420px;
     height: 250px;
@@ -21438,20 +21452,16 @@ body.modal-open .search-box{
     font-size: 22px;
   }
 
-  .segment-card.is-active{
-    transform: translateY(-4px);
-  }
-
-  .segment-card:not(.is-active){
-    transform: translateY(0);
-  }
-
   .segment-card:hover{
     transform: none;
   }
 }
 
 @media (max-width: 480px){
+
+  .segment-switch{
+    padding-top: 120px; /* 70px + imagen que sobresale (50px) */
+  }
 
   .segment-card{
     height: 235px;

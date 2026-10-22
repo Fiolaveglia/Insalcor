@@ -140,7 +140,7 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
                       <h2 class="section-head" data-i18n="pharma.hero_tagline">Calidad, innovación y respaldo técnico</h2>
                     </div>
                     <div class="col-12 col-lg-6">
-                      <p class="slide-desc mt-40" data-i18n="pharma.hero_desc">Desarrollamos, representamos y distribuimos productos farmacéuticos  para uso humano y veterinario, respaldados por marcas internacionales y un equipo técnico especializado. </p>
+                      <p class="slide-desc mt-40" data-i18n="pharma.hero_desc">Desarrollamos, representamos y distribuimos excipientes y principios activos para productos de uso humano y veterinario, respaldados por marcas internacionales y un equipo técnico especializado.</p>
                     </div>
                   </div>
                 </div>
@@ -194,11 +194,11 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
 
 
 
-      <!-- Selector Pharma / VetPharma -->
+      <!-- Selector Pharma / VetPharma / Suplementos -->
       <section class="segment-switch" id="segment-switch">
         <div class="container">
           <div class="row justify-content-center">
-            <div class="col-12 col-lg-10">
+            <div class="col-12">
               <div class="segment-switch__wrap">
 
                 <!-- Pharma -->
@@ -215,6 +215,14 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
                     <img src="assets/images/heros/pharma/thumb-vetpharma.png" alt="VetPharma">
                   </div>
                   <div class="segment-card__label">VetPharma</div>
+                </button>
+
+                <!-- Suplementos (imagen provisoria: la misma de Pharma) -->
+                <button class="segment-card" type="button" data-target="#segment-suplementos" aria-pressed="false">
+                  <div class="segment-card__img">
+                    <img src="assets/images/heros/pharma/thumb-pharma.png" alt="Suplementos">
+                  </div>
+                  <div class="segment-card__label" data-i18n="pharma.supplements">Suplementos</div>
                 </button>
 
               </div>
@@ -331,31 +339,6 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
         </div>
       </section>
 
-        <!--  News     -->
-      <section class="blog grey-light-bg blog-grid blog-grid-3" id="blog-2">
-        <div class="container">
-          <div class="row"> 
-            <div class="col-12 col-lg-6 offset-lg-3">
-              <div class="heading heading-7 text-center">
-                <h2 class="heading-title">Artículos y novedades recientes sobre <span class="color-segment">Pharma</span></h2>
-              </div>
-            </div>
-          </div>
-          <!-- End .row-->
-          <?php if ($pharmaNoticias): ?>
-          <div class="carousel owl-carousel carousel-dots" data-slide="3" data-slide-rs="2" data-autoplay="<?= count($pharmaNoticias) > 3 ? 'true' : 'false' ?>" data-nav="false" data-dots="true" data-space="30" data-loop="<?= count($pharmaNoticias) > 3 ? 'true' : 'false' ?>" data-speed="200">
-            <?php foreach ($pharmaNoticias as $item) { echo render_noticia_slide($item, 'blog-single.php'); } ?>
-          </div>
-          <!-- End .carousel-->
-          <?php else: ?>
-          <div class="row">
-            <div class="col-12"><p class="text-center"><?= e(t('common.no_news')) ?></p></div>
-          </div>
-          <?php endif; ?>
-        </div>
-        <!-- Button -->
-         <a class="btn btn--secondary btn-line btn-news" href="/blog.php">Ir a novedades</a>
-      </section>
 
       <!-- Ultimas novedades  -->
       <!-- <section class="blog blog-grid blog-grid-3" id="blog-2">
@@ -586,6 +569,22 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
           <?php } ?>
           </div>
 
+        </div>
+      </section>
+      </div>
+
+      <!-- SEGMENTO: SUPLEMENTOS (provisorio hasta tener productos) -->
+      <div id="segment-suplementos" class="segment-content">
+      <section class="shop" id="shop-suplementos">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-6 offset-lg-3">
+              <div class="heading heading-7 text--center">
+                <h2 class="heading-title"><span data-i18n="shop.products_of">Productos</span> <span class="color-segment" data-i18n="pharma.supplements">Suplementos</span></h2>
+                <p data-i18n="common.coming_soon">Próximamente</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
       </div>
