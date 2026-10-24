@@ -198,7 +198,7 @@ $noticiasCarrusel = count($noticias) >= 3;
                     <div class="service-desc">
                       <p data-i18n-html="home.area_nutrition_desc">Ofrecemos una línea completa de <b>productos nutricionales</b> desarrollados para <b> cada especie animal</b>, con respaldo técnico, calidad garantizada y asesoramiento especializado.</p>
                     </div>
-                  <div class="service-img"><a href="/nutricion-animal.php"></a><img src="assets/images/services/1.png" alt="Nutrición animal"/></div>
+                  <div class="service-img"><a href="/nutricion-animal.php"></a><img src="assets/images/home/areas-negocio/nutricion_animal.png" alt="Nutrición animal"/></div>
                   </div>
                 </div>
                   
@@ -219,7 +219,7 @@ $noticiasCarrusel = count($noticias) >= 3;
                     <div class="service-desc">
                       <p data-i18n-html="home.area_pharma_desc">Desarrollamos, representamos y distribuimos excipientes y principios activos para productos de uso <b>humano y veterinario</b>.</p>
                     </div>
-                  <div class="service-img"><a href="pharma-vetpharma.php"></a><img src="assets/images/services/2.png" alt="P"/></div>
+                  <div class="service-img"><a href="pharma-vetpharma.php"></a><img src="assets/images/home/areas-negocio/pharma_1.png" alt="Pharma y VetPharma"/></div>
                   </div>
                 </div>
                   
