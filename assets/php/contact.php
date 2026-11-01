@@ -12,6 +12,7 @@ use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 
 require __DIR__ . '/../../inc/env.php';
+require __DIR__ . '/../../inc/consulta.php';
 require __DIR__ . '/PHPMailer/src/Exception.php';
 require __DIR__ . '/PHPMailer/src/PHPMailer.php';
 require __DIR__ . '/PHPMailer/src/SMTP.php';
@@ -79,8 +80,11 @@ if ($senderPhone !== '' && strlen($senderPhone) < 9) {
     responder('error', 'phone', 422);
 }
 
-$recipientEmail = env('CONTACT_TO_EMAIL');
-$recipientName = env('CONTACT_TO_NAME', 'Insalcor');
+// Consulta desde el catálogo Pharma (pharma-vetpharma.php): va a la casilla
+// de Pharma, con el producto. Si no, a la casilla general, como siempre.
+$consulta = consulta_pharma($_POST);
+$recipientEmail = $consulta['to'] ?? env('CONTACT_TO_EMAIL');
+$recipientName = $consulta['toName'] ?? env('CONTACT_TO_NAME', 'Insalcor');
 $smtpUser = env('SMTP_USER');
 
 if (!$recipientEmail || !env('SMTP_HOST') || !$smtpUser || !env('SMTP_PASS')) {
@@ -90,7 +94,7 @@ if (!$recipientEmail || !env('SMTP_HOST') || !$smtpUser || !env('SMTP_PASS')) {
 
 $fecha = date('d/m/Y H:i:s');
 $h = static fn (string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
-$filas = [
+$filas = array_map($h, $consulta['filas'] ?? []) + [
     'Nombre' => $h($senderName),
     'Email' => '<a href="mailto:' . $h($senderEmail) . '">' . $h($senderEmail) . '</a>',
     'Empresa' => $h($senderCompany) ?: '—',
@@ -124,7 +128,7 @@ try {
     $mail->addReplyTo($senderEmail, $senderName);
 
     $mail->isHTML(true);
-    $mail->Subject = 'Nuevo mensaje de contacto desde el sitio web - ' . $senderName;
+    $mail->Subject = ($consulta['asunto'] ?? 'Nuevo mensaje de contacto desde el sitio web') . ' - ' . $senderName;
     $mail->Body = "
     <div style='font-family:Helvetica,Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px'>
         <div style='background:#0D1F61;color:#fff;padding:20px;text-align:center'>
@@ -136,7 +140,11 @@ try {
             <p>Enviado desde el formulario de contacto de www.insalcor.com — {$fecha}</p>
         </div>
     </div>";
-    $mail->AltBody = "Nuevo mensaje de contacto\n\n"
+    $consultaTexto = '';
+    foreach ($consulta['filas'] ?? [] as $etiqueta => $valor) {
+        $consultaTexto .= "$etiqueta: $valor\n";
+    }
+    $mail->AltBody = "Nuevo mensaje de contacto\n\n" . ($consultaTexto !== '' ? $consultaTexto . "\n" : '')
         . "Nombre: $senderName\nEmail: $senderEmail\nEmpresa: $senderCompany\nTeléfono: $senderPhone\n\n"
         . "Mensaje:\n$senderMessage\n\n---\nEnviado desde el formulario de contacto de www.insalcor.com — $fecha";
 

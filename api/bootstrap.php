@@ -5,7 +5,7 @@ session_start();
 
 header('X-Content-Type-Options: nosniff');
 
-const AREAS = ['Nutricion Animal', 'Pharma', 'VetPharma'];
+const AREAS = ['Nutricion Animal', 'Pharma', 'VetPharma', 'Suplementos'];
 const ESPECIES = ['Aves', 'Porcinos', 'Ganadería', 'Mascotas', 'Lechería', 'Equinos', 'Ovinos'];
 
 // Sólo para mostrar en inglés en el sitio público — el valor que se guarda
@@ -28,12 +28,109 @@ const AREAS_ES = [
     'Nutricion Animal' => 'Nutrición Animal',
     'Pharma' => 'Pharma',
     'VetPharma' => 'VetPharma',
+    'Suplementos' => 'Suplementos',
 ];
 
 const AREAS_EN = [
     'Nutricion Animal' => 'Animal Nutrition',
     'Pharma' => 'Pharma',
     'VetPharma' => 'VetPharma',
+    'Suplementos' => 'Supplements',
+];
+
+/* ------------------------------------- catálogo Pharma / VetPharma / Suplementos */
+
+/** Áreas que usan el catálogo por país + categoría (no por especie). */
+const AREAS_PHARMA = ['Pharma', 'VetPharma', 'Suplementos'];
+
+/** Países donde se comercializa. "TODOS" en la planilla = los tres. */
+const PAISES = ['Uruguay', 'Argentina', 'Paraguay'];
+
+/** Código ISO de cada país, para la bandera (flagcdn.com). */
+const PAISES_ISO = ['Uruguay' => 'uy', 'Argentina' => 'ar', 'Paraguay' => 'py'];
+
+const PHARMA_EMAIL = 'pharma@insalcor.com';
+
+/**
+ * Categorías del filtro lateral, por área, en el orden en que se muestran
+ * (el del documento "Filtros Pharma"). Es el valor que se guarda en
+ * `productos.categoria`; se valida en PHP (no con CHECK) para poder sumar
+ * categorías sin reconstruir la tabla. Nutrición no usa categoría.
+ */
+const CATEGORIAS_PHARMA = [
+    'Excipientes', 'APIs', 'Cápsulas', 'Material de empaque',
+    'Recubrimiento', 'Nutrición celular', 'Vitaminas',
+];
+const CATEGORIAS_POR_AREA = [
+    'Nutricion Animal' => [],
+    'Pharma' => CATEGORIAS_PHARMA,
+    'VetPharma' => CATEGORIAS_PHARMA,
+    'Suplementos' => [
+        'Activos', 'Proteínas', 'Creatinas', 'Aminoácidos', 'Extractos',
+        'Hidratos de carbono', 'Grasas', 'Minerales', 'Vitaminas',
+    ],
+];
+
+/**
+ * Cómo se agrupan los productos dentro de cada categoría: bajo un encabezado
+ * por marca (`representada`) o por `subgrupo` (grupo terapéutico de los APIs,
+ * tipo de vitamina). Las categorías que no figuran acá se listan sin agrupar.
+ */
+const CATEGORIAS_AGRUPAR_POR = [
+    'Excipientes' => 'representada',
+    'Cápsulas' => 'representada',
+    'Material de empaque' => 'representada',
+    'APIs' => 'subgrupo',
+    'Vitaminas' => 'subgrupo',
+];
+
+// Sólo para mostrar en inglés: lo que se guarda es siempre el valor en español.
+const CATEGORIAS_EN = [
+    'Excipientes' => 'Excipients',
+    'APIs' => 'APIs',
+    'Cápsulas' => 'Capsules',
+    'Material de empaque' => 'Packaging materials',
+    'Recubrimiento' => 'Coatings',
+    'Nutrición celular' => 'Cell nutrition',
+    'Vitaminas' => 'Vitamins',
+    'Activos' => 'Actives',
+    'Proteínas' => 'Proteins',
+    'Creatinas' => 'Creatines',
+    'Aminoácidos' => 'Amino acids',
+    'Extractos' => 'Extracts',
+    'Hidratos de carbono' => 'Carbohydrates',
+    'Grasas' => 'Fats',
+    'Minerales' => 'Minerals',
+];
+
+// Subgrupos conocidos (los de la planilla). Uno nuevo que no esté acá se
+// muestra en español, sin romper nada.
+const SUBGRUPOS_EN = [
+    'Analgésicos y antiinflamatorios (AINE)' => 'Analgesics and anti-inflammatories (NSAIDs)',
+    'Anestésicos locales' => 'Local anesthetics',
+    'Antibióticos' => 'Antibiotics',
+    'Antifúngicos' => 'Antifungals',
+    'Antiparasitarios internos' => 'Internal antiparasitics',
+    'Antisépticos y dermatológicos' => 'Antiseptics and dermatologicals',
+    'Antivirales' => 'Antivirals',
+    'Articulares y nutracéuticos' => 'Joint health and nutraceuticals',
+    'Cardiovasculares y metabólicos' => 'Cardiovascular and metabolic',
+    'Corticoides' => 'Corticosteroids',
+    'Digestivos' => 'Digestive',
+    'Ectoparasiticidas e insecticidas' => 'Ectoparasiticides and insecticides',
+    'Endectocidas (lactonas macrocíclicas)' => 'Endectocides (macrocyclic lactones)',
+    'Excipientes y auxiliares' => 'Excipients and auxiliaries',
+    'Hormonas y reproducción' => 'Hormones and reproduction',
+    'Laxante' => 'Laxatives',
+    'Minerales y electrolitos' => 'Minerals and electrolytes',
+    'Oftalmológicos' => 'Ophthalmics',
+    'Otros' => 'Others',
+    'Parenteral' => 'Parenteral',
+    'Psicotrópicos y SNC' => 'Psychotropics and CNS',
+    'Respiratorios y antialérgicos' => 'Respiratory and antiallergics',
+    'Vitamina liposoluble' => 'Fat-soluble vitamins',
+    'Vitamina hidrosoluble' => 'Water-soluble vitamins',
+    'Vitaminoide' => 'Vitamin-like compounds',
 ];
 
 const ESTADOS = ['draft', 'published'];

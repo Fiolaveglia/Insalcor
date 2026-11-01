@@ -17,6 +17,11 @@ function producto_row(array $row): array
         'imagen' => $row['imagen'],
         'area_negocio' => $row['area_negocio'],
         'especies' => especies_de((int) $row['id']),
+        'nombre_comercial' => $row['nombre_comercial'],
+        'representada' => $row['representada'],
+        'categoria' => $row['categoria'],
+        'subgrupo' => $row['subgrupo'],
+        'paises' => paises_de((int) $row['id']),
         'ficha_tecnica' => $row['ficha_tecnica'],
         'nota_blog' => $row['nota_blog'],
         'estado' => $row['estado'],
@@ -75,6 +80,75 @@ function guardar_especies(int $productoId, array $especies): void
     }
 }
 
+/** @return string[] Países en los que se comercializa un producto. */
+function paises_de(int $productoId): array
+{
+    $stmt = db()->prepare('SELECT pais FROM producto_paises WHERE producto_id = ? ORDER BY pais');
+    $stmt->execute([$productoId]);
+    return array_column($stmt->fetchAll(), 'pais');
+}
+
+/**
+ * Normaliza y valida el array de países del body (catálogo Pharma /
+ * VetPharma / Suplementos).
+ *
+ * @return string[]
+ */
+function validar_paises(mixed $valor): array
+{
+    if ($valor === null || $valor === '') {
+        return [];
+    }
+    $lista = is_array($valor) ? $valor : [$valor];
+
+    $out = [];
+    foreach ($lista as $p) {
+        $p = sanitize_text(is_string($p) ? $p : '');
+        if ($p === '') {
+            continue;
+        }
+        if (!in_array($p, PAISES, true)) {
+            json_error("País inválido: $p");
+        }
+        $out[$p] = true;
+    }
+    return array_keys($out);
+}
+
+/** Reemplaza el conjunto de países de un producto. @param string[] $paises */
+function guardar_paises(int $productoId, array $paises): void
+{
+    $del = db()->prepare('DELETE FROM producto_paises WHERE producto_id = ?');
+    $del->execute([$productoId]);
+    $ins = db()->prepare('INSERT INTO producto_paises (producto_id, pais) VALUES (?, ?)');
+    foreach ($paises as $p) {
+        $ins->execute([$productoId, $p]);
+    }
+}
+
+/**
+ * La categoría depende del área: en Pharma / VetPharma / Suplementos es
+ * obligatoria y tiene que ser una de CATEGORIAS_POR_AREA; Nutrición no usa
+ * categoría (se clasifica por especie), así que queda vacía.
+ */
+function validar_categoria(string $categoria, string $area): string
+{
+    $validas = CATEGORIAS_POR_AREA[$area] ?? [];
+    if (!$validas) {
+        return '';
+    }
+    if ($categoria === '') {
+        json_error('La categoría es obligatoria en ' . $area);
+    }
+    if (!in_array($categoria, $validas, true)) {
+        json_error("Categoría inválida para $area: $categoria");
+    }
+    return $categoria;
+}
+
+/** Mensaje del 409: la identidad es nombre + nombre comercial + representada + área. */
+const MSG_PRODUCTO_DUPLICADO = 'Ya existe un producto con ese nombre, nombre comercial y representada en esa área de negocio';
+
 function validate_producto(array $body, bool $partial = false): array
 {
     $data = [];
@@ -109,6 +183,11 @@ function validate_producto(array $body, bool $partial = false): array
     }
     if (!$partial || array_key_exists('nota_blog', $body)) {
         $data['nota_blog'] = sanitize_text($body['nota_blog'] ?? '');
+    }
+    foreach (['nombre_comercial', 'representada', 'categoria', 'subgrupo'] as $campo) {
+        if (!$partial || array_key_exists($campo, $body)) {
+            $data[$campo] = sanitize_text($body[$campo] ?? '');
+        }
     }
     if (!$partial || array_key_exists('estado', $body)) {
         $estado = sanitize_text($body['estado'] ?? 'draft');
@@ -158,11 +237,11 @@ if ($method === 'GET') {
     }
 
     if ($q !== '') {
-        $sql .= ' AND (nombre LIKE ?
+        $sql .= ' AND (nombre LIKE ? OR nombre_comercial LIKE ? OR representada LIKE ? OR categoria LIKE ?
                        OR EXISTS (SELECT 1 FROM producto_especies pe
                                   WHERE pe.producto_id = productos.id AND pe.especie LIKE ?))';
         $like = '%' . $q . '%';
-        array_push($params, $like, $like);
+        array_push($params, $like, $like, $like, $like, $like);
     }
 
     $sql .= ' ORDER BY updated_at DESC, id DESC';
@@ -183,6 +262,8 @@ if ($method === 'POST') {
     }
 
     $especies = validar_especies($body['especies'] ?? ($body['especie'] ?? null));
+    $paises = validar_paises($body['paises'] ?? null);
+    $data['categoria'] = validar_categoria($data['categoria'] ?? '', $data['area_negocio']);
 
     // Traducción automática: si no se cargó a mano la versión en inglés,
     // se genera sola a partir del español.
@@ -196,12 +277,17 @@ if ($method === 'POST') {
     db()->beginTransaction();
     try {
         $stmt = db()->prepare(
-            'INSERT INTO productos (nombre, nombre_en, descripcion, descripcion_en, imagen, area_negocio, ficha_tecnica, nota_blog, estado, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO productos (nombre, nombre_en, nombre_comercial, representada, categoria, subgrupo,
+                                    descripcion, descripcion_en, imagen, area_negocio, ficha_tecnica, nota_blog, estado, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         $stmt->execute([
             $data['nombre'],
             $data['nombre_en'] ?? '',
+            $data['nombre_comercial'] ?? '',
+            $data['representada'] ?? '',
+            $data['categoria'],
+            $data['subgrupo'] ?? '',
             $data['descripcion'] ?? '',
             $data['descripcion_en'] ?? '',
             $data['imagen'] ?? '',
@@ -213,11 +299,12 @@ if ($method === 'POST') {
         ]);
         $newId = (int) db()->lastInsertId();
         guardar_especies($newId, $especies);
+        guardar_paises($newId, $paises);
         db()->commit();
     } catch (PDOException $e) {
         db()->rollBack();
         if (str_contains($e->getMessage(), 'UNIQUE constraint failed: productos.nombre')) {
-            json_error('Ya existe un producto con ese nombre en esa área de negocio', 409);
+            json_error(MSG_PRODUCTO_DUPLICADO, 409);
         }
         throw $e;
     }
@@ -253,6 +340,16 @@ if ($method === 'PUT' || $method === 'PATCH') {
     $ficha = $data['ficha_tecnica'] ?? $row['ficha_tecnica'];
     $notaBlog = $data['nota_blog'] ?? $row['nota_blog'];
     $estado = $data['estado'] ?? $row['estado'];
+    $nombreComercial = $data['nombre_comercial'] ?? $row['nombre_comercial'];
+    $representada = $data['representada'] ?? $row['representada'];
+    $subgrupo = $data['subgrupo'] ?? $row['subgrupo'];
+    // La categoría se revalida contra el área final (puede haber cambiado
+    // sólo el área, o sólo la categoría).
+    $categoria = validar_categoria($data['categoria'] ?? $row['categoria'], $area);
+
+    // Los países, igual que las especies, sólo se tocan si vienen en el body.
+    $tocaPaises = array_key_exists('paises', $body);
+    $paises = validar_paises($body['paises'] ?? null);
 
     // Las especies sólo se tocan si vienen en el body.
     $tocaEspecies = array_key_exists('especies', $body) || array_key_exists('especie', $body);
@@ -270,17 +367,23 @@ if ($method === 'PUT' || $method === 'PATCH') {
     db()->beginTransaction();
     try {
         $stmt = db()->prepare(
-            'UPDATE productos SET nombre=?, nombre_en=?, descripcion=?, descripcion_en=?, imagen=?, area_negocio=?, ficha_tecnica=?, nota_blog=?, estado=?, updated_at=? WHERE id=?'
+            'UPDATE productos SET nombre=?, nombre_en=?, nombre_comercial=?, representada=?, categoria=?, subgrupo=?,
+                                  descripcion=?, descripcion_en=?, imagen=?, area_negocio=?, ficha_tecnica=?, nota_blog=?, estado=?, updated_at=?
+             WHERE id=?'
         );
-        $stmt->execute([$nombre, $nombreEn, $descripcion, $descripcionEn, $imagen, $area, $ficha, $notaBlog, $estado, now_sql(), $id]);
+        $stmt->execute([$nombre, $nombreEn, $nombreComercial, $representada, $categoria, $subgrupo,
+                        $descripcion, $descripcionEn, $imagen, $area, $ficha, $notaBlog, $estado, now_sql(), $id]);
         if ($tocaEspecies) {
             guardar_especies($id, $especies);
+        }
+        if ($tocaPaises) {
+            guardar_paises($id, $paises);
         }
         db()->commit();
     } catch (PDOException $e) {
         db()->rollBack();
         if (str_contains($e->getMessage(), 'UNIQUE constraint failed: productos.nombre')) {
-            json_error('Ya existe un producto con ese nombre en esa área de negocio', 409);
+            json_error(MSG_PRODUCTO_DUPLICADO, 409);
         }
         throw $e;
     }

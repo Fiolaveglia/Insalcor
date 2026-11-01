@@ -1,3 +1,8 @@
+<?php
+// Sólo para leer las constantes del catálogo (áreas, categorías, países):
+// el admin las usa para armar el formulario sin duplicarlas en JS.
+require_once __DIR__ . '/../api/bootstrap.php';
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -72,8 +77,14 @@
             <div class="meta-count">Total de productos: <span id="productos-count">0</span></div>
             <div class="search-wrap">
               <i class="fa-solid fa-magnifying-glass"></i>
-              <input type="search" id="productos-search" placeholder="Buscar productos...">
+              <input type="search" id="productos-search" placeholder="Buscar por nombre, nombre comercial, representada...">
             </div>
+            <select id="productos-area-filter" class="toolbar-select" aria-label="Filtrar por área">
+              <option value="">Todas las áreas</option>
+              <?php foreach (AREAS as $a): ?>
+                <option value="<?= htmlspecialchars($a) ?>"><?= htmlspecialchars(AREAS_ES[$a] ?? $a) ?></option>
+              <?php endforeach; ?>
+            </select>
             <button class="btn btn-blue" id="btn-new-producto" type="button"><i class="fa-solid fa-plus"></i> Nuevo Producto</button>
           </div>
           <div class="card-table">
@@ -82,7 +93,7 @@
                 <tr>
                   <th>Producto</th>
                   <th>Área</th>
-                  <th>Categorías</th>
+                  <th>Clasificación</th>
                   <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
@@ -145,9 +156,9 @@
           <label for="noticia-categoria">Categoría</label>
           <select id="noticia-categoria">
             <option value="">Seleccionar categoría</option>
-            <option value="Nutricion Animal">Nutrición Animal</option>
-            <option value="Pharma">Pharma</option>
-            <option value="VetPharma">VetPharma</option>
+            <?php foreach (AREAS as $a): ?>
+              <option value="<?= htmlspecialchars($a) ?>"><?= htmlspecialchars(AREAS_ES[$a] ?? $a) ?></option>
+            <?php endforeach; ?>
           </select>
         </div>
         <div class="form-group">
@@ -188,9 +199,9 @@
         <div class="form-group">
           <label for="producto-area">Área de negocio</label>
           <select id="producto-area">
-            <option value="Nutricion Animal">Nutricion Animal</option>
-            <option value="Pharma">Pharma</option>
-            <option value="VetPharma">VetPharma</option>
+            <?php foreach (AREAS as $a): ?>
+              <option value="<?= htmlspecialchars($a) ?>"><?= htmlspecialchars(AREAS_ES[$a] ?? $a) ?></option>
+            <?php endforeach; ?>
           </select>
         </div>
         <div class="form-group" id="producto-especie-wrap">
@@ -203,6 +214,39 @@
             <label><input type="checkbox" name="especie" value="Lechería"> Lechería</label>
             <label><input type="checkbox" name="especie" value="Equinos"> Equinos</label>
             <label><input type="checkbox" name="especie" value="Ovinos"> Ovinos</label>
+          </div>
+        </div>
+        <!-- Catálogo Pharma / VetPharma / Suplementos: se muestra en lugar de
+             las especies cuando el área es una de esas tres (ver app.js). -->
+        <div id="producto-pharma-wrap" class="hidden">
+          <div class="form-group">
+            <label for="producto-nombre-comercial">Nombre comercial <span class="hint">(se ve al desplegar el producto)</span></label>
+            <input id="producto-nombre-comercial" type="text" placeholder="Ej: PVP K30">
+          </div>
+          <div class="form-group">
+            <label for="producto-representada">Representada / marca <span class="hint">(vacío = se lista bajo "Otros")</span></label>
+            <input id="producto-representada" type="text" placeholder="Ej: BASF">
+          </div>
+          <div class="form-group">
+            <label for="producto-categoria">Categoría</label>
+            <select id="producto-categoria"></select>
+          </div>
+          <div class="form-group">
+            <label for="producto-subgrupo">Subgrupo <span class="hint">(APIs: grupo terapéutico · Vitaminas: liposoluble / hidrosoluble / vitaminoide)</span></label>
+            <input id="producto-subgrupo" type="text" list="producto-subgrupos" placeholder="Ej: Antibióticos">
+            <datalist id="producto-subgrupos">
+              <?php foreach (array_keys(SUBGRUPOS_EN) as $sg): ?>
+                <option value="<?= htmlspecialchars($sg) ?>"></option>
+              <?php endforeach; ?>
+            </datalist>
+          </div>
+          <div class="form-group">
+            <label>Países <span class="hint">(dónde se comercializa)</span></label>
+            <div class="checkbox-grid" id="producto-paises">
+              <?php foreach (PAISES as $pais): ?>
+                <label><input type="checkbox" name="pais" value="<?= htmlspecialchars($pais) ?>"> <?= htmlspecialchars($pais) ?></label>
+              <?php endforeach; ?>
+            </div>
           </div>
         </div>
         <div class="form-group">
@@ -269,6 +313,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
   <script src="../assets/js/admin/api.js"></script>
+  <script>
+    window.ADMIN_CATALOGO = <?= json_encode([
+        'areasPharma' => AREAS_PHARMA,
+        'categorias' => CATEGORIAS_POR_AREA,
+    ], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?>;
+  </script>
   <script src="../assets/js/admin/app.js"></script>
 </body>
 </html>

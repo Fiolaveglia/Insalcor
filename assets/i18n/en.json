@@ -126,5 +126,20 @@
   "search.no_results_hint": "Try different words.",
   "search.submit": "Search",
   "search.view_all": "View all results ({n})",
-  "search.no_suggestions": "No results"
+  "search.no_suggestions": "No results",
+  "pharma.country_title": "Choose your country",
+  "pharma.country_all": "Showing products for all countries.",
+  "pharma.country_selected": "Products available in {pais}.",
+  "pharma.contact_text": "Questions about a product?",
+  "pharma.all_categories": "All",
+  "pharma.others_group": "Others",
+  "pharma.available_in": "Available in",
+  "pharma.ask_product": "Ask about this product",
+  "pharma.no_results": "No products match the selected filters.",
+  "pharma.clear_filters": "Clear filters",
+  "pharma.contact_cta": "Contact us",
+  "pharma.inquiry_title": "Contact us",
+  "pharma.inquiry_product": "Product",
+  "pharma.inquiry_prefill": "Hello, I would like more information about {producto}.",
+  "pharma.inquiry_close": "Close"
 }

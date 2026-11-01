@@ -126,5 +126,20 @@
   "search.no_results_hint": "Probá con otras palabras.",
   "search.submit": "Buscar",
   "search.view_all": "Ver todos los resultados ({n})",
-  "search.no_suggestions": "Sin resultados"
+  "search.no_suggestions": "Sin resultados",
+  "pharma.country_title": "Elegí tu país",
+  "pharma.country_all": "Mostrando productos de todos los países.",
+  "pharma.country_selected": "Productos disponibles en {pais}.",
+  "pharma.contact_text": "¿Consultas sobre algún producto?",
+  "pharma.all_categories": "Todas",
+  "pharma.others_group": "Otros",
+  "pharma.available_in": "Disponible en",
+  "pharma.ask_product": "Consultar por este producto",
+  "pharma.no_results": "No hay productos para los filtros elegidos.",
+  "pharma.clear_filters": "Quitar filtros",
+  "pharma.contact_cta": "Escribinos",
+  "pharma.inquiry_title": "Consultanos",
+  "pharma.inquiry_product": "Producto",
+  "pharma.inquiry_prefill": "Hola, quisiera recibir información sobre {producto}.",
+  "pharma.inquiry_close": "Cerrar"
 }

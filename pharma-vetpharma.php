@@ -2,23 +2,12 @@
 require __DIR__ . '/inc/public.php';
 i18n_begin();
 
-$detailBase = 'product-single.php';
-$filters = active_filters();
-$pharmaProductos = pub_productos('Pharma', $filters);
-$vetProductos = pub_productos('VetPharma', $filters);
-$pharmaRecent = array_slice($pharmaProductos, 0, 3);
-$vetRecent = array_slice($vetProductos, 0, 3);
+// Filtros del catálogo (país compartido; categoría y búsqueda por área).
+// Cada área se arma con render_catalogo_pharma() (inc/public.php).
+$pharmaFiltros = pharma_filtros();
 $recentNoticias = array_slice(pub_noticias(), 0, 3);
 $pharmaNoticias = $recentNoticias;
 $vetNoticias = $recentNoticias;
-$especieOptions = especie_options();
-
-// Paginado: 9 productos por página, independiente para cada segmento.
-$productosPorPagina = 9;
-$paginaPharma = current_page('page_pharma');
-$pharmaProductosPagina = array_slice($pharmaProductos, ($paginaPharma - 1) * $productosPorPagina, $productosPorPagina);
-$paginaVet = current_page('page_vet');
-$vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPorPagina, $productosPorPagina);
 ?>
 <!DOCTYPE html>
 <html dir="ltr" lang="<?= e(current_lang()) ?>">
@@ -235,86 +224,8 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
       <div id="segment-pharma" class="segment-content is-visible">
 
 
-      <!--Products Section-->
-      <section class="shop" id="shop">
-        <div class="container">
-          <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-6 offset-lg-3">
-              <div class="heading heading-7 text--center">
-                <h2 class="heading-title">Productos <span class="color-segment">Pharma</span></h2>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <!--  Sidebar Products  -->
-            <div class="col-12 col-lg-3">
-              <div class="sidebar sidebar-shop">
-
-                <!-- Search-->
-                <div class="widget widget-search">
-                  <div class="widget-title">
-                    <h5 data-i18n="shop.search">Buscar</h5>
-                  </div>
-                  <div class="widget-content">
-                    <form class="form-search" method="get" action="">
-                      <?php if (current_lang() !== 'es'): ?><input type="hidden" name="lang" value="<?= e(current_lang()) ?>"/><?php endif; ?>
-                      <div class="input-group">
-                        <input class="form-control" type="text" name="q" value="<?= e($filters['q']) ?>" placeholder="Buscar ..." data-i18n-placeholder="common.search_placeholder"/><span class="input-group-btn">
-                          <button class="btn" type="submit"><i class="icon-search"></i></button></span>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-
-                <?php /* Categorías: oculto momentáneamente hasta tener
-                       productos reales de Pharma para filtrar (hoy todo
-                       da 0). Para reactivar, borrar esta marca de
-                       comentario y la de más abajo. */ ?>
-                <?php if (false): ?>
-                <div class="widget especie">
-                  <div class="widget-title">
-                    <h5 data-i18n="shop.categories">Categorías</h5>
-                  </div>
-                  <div class="widget-content">
-                    <?= render_filter_list('Pharma', 'especie', $especieOptions) ?>
-                  </div>
-                </div>
-                <?php endif; ?>
-
-                <!-- Recent Products-->
-                <div class="widget widget-recent-products">
-                  <div class="widget-title">
-                    <h5 data-i18n="shop.recent">Productos Recientes</h5>
-                  </div>
-                  <div class="widget-content">
-                    <?php foreach ($pharmaRecent as $item) { echo render_recent_product($item, $detailBase); } ?>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- All Products -->
-            <div class="col-12 col-lg-9">
-              <div class="row">
-                <div class="col-12">
-                  <div class="shop-options">
-                    <div class="products-show"><p><?= e(t('common.showing_products', ['n' => count($pharmaProductos)])) ?></p></div>
-                </div>
-              </div>
-              <div class="row">
-                <?php if ($pharmaProductosPagina) {
-                    foreach ($pharmaProductosPagina as $item) { echo render_product_card($item, $detailBase); }
-                } else { ?>
-                  <div class="col-12"><p><?= e(t('common.no_products')) ?></p></div>
-                <?php } ?>
-              </div>
-              <?= render_pagination(count($pharmaProductos), $productosPorPagina, $paginaPharma, 'page_pharma') ?>
-            </div>
-          </div>
-        </div>
-        </div>
-      </section>
+      <!-- Productos Pharma: banderas, categorías y listado (inc/catalogo-pharma.php) -->
+      <?= render_catalogo_pharma('Pharma', $pharmaFiltros) ?>
 
       <!-- Brands-->
       <section class="cta cta-2" id="cta-2">
@@ -443,86 +354,8 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
       
       <!-- SEGMENTO: VETPHARMA -->
       <div id="segment-vetpharma" class="segment-content">
-      <!--Products Section-->
-      <section class="shop" id="shop">
-        <div class="container">
-          <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-6 offset-lg-3">
-              <div class="heading heading-7 text--center">
-                <h2 class="heading-title">Productos <span class="color-segment">VetPharma</span></h2>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <!--  Sidebar Products  -->
-            <div class="col-12 col-lg-3">
-              <div class="sidebar sidebar-shop">
-
-                <!-- Search-->
-                <div class="widget widget-search">
-                  <div class="widget-title">
-                    <h5 data-i18n="shop.search">Buscar</h5>
-                  </div>
-                  <div class="widget-content">
-                    <form class="form-search" method="get" action="">
-                      <?php if (current_lang() !== 'es'): ?><input type="hidden" name="lang" value="<?= e(current_lang()) ?>"/><?php endif; ?>
-                      <div class="input-group">
-                        <input class="form-control" type="text" name="q" value="<?= e($filters['q']) ?>" placeholder="Buscar ..." data-i18n-placeholder="common.search_placeholder"/><span class="input-group-btn">
-                          <button class="btn" type="submit"><i class="icon-search"></i></button></span>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-
-                <?php /* Categorías: oculto momentáneamente hasta tener
-                       productos reales de VetPharma para filtrar (hoy todo
-                       da 0). Para reactivar, borrar esta marca de
-                       comentario y la de más abajo. */ ?>
-                <?php if (false): ?>
-                <div class="widget especie">
-                  <div class="widget-title">
-                    <h5 data-i18n="shop.categories">Categorías</h5>
-                  </div>
-                  <div class="widget-content">
-                    <?= render_filter_list('VetPharma', 'especie', $especieOptions, 'segment-vetpharma') ?>
-                  </div>
-                </div>
-                <?php endif; ?>
-
-                <!-- Recent Products-->
-                <div class="widget widget-recent-products">
-                  <div class="widget-title">
-                    <h5 data-i18n="shop.recent">Productos Recientes</h5>
-                  </div>
-                  <div class="widget-content">
-                    <?php foreach ($vetRecent as $item) { echo render_recent_product($item, $detailBase); } ?>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- All Products -->
-            <div class="col-12 col-lg-9">
-              <div class="row">
-                <div class="col-12">
-                  <div class="shop-options">
-                    <div class="products-show"><p><?= e(t('common.showing_products', ['n' => count($vetProductos)])) ?></p></div>
-                </div>
-              </div>
-              <div class="row">
-                <?php if ($vetProductosPagina) {
-                    foreach ($vetProductosPagina as $item) { echo render_product_card($item, $detailBase); }
-                } else { ?>
-                  <div class="col-12"><p><?= e(t('common.no_products')) ?></p></div>
-                <?php } ?>
-              </div>
-              <?= render_pagination(count($vetProductos), $productosPorPagina, $paginaVet, 'page_vet') ?>
-            </div>
-          </div>
-        </div>
-        </div>
-      </section>
+      <!-- Productos VetPharma: banderas, categorías y listado (inc/catalogo-pharma.php) -->
+      <?= render_catalogo_pharma('VetPharma', $pharmaFiltros) ?>
 
       <!-- Brands-->
       <section class="cta cta-2" id="cta-2">
@@ -573,20 +406,10 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
       </section>
       </div>
 
-      <!-- SEGMENTO: SUPLEMENTOS (provisorio hasta tener productos) -->
+      <!-- SEGMENTO: SUPLEMENTOS -->
       <div id="segment-suplementos" class="segment-content">
-      <section class="shop" id="shop-suplementos">
-        <div class="container">
-          <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-6 offset-lg-3">
-              <div class="heading heading-7 text--center">
-                <h2 class="heading-title"><span data-i18n="shop.products_of">Productos</span> <span class="color-segment" data-i18n="pharma.supplements">Suplementos</span></h2>
-                <p data-i18n="common.coming_soon">Próximamente</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <!-- Productos Suplementos: banderas, categorías y listado (inc/catalogo-pharma.php) -->
+      <?= render_catalogo_pharma('Suplementos', $pharmaFiltros) ?>
       </div>
 
       <!--   Team Projects #02 Section - PENDIENTE CAMBIAR LA PALABRA PROJECT (Cambiarla por cual?)  -->
@@ -794,6 +617,8 @@ $vetProductosPagina = array_slice($vetProductos, ($paginaVet - 1) * $productosPo
     </div>
 
     <!-- Modal Producto -->
+    <?php include __DIR__ . '/inc/consulta-modal.php'; ?>
+
     <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content product-modal">

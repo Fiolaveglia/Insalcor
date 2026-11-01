@@ -34,7 +34,18 @@ CREATE TABLE IF NOT EXISTS productos (
   imagen TEXT NOT NULL DEFAULT '',
   ficha_tecnica TEXT NOT NULL DEFAULT '',
   nota_blog TEXT NOT NULL DEFAULT '',
-  area_negocio TEXT NOT NULL CHECK (area_negocio IN ('Nutricion Animal', 'Pharma', 'VetPharma')),
+  -- Catálogo Pharma / VetPharma / Suplementos (vacíos en Nutrición Animal):
+  -- nombre_comercial = "Título para desplegable" de la planilla;
+  -- representada     = marca/proveedor ("Representada / Otros");
+  -- categoria        = categoría del filtro lateral (Excipientes, APIs, Vitaminas...);
+  -- subgrupo         = encabezado dentro de la categoría (grupo terapéutico de
+  --                    los APIs, tipo de vitamina). Se validan en PHP, no con
+  --                    CHECK, para sumar categorías sin reconstruir la tabla.
+  nombre_comercial TEXT NOT NULL DEFAULT '',
+  representada TEXT NOT NULL DEFAULT '',
+  categoria TEXT NOT NULL DEFAULT '',
+  subgrupo TEXT NOT NULL DEFAULT '',
+  area_negocio TEXT NOT NULL CHECK (area_negocio IN ('Nutricion Animal', 'Pharma', 'VetPharma', 'Suplementos')),
   estado TEXT NOT NULL DEFAULT 'draft' CHECK (estado IN ('draft', 'published')),
   -- Checklist de contenido que viene de la planilla (NULL = sin dato).
   tiene_imagen INTEGER,
@@ -58,6 +69,14 @@ CREATE TABLE IF NOT EXISTS producto_especies (
   PRIMARY KEY (producto_id, especie)
 );
 
+-- Países en los que se comercializa un producto (Pharma / VetPharma /
+-- Suplementos). "TODOS" en la planilla = una fila por cada país.
+CREATE TABLE IF NOT EXISTS producto_paises (
+  producto_id INTEGER NOT NULL REFERENCES productos(id) ON DELETE CASCADE,
+  pais TEXT NOT NULL CHECK (pais IN ('Uruguay', 'Argentina', 'Paraguay')),
+  PRIMARY KEY (producto_id, pais)
+);
+
 CREATE TABLE IF NOT EXISTS tutoriales (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   titulo TEXT NOT NULL,
@@ -79,9 +98,14 @@ CREATE INDEX IF NOT EXISTS idx_noticias_estado ON noticias(estado);
 CREATE INDEX IF NOT EXISTS idx_tutoriales_estado ON tutoriales(estado);
 CREATE INDEX IF NOT EXISTS idx_productos_estado ON productos(estado);
 CREATE INDEX IF NOT EXISTS idx_productos_area ON productos(area_negocio);
+CREATE INDEX IF NOT EXISTS idx_productos_categoria ON productos(area_negocio, categoria);
 CREATE INDEX IF NOT EXISTS idx_producto_especies_especie ON producto_especies(especie);
+CREATE INDEX IF NOT EXISTS idx_producto_paises_pais ON producto_paises(pais);
 
--- Identidad de un producto: mismo nombre + área es la misma ficha.
--- Permite que la importación sea idempotente (re-correrla no duplica).
+-- Identidad de un producto: mismo nombre + nombre comercial + representada +
+-- área es la misma ficha. En Nutrición los dos del medio quedan vacíos, así
+-- que sigue siendo (nombre, área). En Pharma el compuesto solo se repite (ej.
+-- "Grasa dura" con 13 nombres comerciales distintos). Permite que las
+-- importaciones sean idempotentes (re-correrlas no duplica).
 CREATE UNIQUE INDEX IF NOT EXISTS idx_productos_unico
-  ON productos(nombre, area_negocio);
+  ON productos(nombre, nombre_comercial, representada, area_negocio);

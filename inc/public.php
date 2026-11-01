@@ -454,6 +454,8 @@ function like_busqueda(string $q): string
 const BUSCADOR_CAMPOS_PRODUCTOS = [
     ['nombre', false],
     ['nombre_en', false],
+    ['nombre_comercial', false],
+    ['representada', false],
     ['descripcion', true],
     ['descripcion_en', true],
 ];
@@ -641,11 +643,40 @@ function area_counts(string $area, string $col): array
 
 /* -------------------------------------------------------- card renderers */
 
+/**
+ * A dónde lleva un producto. Los de Nutrición tienen página de detalle; los
+ * del catálogo Pharma / VetPharma / Suplementos no: se ven desplegados en
+ * pharma-vetpharma.php, en su área y categoría (el JS de esa página abre
+ * el desplegable de #producto-ID).
+ */
+function producto_url(array $item, string $detailBase = 'product-single.php'): string
+{
+    $area = (string) ($item['area_negocio'] ?? '');
+    if (isset(SEGMENTOS_PHARMA[$area])) {
+        return 'pharma-vetpharma.php?' . http_build_query(array_filter([
+            'seg' => SEGMENTOS_PHARMA[$area],
+            'categoria' => (string) ($item['categoria'] ?? ''),
+        ], static fn ($v) => $v !== '')) . '#producto-' . (int) $item['id'];
+    }
+    return $detailBase . '?id=' . (int) $item['id'];
+}
+
 function render_product_card(array $item, string $detailBase): string
 {
     $img = asset($item['imagen']);
-    $href = $detailBase . '?id=' . (int) $item['id'];
+    $href = producto_url($item, $detailBase);
     $nombre = e(campo_i18n($item, 'nombre'));
+    // Los del catálogo Pharma no tienen detalle para el modal: navegan a su
+    // página, y muestran área · categoría (en el buscador aparecen junto a
+    // los de Nutrición y el mismo compuesto puede estar en Pharma y VetPharma).
+    $esPharma = isset(SEGMENTOS_PHARMA[$item['area_negocio'] ?? '']);
+    $abrir = $esPharma ? '' : ' js-open-product';
+    $sub = $esPharma
+        ? '<div class="product-category"><span>' . e(implode(' · ', array_filter([
+            area_label((string) $item['area_negocio']),
+            categoria_label((string) ($item['categoria'] ?? '')),
+        ]))) . '</span></div>'
+        : '';
 
     if ($img) {
         return '
@@ -653,11 +684,11 @@ function render_product_card(array $item, string $detailBase): string
         <div class="product-item">
           <div class="product-img">
             <img src="' . e($img) . '" alt="' . $nombre . '"/>
-            <a class="ver-detalle js-open-product" href="' . e($href) . '"><i class="fas fa-eye"></i> ' . e(t('common.view_details')) . '</a>
+            <a class="ver-detalle' . $abrir . '" href="' . e($href) . '"><i class="fas fa-eye"></i> ' . e(t('common.view_details')) . '</a>
             <div class="badge"></div>
           </div>
           <div class="product-content">
-            <div class="product-title"><a class="js-open-product" href="' . e($href) . '">' . $nombre . '</a></div>
+            <div class="product-title"><a class="' . trim($abrir) . '" href="' . e($href) . '">' . $nombre . '</a></div>' . $sub . '
           </div>
         </div>
       </div>';
@@ -671,10 +702,10 @@ function render_product_card(array $item, string $detailBase): string
       <div class="col-12 col-md-6 col-lg-4" data-product-card>
         <div class="product-item product-item--no-image">
           <div class="product-img product-img--empty">
-            <a class="btn btn--secondary btn-sm js-open-product" href="' . e($href) . '"><i class="fas fa-eye"></i> ' . e(t('common.view_details')) . '</a>
+            <a class="btn btn--secondary btn-sm' . $abrir . '" href="' . e($href) . '"><i class="fas fa-eye"></i> ' . e(t('common.view_details')) . '</a>
           </div>
           <div class="product-content">
-            <div class="product-title"><a class="js-open-product" href="' . e($href) . '">' . $nombre . '</a></div>
+            <div class="product-title"><a class="' . trim($abrir) . '" href="' . e($href) . '">' . $nombre . '</a></div>' . $sub . '
           </div>
         </div>
       </div>';
@@ -896,4 +927,254 @@ function render_tutorial_card(array $item, string $detailBase): string
           </div>
         </div>
       </div>';
+}
+
+/* ---------------------------- catálogo Pharma / VetPharma / Suplementos */
+
+/**
+ * Slug de cada área en la URL (?seg=...) y en el id de su contenedor
+ * (#segment-pharma), que es lo que usa el selector de áreas de la página.
+ */
+const SEGMENTOS_PHARMA = ['Pharma' => 'pharma', 'VetPharma' => 'vetpharma', 'Suplementos' => 'suplementos'];
+
+/**
+ * Filtros de la página de Pharma leídos del query string. El país se
+ * comparte entre las tres áreas (es la misma persona eligiendo dónde está);
+ * la categoría y la búsqueda sólo aplican al área de ?seg, porque las
+ * categorías de Suplementos no son las de Pharma.
+ *
+ * @return array{seg: string, pais: string, categoria: string, q: string}
+ */
+function pharma_filtros(): array
+{
+    $pais = trim((string) ($_GET['pais'] ?? ''));
+    $seg = trim((string) ($_GET['seg'] ?? ''));
+    return [
+        'seg' => in_array($seg, SEGMENTOS_PHARMA, true) ? $seg : '',
+        'pais' => in_array($pais, PAISES, true) ? $pais : '',
+        'categoria' => trim((string) ($_GET['categoria'] ?? '')),
+        'q' => trim((string) ($_GET['q'] ?? '')),
+    ];
+}
+
+/** Los filtros que efectivamente aplican a un área. */
+function pharma_filtros_de(string $area, array $f): array
+{
+    $esSuya = $f['seg'] === SEGMENTOS_PHARMA[$area];
+    return [
+        'pais' => $f['pais'],
+        'categoria' => $esSuya && in_array($f['categoria'], CATEGORIAS_POR_AREA[$area], true) ? $f['categoria'] : '',
+        'q' => $esSuya ? $f['q'] : '',
+    ];
+}
+
+/**
+ * URL de la página de Pharma con los filtros de un área cambiados.
+ * $cambios: clave => valor ('' o null lo quita). Siempre termina en el ancla
+ * del área, así al recargar se abre la misma área.
+ */
+function pharma_url(string $area, array $f, array $cambios): string
+{
+    $params = array_filter(array_merge([
+        'seg' => SEGMENTOS_PHARMA[$area],
+        'pais' => $f['pais'],
+        'categoria' => $f['categoria'],
+        'q' => $f['q'],
+    ], $cambios), static fn ($v) => $v !== null && $v !== '');
+    $qs = http_build_query($params);
+    return strtok($_SERVER['REQUEST_URI'] ?? '', '?') . ($qs ? '?' . $qs : '') . '#segment-' . SEGMENTOS_PHARMA[$area];
+}
+
+/**
+ * Productos publicados de un área del catálogo Pharma, con sus países
+ * (`paises`, separados por coma), filtrados por país / categoría / texto.
+ * El texto se busca en nombre, nombre comercial, representada y subgrupo,
+ * sin importar acentos (mismo criterio que el buscador del header).
+ */
+function pub_productos_pharma(string $area, array $f): array
+{
+    $sql = "SELECT p.*,
+                   (SELECT group_concat(pp.pais, ',') FROM producto_paises pp WHERE pp.producto_id = p.id) AS paises
+            FROM productos p
+            WHERE p.estado = 'published' AND p.area_negocio = ?";
+    $params = [$area];
+
+    if ($f['pais'] !== '') {
+        $sql .= ' AND EXISTS (SELECT 1 FROM producto_paises pp WHERE pp.producto_id = p.id AND pp.pais = ?)';
+        $params[] = $f['pais'];
+    }
+    if ($f['categoria'] !== '') {
+        $sql .= ' AND p.categoria = ?';
+        $params[] = $f['categoria'];
+    }
+    if ($f['q'] !== '') {
+        $campos = ['p.nombre', 'p.nombre_en', 'p.nombre_comercial', 'p.representada', 'p.subgrupo'];
+        $sql .= ' AND (' . implode(' OR ', array_map(
+            static fn ($c) => sql_normalizado($c) . " LIKE ? ESCAPE '!'",
+            $campos
+        )) . ')';
+        array_push($params, ...array_fill(0, count($campos), like_busqueda($f['q'])));
+    }
+
+    $stmt = db()->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+}
+
+/** Etiqueta de una categoría del catálogo en el idioma activo. */
+function categoria_label(string $categoria): string
+{
+    return current_lang() === 'en' ? (CATEGORIAS_EN[$categoria] ?? $categoria) : $categoria;
+}
+
+/** Etiqueta de un subgrupo (grupo terapéutico / tipo de vitamina). */
+function subgrupo_label(string $subgrupo): string
+{
+    return current_lang() === 'en' ? (SUBGRUPOS_EN[$subgrupo] ?? $subgrupo) : $subgrupo;
+}
+
+/**
+ * Ordena y agrupa productos para mostrarlos:
+ *   [categoría => [encabezado => [productos]]]
+ * El encabezado sale de CATEGORIAS_AGRUPAR_POR (marca o subgrupo); en las
+ * categorías que se listan sin agrupar hay un único grupo con clave ''.
+ * Las categorías van en el orden de CATEGORIAS_POR_AREA; los encabezados y
+ * los productos, alfabéticos (sin importar acentos), con "Otros" al final.
+ */
+function agrupar_pharma(string $area, array $items): array
+{
+    $orden = array_flip(CATEGORIAS_POR_AREA[$area]);
+    $porCategoria = [];
+    foreach ($items as $it) {
+        $campo = CATEGORIAS_AGRUPAR_POR[$it['categoria']] ?? null;
+        $grupo = $campo === null ? '' : (trim((string) $it[$campo]) ?: "\u{FFFF}otros");
+        $porCategoria[$it['categoria']][$grupo][] = $it;
+    }
+    uksort($porCategoria, static fn ($a, $b) => ($orden[$a] ?? 99) <=> ($orden[$b] ?? 99));
+
+    $porNombre = static fn ($a, $b) => strcmp(
+        normalizar_texto(campo_i18n($a, 'nombre') . ' ' . $a['nombre_comercial']),
+        normalizar_texto(campo_i18n($b, 'nombre') . ' ' . $b['nombre_comercial'])
+    );
+    foreach ($porCategoria as &$grupos) {
+        uksort($grupos, static fn ($a, $b) => strcmp(normalizar_texto($a), normalizar_texto($b)));
+        foreach ($grupos as &$lista) {
+            usort($lista, $porNombre);
+        }
+        unset($lista);
+    }
+    unset($grupos);
+    return $porCategoria;
+}
+
+/** Texto del encabezado de un grupo ("Otros" para los sin marca). */
+function grupo_pharma_label(string $grupo): string
+{
+    return $grupo === "\u{FFFF}otros" ? t('pharma.others_group') : subgrupo_label($grupo);
+}
+
+/**
+ * Un producto del catálogo como desplegable. Cerrado muestra el nombre del
+ * compuesto (lo pide el documento); si ese nombre se repite dentro del mismo
+ * grupo, suma el nombre comercial en gris para poder distinguirlos.
+ */
+function render_pharma_item(array $item, bool $mostrarComercial): string
+{
+    $nombre = campo_i18n($item, 'nombre');
+    $comercial = trim((string) $item['nombre_comercial']);
+    $paises = array_filter(explode(',', (string) ($item['paises'] ?? '')));
+    // Sólo lo que no figura ya como encabezado en la lista: la categoría y el
+    // subgrupo siempre lo son, y la marca también en las categorías que se
+    // agrupan por marca (Excipientes, Cápsulas...). En el resto la marca
+    // (ej. Jiaherb en Extractos, Balchem en Vitaminas) sí aporta.
+    $agrupaPorMarca = (CATEGORIAS_AGRUPAR_POR[$item['categoria']] ?? null) === 'representada';
+    $marca = $agrupaPorMarca ? '' : trim((string) $item['representada']);
+    // Lo que se muestra en el formulario de consulta. contact.php no lo usa:
+    // busca el producto por id (ver inc/consulta.php).
+    $etiquetaConsulta = $nombre . ($comercial !== '' && normalizar_texto($comercial) !== normalizar_texto($nombre) ? ' (' . $comercial . ')' : '');
+
+    $html = '<details class="pharma-item" id="producto-' . (int) $item['id'] . '">'
+        . '<summary><span class="pharma-item__nombre">' . e($nombre) . '</span>'
+        . ($mostrarComercial && $comercial !== '' ? '<span class="pharma-item__extra"> · ' . e($comercial) . '</span>' : '')
+        . '</summary><div class="pharma-item__body">';
+    if ($comercial !== '' && normalizar_texto($comercial) !== normalizar_texto($nombre)) {
+        $html .= '<p class="pharma-item__comercial">' . e($comercial) . '</p>';
+    }
+    if ($marca !== '') {
+        $html .= '<p class="pharma-item__meta">' . e($marca) . '</p>';
+    }
+    $descripcion = campo_i18n($item, 'descripcion');
+    if (trim(strip_tags($descripcion)) !== '') {
+        $html .= '<div class="pharma-item__desc">' . $descripcion . '</div>';
+    }
+    if ($paises) {
+        $html .= '<p class="pharma-item__paises"><span>' . e(t('pharma.available_in')) . ':</span> ';
+        foreach (PAISES as $p) {
+            if (in_array($p, $paises, true)) {
+                $html .= '<span class="pharma-chip"><img src="https://flagcdn.com/' . PAISES_ISO[$p] . '.svg" alt="" width="18" height="12"/> ' . e($p) . '</span>';
+            }
+        }
+        $html .= '</p>';
+    }
+    $html .= '<a class="btn btn--secondary btn-sm pharma-item__consultar js-consultar" href="contact.html"'
+        . ' data-producto="' . (int) $item['id'] . '" data-area="' . e((string) $item['area_negocio']) . '"'
+        . ' data-nombre="' . e($etiquetaConsulta) . '"><i class="fas fa-envelope"></i> '
+        . e(t('pharma.ask_product')) . '</a></div></details>';
+    return $html;
+}
+
+/** Botones de país (banderas). Click en el país activo lo quita. */
+function render_pais_filter(string $area, array $f): string
+{
+    $html = '<div class="pharma-paises" role="group" aria-label="' . e(t('pharma.country_title')) . '">';
+    foreach (PAISES as $p) {
+        $activo = $f['pais'] === $p;
+        $html .= '<a class="pharma-pais' . ($activo ? ' is-active' : '') . '" aria-pressed="' . ($activo ? 'true' : 'false') . '" href="'
+            . e(pharma_url($area, $f, ['pais' => $activo ? '' : $p]))
+            . '"><img src="https://flagcdn.com/' . PAISES_ISO[$p] . '.svg" alt="" width="36" height="24"/><span>' . e($p) . '</span></a>';
+    }
+    return $html . '</div>';
+}
+
+/**
+ * Lista de categorías del sidebar con su cantidad, contada con el país y la
+ * búsqueda activos (así el número coincide con lo que se ve al elegirla).
+ * Mismo marcado que render_filter_list().
+ */
+function render_categoria_filter(string $area, array $f, array $conteos): string
+{
+    $total = array_sum($conteos);
+    $html = '<ul class="list-unstyled">'
+        . '<li><a' . ($f['categoria'] === '' ? ' class="is-active"' : '') . ' href="' . e(pharma_url($area, $f, ['categoria' => ''])) . '">'
+        . e(t('pharma.all_categories')) . '</a><span>' . $total . '</span></li>';
+    foreach (CATEGORIAS_POR_AREA[$area] as $cat) {
+        $n = $conteos[$cat] ?? 0;
+        $activa = $f['categoria'] === $cat;
+        $html .= '<li' . ($n === 0 && !$activa ? ' class="is-empty"' : '') . '><a' . ($activa ? ' class="is-active"' : '') . ' href="'
+            . e(pharma_url($area, $f, ['categoria' => $activa ? '' : $cat])) . '">' . e(categoria_label($cat)) . '</a><span>' . $n . '</span></li>';
+    }
+    return $html . '</ul>';
+}
+
+/**
+ * Bloque completo de productos de un área del catálogo (banderas, contacto,
+ * sidebar con búsqueda y categorías, listado agrupado). La plantilla está en
+ * inc/catalogo-pharma.php.
+ */
+function render_catalogo_pharma(string $area, array $filtrosPagina): string
+{
+    $f = pharma_filtros_de($area, $filtrosPagina);
+    $items = pub_productos_pharma($area, $f);
+
+    // Los conteos del sidebar ignoran la categoría elegida (si no, todas las
+    // demás darían 0); si hay una elegida hace falta otra consulta.
+    $sinCategoria = $f['categoria'] === '' ? $items : pub_productos_pharma($area, array_merge($f, ['categoria' => '']));
+    $conteos = array_count_values(array_column($sinCategoria, 'categoria'));
+
+    $grupos = agrupar_pharma($area, $items);
+    $slug = SEGMENTOS_PHARMA[$area];
+
+    ob_start();
+    include __DIR__ . '/catalogo-pharma.php';
+    return (string) ob_get_clean();
 }

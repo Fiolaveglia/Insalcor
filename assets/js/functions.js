@@ -610,17 +610,60 @@ $(".slider-carousel").each(function() {
         document.body.classList.remove("modal-open");
     });
 
+    // Consulta por producto (catálogo Pharma): abre el formulario de contacto
+    // en un modal con el producto ya cargado; lo envía el mismo handler de
+    // .contactForm que usa contact.html. Si la página no tiene el modal, el
+    // link lleva a contact.html.
+    document.addEventListener("click", function (e) {
+        const link = e.target.closest(".js-consultar");
+        if (!link) return;
+
+        const modalEl = document.getElementById("consultaModal");
+        if (!modalEl || typeof bootstrap === "undefined") return;
+        e.preventDefault();
+
+        const form = modalEl.querySelector(".contactForm");
+        const nombre = link.dataset.nombre || "";
+        form.querySelector('[name="contact-producto"]').value = link.dataset.producto || "";
+        form.querySelector('[name="contact-area"]').value = link.dataset.area || "";
+        form.querySelector(".contact-result").innerHTML = "";
+
+        modalEl.querySelector(".consulta-producto").textContent = nombre;
+        modalEl.querySelector(".consulta-modal__producto").classList.toggle("d-none", !nombre);
+
+        // El mensaje se precarga con el producto, salvo que la persona ya
+        // haya escrito algo propio.
+        const mensaje = form.querySelector('[name="contact-message"]');
+        if (!mensaje.value.trim() || mensaje.dataset.autocompletado === "1") {
+            mensaje.value = nombre ? (modalEl.dataset.plantilla || "").replace("{producto}", nombre) : "";
+            mensaje.dataset.autocompletado = "1";
+        }
+        if (!mensaje.dataset.escucha) {
+            mensaje.dataset.escucha = "1";
+            mensaje.addEventListener("input", function () { delete mensaje.dataset.autocompletado; });
+        }
+
+        // backdrop 'static': un click afuera por error no cierra el formulario
+        // (se cierra con la X o con Esc). Va acá y no como data-bs-backdrop
+        // porque el Bootstrap del tema (5.0.0-beta3) ignora los data-bs-* al
+        // crear el modal desde JS, y tampoco tiene getOrCreateInstance.
+        (bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl, { backdrop: 'static' })).show();
+    });
+
     // Scipt para el modal 
     document.addEventListener("click", async function (e) {
         const link = e.target.closest(".js-open-product");
         if (!link) return;
 
+        // Páginas sin el modal (ej. buscar.php): el link navega normalmente
+        // al detalle en vez de quedar muerto.
+        const modalEl = document.getElementById("productModal");
+        const bodyEl = document.getElementById("productModalBody");
+        if (!modalEl || !bodyEl) return;
+
         e.preventDefault();
 
         const url = link.getAttribute("href") || "product-single.html";
-
-        const modalEl = document.getElementById("productModal");
-        const bodyEl = document.getElementById("productModalBody");
 
         bodyEl.innerHTML = '<div class="text-center p-5">Cargando…</div>';
 
@@ -682,13 +725,33 @@ $(".slider-carousel").each(function() {
             });
             });
 
-            // Honor a #segment-… hash (e.g. after a VetPharma filter reload),
-            // otherwise default to Pharma.
+            // Qué área abrir al cargar:
+            //  - #segment-… (vuelta de un filtro de esa área);
+            //  - #producto-123 (resultado del buscador del header): el área que
+            //    contiene ese producto, que además se despliega y se centra;
+            //  - ?seg=… (ej. al cambiar de idioma, que pierde el #);
+            //  - si no, Pharma.
+            if (!segments.length) return;
             var initial = '#segment-pharma';
-            if (location.hash && document.querySelector(location.hash + '.segment-content')) {
+            var destino = null;
+            try { destino = location.hash ? document.querySelector(location.hash) : null; } catch (e) {}
+            var seg = new URLSearchParams(location.search).get('seg');
+            if (destino && destino.classList.contains('segment-content')) {
                 initial = location.hash;
+            } else if (destino && destino.closest('.segment-content')) {
+                initial = '#' + destino.closest('.segment-content').id;
+            } else if (seg && document.getElementById('segment-' + seg)) {
+                initial = '#segment-' + seg;
             }
             showSegment(initial);
+
+            if (destino && destino.tagName === 'DETAILS') {
+                destino.open = true;
+                destino.classList.add('is-highlight');
+                // Al cargar, el área estaba oculta: el salto nativo al # no
+                // ocurrió, así que se hace a mano una vez visible.
+                setTimeout(function(){ destino.scrollIntoView({block: 'center'}); }, 300);
+            }
         })();
 
 
@@ -747,6 +810,21 @@ $(".slider-carousel").each(function() {
                         
                         // Limpiar formulario
                         $form[0].reset();
+
+                        // Formulario dentro de un modal (consulta del catálogo
+                        // Pharma): se ve la confirmación un momento y el modal
+                        // se cierra solo. Si mientras tanto se reabrió para otro
+                        // producto, el mensaje ya no está y no se cierra.
+                        var modalEl = $form.closest('.modal')[0];
+                        if (modalEl && typeof bootstrap !== 'undefined') {
+                            setTimeout(function() {
+                                var modal = bootstrap.Modal.getInstance(modalEl);
+                                if (modal && $resultDiv.find('.alert-success').length) {
+                                    modal.hide();
+                                }
+                            }, 1500);
+                            return;
+                        }
                         
                         // Scroll al mensaje de éxito
                         $('html, body').animate({

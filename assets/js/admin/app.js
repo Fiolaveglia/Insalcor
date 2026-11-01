@@ -118,6 +118,43 @@
     especieBoxes().forEach((b) => { b.checked = selected.has(b.value); });
   }
 
+  /* Catálogo Pharma / VetPharma / Suplementos: países + categoría por área.
+     Las listas vienen de api/bootstrap.php (window.ADMIN_CATALOGO). */
+  const CATALOGO = window.ADMIN_CATALOGO || { areasPharma: [], categorias: {} };
+
+  function esAreaPharma(area) {
+    return CATALOGO.areasPharma.includes(area);
+  }
+
+  function paisBoxes() {
+    return Array.from(document.querySelectorAll('#producto-paises input[name="pais"]'));
+  }
+
+  function getPaises() {
+    return paisBoxes().filter((b) => b.checked).map((b) => b.value);
+  }
+
+  function setPaises(list) {
+    const selected = new Set(list || []);
+    paisBoxes().forEach((b) => { b.checked = selected.has(b.value); });
+  }
+
+  /** Muestra especies (Nutrición) o los campos del catálogo Pharma, y carga
+      las categorías del área elegida conservando la seleccionada si existe. */
+  function toggleProductoArea() {
+    const area = document.getElementById('producto-area').value;
+    const pharma = esAreaPharma(area);
+    document.getElementById('producto-especie-wrap').classList.toggle('hidden', pharma);
+    document.getElementById('producto-pharma-wrap').classList.toggle('hidden', !pharma);
+
+    const select = document.getElementById('producto-categoria');
+    const actual = select.value;
+    const categorias = CATALOGO.categorias[area] || [];
+    select.innerHTML = '<option value="">Seleccionar categoría</option>'
+      + categorias.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+    select.value = categorias.includes(actual) ? actual : '';
+  }
+
   /* -------- Noticias -------- */
   async function loadNoticias() {
     const q = document.getElementById('noticias-search').value.trim();
@@ -214,7 +251,8 @@
   /* -------- Productos -------- */
   async function loadProductos() {
     const q = document.getElementById('productos-search').value.trim();
-    const data = await AdminAPI.listProductos(q);
+    const area = document.getElementById('productos-area-filter').value;
+    const data = await AdminAPI.listProductos(q, area);
     const tbody = document.getElementById('productos-tbody');
     const empty = document.getElementById('productos-empty');
     document.getElementById('productos-count').textContent = data.total;
@@ -232,11 +270,15 @@
             <img class="item-thumb" src="${assetUrl(item.imagen) || ''}" alt="">
             <div>
               <strong>${escapeHtml(item.nombre)}</strong>
+              ${item.nombre_comercial ? `<div class="item-sub">${escapeHtml(item.nombre_comercial)}${item.representada ? ' · ' + escapeHtml(item.representada) : ''}</div>` : ''}
             </div>
           </div>
         </td>
         <td>${escapeHtml(item.area_negocio)}</td>
-        <td>${escapeHtml((item.especies || []).join(', ') || '—')}</td>
+        <td>${esAreaPharma(item.area_negocio)
+          ? escapeHtml([item.categoria, item.subgrupo].filter(Boolean).join(' › ') || '—')
+            + `<div class="item-sub">${escapeHtml((item.paises || []).join(', ') || 'sin país')}</div>`
+          : escapeHtml((item.especies || []).join(', ') || '—')}</td>
         <td>${badge(item.estado)}</td>
         <td>
           <div class="actions">
@@ -254,6 +296,10 @@
     document.getElementById('producto-nombre').value = '';
     document.getElementById('producto-area').value = 'Nutricion Animal';
     setEspecies([]);
+    setPaises([]);
+    ['producto-nombre-comercial', 'producto-representada', 'producto-subgrupo', 'producto-categoria']
+      .forEach((elId) => { document.getElementById(elId).value = ''; });
+    toggleProductoArea();
     document.getElementById('producto-imagen').value = '';
     document.getElementById('producto-ficha').value = '';
     document.getElementById('producto-ficha-file').value = '';
@@ -271,6 +317,12 @@
       document.getElementById('producto-id').value = item.id;
       document.getElementById('producto-nombre').value = item.nombre;
       document.getElementById('producto-area').value = item.area_negocio;
+      toggleProductoArea();
+      document.getElementById('producto-categoria').value = item.categoria || '';
+      document.getElementById('producto-subgrupo').value = item.subgrupo || '';
+      document.getElementById('producto-nombre-comercial').value = item.nombre_comercial || '';
+      document.getElementById('producto-representada').value = item.representada || '';
+      setPaises(item.paises);
       setEspecies(item.especies);
       document.getElementById('producto-imagen').value = item.imagen || '';
       document.getElementById('producto-ficha').value = item.ficha_tecnica || '';
@@ -292,8 +344,21 @@
       descripcion: productoQuill.root.innerHTML,
       estado,
     };
+    if (esAreaPharma(area)) {
+      Object.assign(payload, {
+        nombre_comercial: document.getElementById('producto-nombre-comercial').value.trim(),
+        representada: document.getElementById('producto-representada').value.trim(),
+        categoria: document.getElementById('producto-categoria').value,
+        subgrupo: document.getElementById('producto-subgrupo').value.trim(),
+        paises: getPaises(),
+      });
+    }
     if (!payload.nombre) {
       alert('El nombre es obligatorio');
+      return;
+    }
+    if (esAreaPharma(area) && !payload.categoria) {
+      alert('Elegí una categoría');
       return;
     }
     try {
@@ -502,6 +567,8 @@
     document.getElementById('btn-save-producto-draft').addEventListener('click', () => saveProducto('draft'));
     document.getElementById('btn-save-producto-publish').addEventListener('click', () => saveProducto('published'));
     document.getElementById('productos-search').addEventListener('input', debounce(loadProductos, 250));
+    document.getElementById('productos-area-filter').addEventListener('change', loadProductos);
+    document.getElementById('producto-area').addEventListener('change', toggleProductoArea);
 
     document.getElementById('noticias-tbody').addEventListener('click', async (e) => {
       const edit = e.target.closest('[data-edit-noticia]');

@@ -24,8 +24,13 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
         return array_map(static fn(array $r): array => [
             'id' => (int) $r['id'],
             'titulo' => campo_i18n($r, $campo),
-            'categoria' => area_label((string) ($r[$etiqueta] ?? '')),
-            'url' => $base . '?id=' . (int) $r['id'],
+            // Productos del catálogo Pharma: "Pharma · Excipientes" (el mismo
+            // compuesto puede estar en Pharma y en VetPharma).
+            'categoria' => implode(' · ', array_filter([
+                area_label((string) ($r[$etiqueta] ?? '')),
+                $campo === 'nombre' ? categoria_label((string) ($r['categoria'] ?? '')) : '',
+            ])),
+            'url' => $campo === 'nombre' ? producto_url($r, $base) : $base . '?id=' . (int) $r['id'],
         ], $rows);
     };
     json_response([

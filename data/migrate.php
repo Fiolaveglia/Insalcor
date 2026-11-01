@@ -23,9 +23,14 @@ const PRODUCTOS_COLUMNAS_NUEVAS = [
     'origen'             => "TEXT NOT NULL DEFAULT ''",
     'nombre_en'          => "TEXT NOT NULL DEFAULT ''",
     'descripcion_en'     => "TEXT NOT NULL DEFAULT ''",
+    // Catálogo Pharma / VetPharma / Suplementos (ver schema.sql).
+    'nombre_comercial'   => "TEXT NOT NULL DEFAULT ''",
+    'representada'       => "TEXT NOT NULL DEFAULT ''",
+    'categoria'          => "TEXT NOT NULL DEFAULT ''",
+    'subgrupo'           => "TEXT NOT NULL DEFAULT ''",
 ];
 
-/** DDL de `productos` en su forma actual (una ficha, N especies, catálogo único). */
+/** DDL de `productos` en su forma actual (una ficha, N especies, N países). */
 const DDL_PRODUCTOS = <<<'SQL'
 CREATE TABLE productos (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,8 +41,12 @@ CREATE TABLE productos (
   imagen        TEXT NOT NULL DEFAULT '',
   ficha_tecnica TEXT NOT NULL DEFAULT '',
   nota_blog     TEXT NOT NULL DEFAULT '',
+  nombre_comercial TEXT NOT NULL DEFAULT '',
+  representada  TEXT NOT NULL DEFAULT '',
+  categoria     TEXT NOT NULL DEFAULT '',
+  subgrupo      TEXT NOT NULL DEFAULT '',
   area_negocio  TEXT NOT NULL
-                CHECK (area_negocio IN ('Nutricion Animal', 'Pharma', 'VetPharma')),
+                CHECK (area_negocio IN ('Nutricion Animal', 'Pharma', 'VetPharma', 'Suplementos')),
   estado        TEXT NOT NULL DEFAULT 'draft' CHECK (estado IN ('draft', 'published')),
   tiene_imagen       INTEGER,
   tiene_ficha        INTEGER,
@@ -59,6 +68,84 @@ CREATE TABLE producto_especies (
   PRIMARY KEY (producto_id, especie)
 )
 SQL;
+
+const DDL_PRODUCTO_PAISES = <<<'SQL'
+CREATE TABLE producto_paises (
+  producto_id INTEGER NOT NULL REFERENCES productos(id) ON DELETE CASCADE,
+  pais        TEXT    NOT NULL CHECK (pais IN ('Uruguay','Argentina','Paraguay')),
+  PRIMARY KEY (producto_id, pais)
+)
+SQL;
+
+/**
+ * Índices de `productos`. La identidad de una ficha es (nombre, nombre
+ * comercial, representada, área): en Nutrición los dos del medio quedan
+ * vacíos, así que sigue siendo (nombre, área); en Pharma el compuesto solo
+ * se repite (ej. "Grasa dura" con 13 nombres comerciales).
+ */
+const INDICES_PRODUCTOS = [
+    'idx_productos_estado'    => 'CREATE INDEX idx_productos_estado ON productos(estado)',
+    'idx_productos_area'      => 'CREATE INDEX idx_productos_area ON productos(area_negocio)',
+    'idx_productos_categoria' => 'CREATE INDEX idx_productos_categoria ON productos(area_negocio, categoria)',
+    'idx_productos_unico'     => 'CREATE UNIQUE INDEX idx_productos_unico ON productos(nombre, nombre_comercial, representada, area_negocio)',
+];
+
+function crear_indices_productos(PDO $pdo): void
+{
+    foreach (INDICES_PRODUCTOS as $sql) {
+        $pdo->exec($sql);
+    }
+}
+
+/**
+ * Reconstruye `productos` con DDL_PRODUCTOS (para cambios que SQLite no
+ * permite con ALTER: un CHECK, sacar columnas), copiando $columnas.
+ *
+ * OJO: producto_especies y producto_paises apuntan a productos con
+ * ON DELETE CASCADE. Desde SQLite 3.26, renombrar productos repunta esas FKs
+ * a la tabla renombrada, y al borrarla el CASCADE las vacía. Por eso se sigue
+ * el procedimiento que documenta SQLite para reconstruir una tabla
+ * (https://www.sqlite.org/lang_altertable.html#otheralter): FKs apagadas,
+ * tabla nueva con otro nombre, copiar, borrar la vieja y renombrar la NUEVA,
+ * así las FKs de las tablas hijas nunca se tocan. El PRAGMA no tiene efecto
+ * dentro de una transacción: va antes.
+ *
+ * @param string[] $columnas Columnas a copiar (deben existir en las dos tablas).
+ */
+function reconstruir_productos(PDO $pdo, array $columnas): void
+{
+    $lista = implode(', ', $columnas);
+
+    $pdo->exec('PRAGMA foreign_keys = OFF');
+    $pdo->beginTransaction();
+    try {
+        if (tabla_existe($pdo, 'productos_nueva')) {
+            $pdo->exec('DROP TABLE productos_nueva'); // corrida parcial previa
+        }
+        $ddlNueva = preg_replace('/CREATE TABLE productos\b/', 'CREATE TABLE productos_nueva', DDL_PRODUCTOS, 1);
+        $pdo->exec($ddlNueva);
+        $pdo->exec("INSERT INTO productos_nueva ($lista) SELECT $lista FROM productos");
+
+        // Borrar la tabla vieja se lleva sus índices, liberando los nombres.
+        $pdo->exec('DROP TABLE productos');
+        $pdo->exec('ALTER TABLE productos_nueva RENAME TO productos');
+        crear_indices_productos($pdo);
+
+        // Con las FKs apagadas SQLite no valida nada: se controla a mano
+        // antes de confirmar, y ante cualquier problema se deshace todo.
+        $rotas = $pdo->query('PRAGMA foreign_key_check')->fetchAll();
+        if ($rotas) {
+            throw new RuntimeException('foreign_key_check falló: ' . json_encode($rotas));
+        }
+
+        $pdo->commit();
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        $pdo->exec('PRAGMA foreign_keys = ON');
+        throw $e;
+    }
+    $pdo->exec('PRAGMA foreign_keys = ON');
+}
 
 /** @return string[] Nombres de columna de una tabla. */
 function tabla_columnas(PDO $pdo, string $tabla): array
@@ -185,7 +272,7 @@ function migrar_especies(PDO $pdo): array
         $pdo->exec('ALTER TABLE productos RENAME TO productos_pre_merge');
         // El RENAME se lleva los índices puestos: hay que liberar los nombres
         // antes de recrearlos sobre la tabla nueva.
-        foreach (['idx_productos_estado', 'idx_productos_area', 'idx_productos_especie', 'idx_productos_unico'] as $idx) {
+        foreach (array_merge(array_keys(INDICES_PRODUCTOS), ['idx_productos_especie']) as $idx) {
             $pdo->exec("DROP INDEX IF EXISTS $idx");
         }
         $pdo->exec(DDL_PRODUCTOS);
@@ -205,9 +292,7 @@ function migrar_especies(PDO $pdo): array
             $insEsp->execute($e);
         }
 
-        $pdo->exec('CREATE INDEX idx_productos_estado ON productos(estado)');
-        $pdo->exec('CREATE INDEX idx_productos_area ON productos(area_negocio)');
-        $pdo->exec('CREATE UNIQUE INDEX idx_productos_unico ON productos(nombre, area_negocio)');
+        crear_indices_productos($pdo);
         $pdo->exec('CREATE INDEX idx_producto_especies_especie ON producto_especies(especie)');
 
         $pdo->commit();
@@ -251,65 +336,70 @@ function migrar_usuarios(PDO $pdo): array
 }
 
 /**
- * Catálogo único: `categoria` y `marca` dejan de existir. Todo se clasifica
- * por especie (Especies ya se usa igual para Nutrición Animal, Pharma y
- * VetPharma).
+ * Esquema viejo de Nutrición: `categoria` y `marca` dejan de existir. Todo se
+ * clasifica por especie.
+ *
+ * Se dispara sólo si existe `marca`: las bases viejas tenían siempre las dos
+ * columnas juntas, y desde el catálogo Pharma hay una `categoria` NUEVA (la del
+ * filtro lateral) que no hay que borrar. Como la reconstrucción usa
+ * DDL_PRODUCTOS, la tabla resultante ya trae la `categoria` nueva, vacía.
  *
  * @return string[] Log de lo que se hizo.
  */
 function migrar_quitar_categoria_marca(PDO $pdo): array
 {
     $existentes = tabla_columnas($pdo, 'productos');
-    if (!in_array('categoria', $existentes, true) && !in_array('marca', $existentes, true)) {
+    if (!in_array('marca', $existentes, true)) {
         return [];
     }
 
     // Sólo las columnas que van a sobrevivir, en el orden en que existan hoy.
-    $columnasFinales = array_values(array_diff($existentes, ['categoria', 'marca']));
-    $lista = implode(', ', $columnasFinales);
+    reconstruir_productos($pdo, array_values(array_diff($existentes, ['categoria', 'marca'])));
 
-    // OJO: acá producto_especies YA existe y apunta a productos con
-    // ON DELETE CASCADE. Desde SQLite 3.26, renombrar productos repunta esa FK
-    // a la tabla renombrada, y al borrarla el CASCADE vacía producto_especies.
-    // Por eso se sigue el procedimiento que documenta SQLite para reconstruir
-    // una tabla (https://www.sqlite.org/lang_altertable.html#otheralter):
-    // FKs apagadas, tabla nueva con otro nombre, copiar, borrar la vieja y
-    // renombrar la NUEVA — así la FK de producto_especies nunca se toca.
-    // El PRAGMA no tiene efecto dentro de una transacción: va antes.
-    $pdo->exec('PRAGMA foreign_keys = OFF');
-    $pdo->beginTransaction();
-    try {
-        if (tabla_existe($pdo, 'productos_nueva')) {
-            $pdo->exec('DROP TABLE productos_nueva'); // corrida parcial previa
-        }
-        $ddlNueva = preg_replace('/CREATE TABLE productos\b/', 'CREATE TABLE productos_nueva', DDL_PRODUCTOS, 1);
-        $pdo->exec($ddlNueva);
-        $pdo->exec("INSERT INTO productos_nueva ($lista) SELECT $lista FROM productos");
+    return ['productos: columnas viejas categoria y marca eliminadas (Nutrición se clasifica por especie).'];
+}
 
-        // Borrar la tabla vieja se lleva sus índices, liberando los nombres.
-        $pdo->exec('DROP TABLE productos');
-        $pdo->exec('ALTER TABLE productos_nueva RENAME TO productos');
+/**
+ * Catálogo Pharma / VetPharma / Suplementos:
+ *  - `area_negocio` acepta 'Suplementos' (es un CHECK: hay que reconstruir);
+ *  - la identidad pasa a (nombre, nombre_comercial, representada, área);
+ *  - índice por (área, categoría) para el filtro lateral;
+ *  - tabla `producto_paises`.
+ * Las columnas nuevas ya las agregó el ADD COLUMN de migrar().
+ *
+ * @return string[] Log de lo que se hizo.
+ */
+function migrar_catalogo_pharma(PDO $pdo): array
+{
+    $log = [];
+    $sqlDe = static function (string $nombre) use ($pdo): string {
+        $stmt = $pdo->prepare('SELECT sql FROM sqlite_master WHERE name = ?');
+        $stmt->execute([$nombre]);
+        return (string) $stmt->fetchColumn();
+    };
 
-        $pdo->exec('CREATE INDEX idx_productos_estado ON productos(estado)');
-        $pdo->exec('CREATE INDEX idx_productos_area ON productos(area_negocio)');
-        $pdo->exec('CREATE UNIQUE INDEX idx_productos_unico ON productos(nombre, area_negocio)');
-
-        // Con las FKs apagadas SQLite no valida nada: se controla a mano
-        // antes de confirmar, y ante cualquier problema se deshace todo.
-        $rotas = $pdo->query('PRAGMA foreign_key_check')->fetchAll();
-        if ($rotas) {
-            throw new RuntimeException('foreign_key_check falló: ' . json_encode($rotas));
-        }
-
-        $pdo->commit();
-    } catch (Throwable $e) {
-        $pdo->rollBack();
-        $pdo->exec('PRAGMA foreign_keys = ON');
-        throw $e;
+    if (!str_contains($sqlDe('productos'), "'Suplementos'")) {
+        reconstruir_productos($pdo, tabla_columnas($pdo, 'productos'));
+        $log[] = "productos: area_negocio acepta 'Suplementos'; identidad = (nombre, nombre_comercial, representada, área).";
+    } elseif (!str_contains($sqlDe('idx_productos_unico'), 'nombre_comercial')) {
+        // El CHECK ya estaba al día: alcanza con rehacer el índice.
+        $pdo->exec('DROP INDEX IF EXISTS idx_productos_unico');
+        $pdo->exec(INDICES_PRODUCTOS['idx_productos_unico']);
+        $log[] = 'productos: identidad = (nombre, nombre_comercial, representada, área).';
     }
-    $pdo->exec('PRAGMA foreign_keys = ON');
 
-    return ['productos: columnas categoria y marca eliminadas (catálogo único, todo se clasifica por especie).'];
+    if ($sqlDe('idx_productos_categoria') === '') {
+        $pdo->exec(INDICES_PRODUCTOS['idx_productos_categoria']);
+        $log[] = 'productos: + índice idx_productos_categoria.';
+    }
+
+    if (!tabla_existe($pdo, 'producto_paises')) {
+        $pdo->exec(DDL_PRODUCTO_PAISES);
+        $pdo->exec('CREATE INDEX idx_producto_paises_pais ON producto_paises(pais)');
+        $log[] = 'producto_paises: tabla creada.';
+    }
+
+    return $log;
 }
 
 /** DDL de `tutoriales` (video de YouTube con título y descripción). */
@@ -378,8 +468,11 @@ function migrar(PDO $pdo): array
     // tabla producto_especies.
     $log = array_merge($log, migrar_especies($pdo));
 
-    // Catálogo único: se elimina la distinción categoria/marca.
+    // Esquema viejo de Nutrición: se eliminan categoria/marca.
     $log = array_merge($log, migrar_quitar_categoria_marca($pdo));
+
+    // Catálogo Pharma / VetPharma / Suplementos (área nueva, identidad, países).
+    $log = array_merge($log, migrar_catalogo_pharma($pdo));
 
     // Sección de tutoriales (video de YouTube).
     $log = array_merge($log, migrar_tutoriales($pdo));
