@@ -103,33 +103,17 @@
   object-fit: cover;
 }
 
-/* Producto sin imagen cargada: en vez de la foto genérica, texto +
-   accesos directos a Ficha técnica / Consultar, centrado y con el
-   mismo "peso" visual que una card con foto. */
-.product-item.product-item--no-image {
+/* Producto sin imagen cargada: en lugar de la foto, una caja vacía con la
+   misma proporción (3:4) y el botón de Ver detalle siempre visible. El
+   título queda debajo, igual que en las cards con foto. */
+.product-item .product-img.product-img--empty {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Misma proporción que las fotos (3:4) para que todas las cards midan igual */
-  aspect-ratio: 3 / 4;
   border: 1px solid #e5e7ef;
-  border-radius: 8px;
   background: #fafbfc;
 }
-.product-item--no-image .product-content {
-  padding: 28px 24px;
-  text-align: center;
-}
-.product-item--no-image .product-title {
-  margin-bottom: 18px;
-}
-.product-actions-inline {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-}
-.product-actions-inline .btn {
+.product-img--empty .btn {
   font-size: 13px;
   padding: 10px 18px;
 }

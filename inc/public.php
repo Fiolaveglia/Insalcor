@@ -663,16 +663,18 @@ function render_product_card(array $item, string $detailBase): string
       </div>';
     }
 
-    // Sin imagen cargada: nada de foto genérica. Solo el texto de la
-    // card y el botón de Ver detalle (mismo que el de las cards con foto).
+    // Sin imagen cargada: nada de foto genérica. Se mantiene la misma
+    // estructura que la card con foto (caja 3:4 arriba, título abajo) para
+    // que el nombre quede siempre a la misma altura en toda la grilla; en la
+    // caja vacía va el botón de Ver detalle, siempre visible.
     return '
       <div class="col-12 col-md-6 col-lg-4" data-product-card>
         <div class="product-item product-item--no-image">
+          <div class="product-img product-img--empty">
+            <a class="btn btn--secondary btn-sm js-open-product" href="' . e($href) . '"><i class="fas fa-eye"></i> ' . e(t('common.view_details')) . '</a>
+          </div>
           <div class="product-content">
             <div class="product-title"><a class="js-open-product" href="' . e($href) . '">' . $nombre . '</a></div>
-            <div class="product-actions-inline">
-              <a class="btn btn--secondary btn-sm js-open-product" href="' . e($href) . '"><i class="fas fa-eye"></i> ' . e(t('common.view_details')) . '</a>
-            </div>
           </div>
         </div>
       </div>';
