@@ -141,6 +141,15 @@ button, input, select, textarea { font: inherit; }
 .btn-primary:hover { background: var(--navy-dark); }
 .btn-blue { background: var(--blue); color: #fff; }
 .btn-blue:hover { background: var(--blue-hover); }
+/* Acción destructiva (ej. "Eliminar los N listados"): contorno rojo para que
+   no se confunda con las acciones principales. */
+.btn-danger {
+  background: #fff;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+.btn-danger:hover { background: var(--danger-bg); }
+.btn-danger:disabled { opacity: .6; cursor: wait; }
 .btn-secondary {
   background: #fff;
   color: var(--text);
@@ -303,6 +312,13 @@ table.data tr:last-child td { border-bottom: none; }
   object-fit: cover;
   background: #f3f4f6;
   flex-shrink: 0;
+}
+.item-thumb--vacia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c4c8d0;
+  font-size: 18px;
 }
 .item-cell strong { display: block; }
 .item-cell .sub {

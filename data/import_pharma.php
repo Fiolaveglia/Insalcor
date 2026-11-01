@@ -14,6 +14,13 @@
  *                  Sin esto sólo completa lo que está vacío y suma países.
  *   --estado=X     published | draft, para las fichas NUEVAS (default:
  *                  published). Las existentes conservan su estado.
+ *   --vetpharma=X  todas | apis (default: todas).
+ *                  todas: las pestañas sin columna "Uso" (Excipiente,
+ *                         Capsulas, ...) van a Pharma y a VetPharma.
+ *                  apis:  VetPharma recibe SÓLO los APIs de uso Veterinario
+ *                         de APIS TODOS; esas pestañas van sólo a Pharma.
+ *                  Ojo: el importador no borra. Pasar de "todas" a "apis"
+ *                  requiere borrar antes las fichas de VetPharma que sobran.
  *
  * Cómo se lee cada pestaña (ver PESTANIAS):
  *   - Las columnas se buscan por NOMBRE de encabezado, no por posición: el
@@ -326,9 +333,14 @@ $dir = arg_valor($argv, 'dir');
 $dryRun = arg_flag($argv, 'dry-run');
 $force = arg_flag($argv, 'force');
 $estadoNuevas = arg_valor($argv, 'estado', 'published');
+$vetpharma = arg_valor($argv, 'vetpharma', 'todas');
 
 if ($dir === null || !is_dir($dir)) {
-    fwrite(STDERR, "Uso: php data/import_pharma.php --dir=CARPETA [--dry-run] [--force] [--estado=published|draft]\n");
+    fwrite(STDERR, "Uso: php data/import_pharma.php --dir=CARPETA [--dry-run] [--force] [--estado=published|draft] [--vetpharma=todas|apis]\n");
+    exit(1);
+}
+if (!in_array($vetpharma, ['todas', 'apis'], true)) {
+    fwrite(STDERR, "--vetpharma debe ser todas o apis\n");
     exit(1);
 }
 if (!in_array($estadoNuevas, ESTADOS, true)) {
@@ -360,6 +372,24 @@ try {
 if (!$leidas) {
     fwrite(STDERR, "No se encontró ningún CSV de pestaña conocida en $dir\n");
     exit(1);
+}
+
+// --vetpharma=apis: VetPharma queda sólo con los APIs de uso Veterinario
+// (APIS TODOS); las pestañas compartidas van únicamente a Pharma.
+$excluidasVet = 0;
+if ($vetpharma === 'apis') {
+    $fichas = array_values(array_filter($fichas, static function (array $f) use (&$excluidasVet): bool {
+        if ($f['area_negocio'] === 'VetPharma' && $f['pestania'] !== 'apis todos') {
+            $excluidasVet++;
+            return false;
+        }
+        return true;
+    }));
+    // El conteo por pestaña refleja lo que efectivamente se importa.
+    $conteo = array_count_values(array_column($fichas, 'pestania'));
+    foreach ($leidas as $pestania => $_) {
+        $leidas[$pestania] = $conteo[$pestania] ?? 0;
+    }
 }
 
 // La misma ficha dos veces en la planilla: se usa la primera y se avisa.
@@ -494,7 +524,10 @@ try {
 
 $modo = $dryRun ? 'SIMULACIÓN (--dry-run, no se escribió nada)' : 'IMPORTACIÓN APLICADA';
 echo "\n== $modo ==\n";
-echo "Carpeta: $dir\n\n";
+echo "Carpeta: $dir\n";
+echo $vetpharma === 'apis'
+    ? "VetPharma: sólo APIs de uso Veterinario (--vetpharma=apis); $excluidasVet fichas de pestañas compartidas no se importan en VetPharma.\n\n"
+    : "VetPharma: APIs veterinarios + pestañas compartidas (--vetpharma=todas).\n\n";
 
 echo "Fichas por pestaña (una por área):\n";
 foreach ($leidas as $pestania => $n) {

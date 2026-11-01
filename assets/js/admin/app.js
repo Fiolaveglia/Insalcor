@@ -11,6 +11,18 @@
     return '../' + path.replace(/^\//, '');
   }
 
+  /** Miniatura del listado de productos. Sin imagen (todo el catálogo Pharma)
+      o si el archivo no carga: un recuadro gris con un ícono, en vez del
+      ícono de imagen rota del navegador. */
+  const THUMB_VACIA = '<div class="item-thumb item-thumb--vacia"><i class="fa-regular fa-image"></i></div>';
+
+  function productoThumb(path) {
+    const url = assetUrl(path);
+    if (!url) return THUMB_VACIA;
+    return `<img class="item-thumb" src="${escapeHtml(url)}" alt="" onerror="this.outerHTML = THUMB_VACIA_HTML">`;
+  }
+  window.THUMB_VACIA_HTML = THUMB_VACIA;
+
   function formatDate(iso) {
     if (!iso) return '—';
     const d = new Date(iso.includes('T') ? iso : iso.replace(' ', 'T') + 'Z');
@@ -257,6 +269,9 @@
     const empty = document.getElementById('productos-empty');
     document.getElementById('productos-count').textContent = data.total;
     tbody.innerHTML = '';
+    // Lo que "Eliminar listados" va a borrar: exactamente lo que se ve.
+    productosListados = data.items.map((item) => item.id);
+    actualizarBotonEliminarListados();
     if (!data.items.length) {
       empty.classList.remove('hidden');
       return;
@@ -267,7 +282,7 @@
       tr.innerHTML = `
         <td>
           <div class="item-cell">
-            <img class="item-thumb" src="${assetUrl(item.imagen) || ''}" alt="">
+            ${productoThumb(item.imagen)}
             <div>
               <strong>${escapeHtml(item.nombre)}</strong>
               ${item.nombre_comercial ? `<div class="item-sub">${escapeHtml(item.nombre_comercial)}${item.representada ? ' · ' + escapeHtml(item.representada) : ''}</div>` : ''}
@@ -288,6 +303,53 @@
         </td>`;
       tbody.appendChild(tr);
     });
+  }
+
+  /* -------- Borrado masivo de la lista -------- */
+  let productosListados = [];
+
+  function actualizarBotonEliminarListados() {
+    const btn = document.getElementById('btn-delete-productos');
+    const n = productosListados.length;
+    btn.classList.toggle('hidden', n === 0);
+    btn.querySelector('span').textContent = n === 1 ? 'Eliminar el listado' : `Eliminar los ${n} listados`;
+  }
+
+  /** Describe el filtro activo para el mensaje de confirmación. */
+  function descripcionFiltroProductos() {
+    const area = document.getElementById('productos-area-filter');
+    const q = document.getElementById('productos-search').value.trim();
+    const partes = [];
+    if (area.value) partes.push(`área: ${area.options[area.selectedIndex].textContent.trim()}`);
+    if (q) partes.push(`búsqueda: "${q}"`);
+    return partes.length ? partes.join(', ') : 'sin filtros: TODOS los productos';
+  }
+
+  async function eliminarProductosListados() {
+    const ids = productosListados.slice();
+    if (!ids.length) return;
+    // Se pide escribir la cantidad: un click de más no puede borrar cientos.
+    const respuesta = prompt(
+      `Vas a eliminar ${ids.length} producto(s) (${descripcionFiltroProductos()}).\n`
+      + 'Esta acción no se puede deshacer.\n\n'
+      + `Para confirmar, escribí la cantidad: ${ids.length}`
+    );
+    if (respuesta === null) return;
+    if (respuesta.trim() !== String(ids.length)) {
+      alert('La cantidad no coincide. No se eliminó nada.');
+      return;
+    }
+    const btn = document.getElementById('btn-delete-productos');
+    btn.disabled = true;
+    try {
+      const { deleted } = await AdminAPI.deleteProductos(ids);
+      alert(`Se eliminaron ${deleted} producto(s).`);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      btn.disabled = false;
+      await loadProductos();
+    }
   }
 
   function resetProductoForm() {
@@ -568,6 +630,7 @@
     document.getElementById('btn-save-producto-publish').addEventListener('click', () => saveProducto('published'));
     document.getElementById('productos-search').addEventListener('input', debounce(loadProductos, 250));
     document.getElementById('productos-area-filter').addEventListener('change', loadProductos);
+    document.getElementById('btn-delete-productos').addEventListener('click', eliminarProductosListados);
     document.getElementById('producto-area').addEventListener('change', toggleProductoArea);
 
     document.getElementById('noticias-tbody').addEventListener('click', async (e) => {

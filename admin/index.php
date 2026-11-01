@@ -85,6 +85,9 @@ require_once __DIR__ . '/../api/bootstrap.php';
                 <option value="<?= htmlspecialchars($a) ?>"><?= htmlspecialchars(AREAS_ES[$a] ?? $a) ?></option>
               <?php endforeach; ?>
             </select>
+            <!-- Borra exactamente los productos de la lista (con el filtro y la
+                 búsqueda aplicados). Se oculta cuando la lista está vacía. -->
+            <button class="btn btn-danger hidden" id="btn-delete-productos" type="button"><i class="fa-solid fa-trash"></i> <span>Eliminar listados</span></button>
             <button class="btn btn-blue" id="btn-new-producto" type="button"><i class="fa-solid fa-plus"></i> Nuevo Producto</button>
           </div>
           <div class="card-table">

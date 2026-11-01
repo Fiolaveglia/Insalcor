@@ -58,6 +58,9 @@ const AdminAPI = (() => {
       }),
     deleteProducto: (id) =>
       request(`${API}/productos.php?id=${id}`, { method: 'DELETE', body: {} }),
+    // Borrado masivo: los ids exactos de la lista que se está viendo.
+    deleteProductos: (ids) =>
+      request(`${API}/productos.php`, { method: 'DELETE', body: { ids } }),
     listTutoriales: (q = '') => request(`${API}/tutoriales.php?q=${encodeURIComponent(q)}`),
     getTutorial: (id) => request(`${API}/tutoriales.php?id=${id}`),
     saveTutorial: (payload, id) =>
