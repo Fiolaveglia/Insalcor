@@ -266,32 +266,48 @@ function migrar_quitar_categoria_marca(PDO $pdo): array
 
     // Sólo las columnas que van a sobrevivir, en el orden en que existan hoy.
     $columnasFinales = array_values(array_diff($existentes, ['categoria', 'marca']));
+    $lista = implode(', ', $columnasFinales);
 
+    // OJO: acá producto_especies YA existe y apunta a productos con
+    // ON DELETE CASCADE. Desde SQLite 3.26, renombrar productos repunta esa FK
+    // a la tabla renombrada, y al borrarla el CASCADE vacía producto_especies.
+    // Por eso se sigue el procedimiento que documenta SQLite para reconstruir
+    // una tabla (https://www.sqlite.org/lang_altertable.html#otheralter):
+    // FKs apagadas, tabla nueva con otro nombre, copiar, borrar la vieja y
+    // renombrar la NUEVA — así la FK de producto_especies nunca se toca.
+    // El PRAGMA no tiene efecto dentro de una transacción: va antes.
+    $pdo->exec('PRAGMA foreign_keys = OFF');
     $pdo->beginTransaction();
     try {
-        if (tabla_existe($pdo, 'productos_pre_sin_categoria')) {
-            $pdo->exec('DROP TABLE productos_pre_sin_categoria');
+        if (tabla_existe($pdo, 'productos_nueva')) {
+            $pdo->exec('DROP TABLE productos_nueva'); // corrida parcial previa
         }
-        $pdo->exec('ALTER TABLE productos RENAME TO productos_pre_sin_categoria');
-        foreach (['idx_productos_estado', 'idx_productos_area', 'idx_productos_unico'] as $idx) {
-            $pdo->exec("DROP INDEX IF EXISTS $idx");
-        }
-        $pdo->exec(DDL_PRODUCTOS);
+        $ddlNueva = preg_replace('/CREATE TABLE productos\b/', 'CREATE TABLE productos_nueva', DDL_PRODUCTOS, 1);
+        $pdo->exec($ddlNueva);
+        $pdo->exec("INSERT INTO productos_nueva ($lista) SELECT $lista FROM productos");
 
-        $lista = implode(', ', $columnasFinales);
-        $pdo->exec("INSERT INTO productos ($lista) SELECT $lista FROM productos_pre_sin_categoria");
+        // Borrar la tabla vieja se lleva sus índices, liberando los nombres.
+        $pdo->exec('DROP TABLE productos');
+        $pdo->exec('ALTER TABLE productos_nueva RENAME TO productos');
 
         $pdo->exec('CREATE INDEX idx_productos_estado ON productos(estado)');
         $pdo->exec('CREATE INDEX idx_productos_area ON productos(area_negocio)');
         $pdo->exec('CREATE UNIQUE INDEX idx_productos_unico ON productos(nombre, area_negocio)');
 
-        $pdo->exec('DROP TABLE productos_pre_sin_categoria');
+        // Con las FKs apagadas SQLite no valida nada: se controla a mano
+        // antes de confirmar, y ante cualquier problema se deshace todo.
+        $rotas = $pdo->query('PRAGMA foreign_key_check')->fetchAll();
+        if ($rotas) {
+            throw new RuntimeException('foreign_key_check falló: ' . json_encode($rotas));
+        }
 
         $pdo->commit();
     } catch (Throwable $e) {
         $pdo->rollBack();
+        $pdo->exec('PRAGMA foreign_keys = ON');
         throw $e;
     }
+    $pdo->exec('PRAGMA foreign_keys = ON');
 
     return ['productos: columnas categoria y marca eliminadas (catálogo único, todo se clasifica por especie).'];
 }
