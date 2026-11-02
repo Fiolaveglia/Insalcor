@@ -69,7 +69,7 @@ $hayFiltros = $f['pais'] !== '' || $f['categoria'] !== '' || $f['q'] !== '';
           </div>
 
           <!-- Contacto: visible mientras se recorren los productos -->
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-12">
               <div class="pharma-contacto">
                 <i class="fas fa-envelope"></i>
@@ -77,7 +77,7 @@ $hayFiltros = $f['pais'] !== '' || $f['categoria'] !== '' || $f['q'] !== '';
                 <a class="js-consultar" href="contact.html" data-area="<?= e($area) ?>"><?= e(t('pharma.contact_cta')) ?></a>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <div class="row">
             <!-- Sidebar: búsqueda + Filtro 3 (categoría) -->

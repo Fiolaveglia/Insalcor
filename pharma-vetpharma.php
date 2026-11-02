@@ -140,47 +140,6 @@ $vetNoticias = $recentNoticias;
       </section>
 
 
-      <!-- probando otras Cards de Pharma y VetPharma -->
-      <!-- <section class="Pharma-VetPharma-Cards">
-        <div class="container">
-          <div class="row g-4 mt-4">
-          <div class="col-12 col-md-6 col-lg-4">
-              <div class="blog-entry">
-                <div class="entry-img">
-                    <a href="blog-single-sidebar.html"><img src="assets/images/heros/pharma/thumb-pharma.png" alt="Título de noticia"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Pharma</a></h4>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver productos</span></a>
-                    </div>
-                </div>
-              </div>
-          </div>
-
-          <div class="col-12 col-md-6 col-lg-4">
-              <div class="blog-entry">
-                <div class="entry-img">
-                    <a href="blog-single-sidebar.html"><img src="assets/images/heros/pharma/thumb-vetpharma.png" alt="Título de noticia"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">VetPharma</a></h4>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver productos</span></a></div>
-                </div>
-              </div>
-          </div>
-          </div>
-        </div>
-      </section> -->
-      
-
-
-
 
 
       <!-- Selector Pharma / VetPharma / Suplementos -->
@@ -232,7 +191,7 @@ $vetNoticias = $recentNoticias;
         <div class="container">
           <div class="heading heading-6">
             <div class="row">
-               <h2 class="heading-title" data-i18n="pharma.brands_title">Marcas que representamos</h2>
+                <h2 class="heading-title" data-i18n="pharma.brands_title">Marcas que representamos</h2>
             </div>
           </div>
           <!-- PENDIENTE A ACTUALIZAR LAS MARCAS Pharma -->
@@ -250,106 +209,6 @@ $vetNoticias = $recentNoticias;
         </div>
       </section>
 
-
-      <!-- Ultimas novedades  -->
-      <!-- <section class="blog blog-grid blog-grid-3" id="blog-2">
-        <div class="bg-section"> <img src="assets/images/background/pattern.png" alt="background"/></div>
-
-        <div class="container">
-          <div class="row"> 
-            <div class="col-12 col-lg-6 offset-lg-3">
-              <div class="heading heading-7 text-center">
-                <h2 class="heading-title">Artículos y novedades recientes sobre <span class="color-segment">Pharma</span></h2>
-              </div>
-            </div>
-          </div>
-          
-        <div class="row g-4 mt-4">
-            
-          <div class="col-12 col-md-6 col-lg-4">
-              <div class="blog-entry">
-                <div class="entry-img">
-                  <div class="entry-date">
-                    <div class="entry-content"><span class="day">20</span><span class="month">ene</span><span class="year">2025</span></div>
-                  </div>
-                    <a href="blog-single-sidebar.html"><img src="assets/images/blog/grid/1.jpg" alt="Título de noticia"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)" style="cursor: default;">Pharma</a>
-                    </div>
-                    <div class="divider"></div>
-                  </div>
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Titulo de noticia</a></h4>
-                  </div>
-                  <div class="entry-bio">
-                    <p>Lorem ipsum dolor sit amet consectetur. Turpis auctor pulvinar fringilla aliquet id. Mi est malesuada eu mattis. Elementum risus convallis pulvinar velit nulla mi rutrum. Id at tristique condimentum viverra vel nec vestibulum.</p>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver más</span></a></div>
-                </div>
-              </div>
-          </div>
-
-          <div class="col-12 col-md-6 col-lg-4">
-              <div class="blog-entry">
-                <div class="entry-img">
-                  <div class="entry-date">
-                    <div class="entry-content"><span class="day">20</span><span class="month">ene</span><span class="year">2025</span></div>
-                  </div>
-                    <a href="blog-single-sidebar.html"><img src="assets/images/blog/grid/1.jpg" alt="Título de noticia"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)" style="cursor: default;">Pharma</a>
-                    </div>
-                    <div class="divider"></div>
-                  </div>
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Titulo de noticia</a></h4>
-                  </div>
-                  <div class="entry-bio">
-                    <p>Lorem ipsum dolor sit amet consectetur. Turpis auctor pulvinar fringilla aliquet id. Mi est malesuada eu mattis. Elementum risus convallis pulvinar velit nulla mi rutrum. Id at tristique condimentum viverra vel nec vestibulum.</p>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver más</span></a></div>
-                </div>
-              </div>
-          </div>
-
-          <div class="col-12 col-md-6 col-lg-4">
-              <div class="blog-entry">
-                <div class="entry-img">
-                  <div class="entry-date">
-                    <div class="entry-content"><span class="day">20</span><span class="month">ene</span><span class="year">2025</span></div>
-                  </div>
-                    <a href="blog-single-sidebar.html"><img src="assets/images/blog/grid/1.jpg" alt="Título de noticia"/></a>
-                </div>
-                <div class="entry-content">
-                  <div class="entry-meta">
-                    <div class="entry-category"><a href="javascript:void(0)" style="cursor: default;">Pharma</a>
-                    </div>
-                    <div class="divider"></div>
-                  </div>
-                  <div class="entry-title">
-                    <h4><a href="blog-single-sidebar.html">Titulo de noticia</a></h4>
-                  </div>
-                  <div class="entry-bio">
-                    <p>Lorem ipsum dolor sit amet consectetur. Turpis auctor pulvinar fringilla aliquet id. Mi est malesuada eu mattis. Elementum risus convallis pulvinar velit nulla mi rutrum. Id at tristique condimentum viverra vel nec vestibulum.</p>
-                  </div>
-                  <div class="entry-more"> <a class="btn btn--white btn-line btn-line-before btn-line-inversed" href="blog-single-sidebar.html"> 
-                      <div class="line"> <span> </span></div><span>Ver más</span></a></div>
-                </div>
-              </div>
-          </div>
-
-
-          </div>
-
-        </div>
-      </section>
-      </div> -->
       </div>
       
       <!-- SEGMENTO: VETPHARMA -->
@@ -415,10 +274,10 @@ $vetNoticias = $recentNoticias;
       <!--   Team Projects #02 Section - PENDIENTE CAMBIAR LA PALABRA PROJECT (Cambiarla por cual?)  -->
       <section class="team team-projects" id="teamProjects-2">
         <div class="carousel owl-carousel" data-slide="4" data-slide-rs="2" data-autoplay="true" data-nav="false" data-dots="false" data-space="0" data-loop="true" data-speed="800">
-          <div class="project" ><a class="img-gallery-item" href="assets/images/team/projects/5.jpg" title="DR.Richard Muldoone" ></a><img src="assets/images/team/projects/5.jpg" alt="DR.Richard Muldoone"/></div>
-          <div class="project" ><a class="img-gallery-item" href="assets/images/team/projects/6.jpg" title="DR.Michael Brian" ></a><img src="assets/images/team/projects/6.jpg" alt="DR.Michael Brian"/></div>
-          <div class="project" ><a class="img-gallery-item" href="assets/images/team/projects/7.jpg" title="DR.Maria Andaloro" ></a><img src="assets/images/team/projects/7.jpg" alt="DR.Maria Andaloro"/></div>
-          <div class="project" ><a class="img-gallery-item" href="assets/images/team/projects/8.jpg" title="DR.Dupree Black" ></a><img src="assets/images/team/projects/8.jpg" alt="DR.Dupree Black"/></div>
+          <div class="project" ><a class="img-gallery-item" href="assets/images/team/projects/5.jpg" title="Pharma y VetPharma" ></a><img src="assets/images/team/projects/5.jpg" alt="DR.Richard Muldoone"/></div>
+          <div class="project" ><a class="img-gallery-item" href="assets/images/team/projects/6.jpg" title="Pharma y VetPharma" ></a><img src="assets/images/team/projects/6.jpg" alt="DR.Michael Brian"/></div>
+          <div class="project" ><a class="img-gallery-item" href="assets/images/team/projects/7.jpg" title="Pharma y VetPharma" ></a><img src="assets/images/team/projects/7.jpg" alt="DR.Maria Andaloro"/></div>
+          <div class="project" ><a class="img-gallery-item" href="assets/images/team/projects/8.jpg" title="Pharma y VetPharma" ></a><img src="assets/images/team/projects/8.jpg" alt="DR.Dupree Black"/></div>
         </div>
       </section>
 

@@ -1096,7 +1096,15 @@ function render_pharma_item(array $item, bool $mostrarComercial): string
     $html = '<details class="pharma-item" id="producto-' . (int) $item['id'] . '">'
         . '<summary><span class="pharma-item__nombre">' . e($nombre) . '</span>'
         . ($mostrarComercial && $comercial !== '' ? '<span class="pharma-item__extra"> · ' . e($comercial) . '</span>' : '')
-        . '</summary><div class="pharma-item__body">';
+        . '</summary>';
+    // Con imagen: el cuerpo pasa a dos columnas (texto + foto a la derecha; en
+    // mobile la foto va arriba). Sin imagen queda como siempre, sin hueco.
+    $img = asset($item['imagen'] ?? '');
+    $html .= '<div class="pharma-item__body' . ($img ? ' has-img' : '') . '">';
+    if ($img) {
+        $html .= '<figure class="pharma-item__img"><img src="' . e($img) . '" alt="' . e($nombre) . '" loading="lazy"/></figure>';
+    }
+    $html .= '<div class="pharma-item__text">';
     if ($comercial !== '' && normalizar_texto($comercial) !== normalizar_texto($nombre)) {
         $html .= '<p class="pharma-item__comercial">' . e($comercial) . '</p>';
     }
@@ -1119,7 +1127,7 @@ function render_pharma_item(array $item, bool $mostrarComercial): string
     $html .= '<a class="btn btn--secondary btn-sm pharma-item__consultar js-consultar" href="contact.html"'
         . ' data-producto="' . (int) $item['id'] . '" data-area="' . e((string) $item['area_negocio']) . '"'
         . ' data-nombre="' . e($etiquetaConsulta) . '"><i class="fas fa-envelope"></i> '
-        . e(t('pharma.ask_product')) . '</a></div></details>';
+        . e(t('pharma.ask_product')) . '</a></div></div></details>';
     return $html;
 }
 

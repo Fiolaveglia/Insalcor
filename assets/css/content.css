@@ -557,7 +557,7 @@
 }
 .pharma-grupo__titulo {
   font-size: 17px;
-  margin: 0 0 10px;
+  margin: 20px 0;
   color: var(--global--color-secondary);
 }
 
@@ -640,6 +640,47 @@
 }
 .pharma-chip img {
   border-radius: 2px;
+}
+/* Imagen del producto dentro del desplegable: a la derecha en desktop,
+   arriba y centrada en mobile. Sin imagen el cuerpo no cambia. */
+.pharma-item__body.has-img {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.pharma-item__img {
+  order: -1;
+  margin: 0;
+  text-align: center;
+}
+.pharma-item__img img {
+  display: inline-block;
+  width: auto;
+  max-width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #fafbfc;
+}
+.pharma-item__text {
+  min-width: 0;
+}
+@media (min-width: 768px) {
+  .pharma-item__body.has-img {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .pharma-item__body.has-img .pharma-item__text {
+    flex: 1 1 auto;
+  }
+  .pharma-item__body.has-img .pharma-item__img {
+    order: 0;
+    flex: 0 0 220px;
+  }
+  .pharma-item__img img {
+    max-height: 280px;
+  }
 }
 /* El .btn del tema tiene ancho fijo (170px) y va centrado: acá el botón
    se ajusta al texto y queda alineado a la izquierda, en una sola línea. */
