@@ -10,6 +10,65 @@ $recent = array_slice($productos, 0, 3);
 $especieOptions = especie_options();
 $noticias = array_slice(pub_noticias(), 0, 3);
 
+// Hero: sin especie elegida se ve el slider con una foto por especie; con una
+// especie elegida (?especie=Ovinos) se ve solo la foto de esa especie.
+// Las fotos están en assets/images/heros/nutricion-animal/ con el nombre de la
+// especie (sin tilde). Si falta alguna, simplemente no aparece.
+$heroDir = 'assets/images/heros/nutricion-animal/';
+$heroPorEspecie = [
+    'Aves'      => 'Aves.png',
+    'Equinos'   => 'Equinos.png',
+    'Ganadería' => 'Ganaderia.png',
+    'Lechería'  => 'Lecheria.png',
+    'Mascotas'  => 'Mascotas.png',
+    'Ovinos'    => 'Ovinos.png',
+    'Porcinos'  => 'Porcinos.png',
+];
+$heroSlides = [];
+foreach ($heroPorEspecie as $esp => $archivo) {
+    if (is_file(__DIR__ . '/' . $heroDir . $archivo)) {
+        $heroSlides[$esp] = $heroDir . $archivo;
+    }
+}
+$heroEspecie = null;
+if (($filters['especie'] ?? '') !== '') {
+    foreach ($heroSlides as $esp => $ruta) {
+        if (normalizar_texto($esp) === normalizar_texto($filters['especie'])) {
+            $heroEspecie = $esp;
+            break;
+        }
+    }
+}
+
+/** Un slide del hero (mismo texto y botones para todas las fotos). */
+function render_nutricion_hero_slide(string $ruta, string $alt): string
+{
+    ob_start(); ?>
+            <div class="slide bg-overlay bg-overlay-dark-slider">
+              <div class="bg-section"><img src="<?= e($ruta) ?>" alt="<?= e($alt) ?>"/></div>
+              <div class="container">
+                <div class="slide-content">
+                  <div class="row">
+                    <div class="col-12 col-lg-7">
+                      <h1 class="slide-headline" data-i18n="nutrition.hero_title">Nutrición Animal</h1>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      <p class="slide-desc" data-i18n="nutrition.hero_desc">Ofrecemos una línea completa de productos nutricionales desarrollados para cada especie animal, con respaldo técnico, calidad garantizada y asesoramiento especializado.</p>
+                      <div class="slide-action">
+                        <a class="btn btn--white btn-line btn-line-after btn-line-inversed" href="contact.html"> <span data-i18n="common.contact_us">Contáctanos</span><span class="line"> <span></span></span></a>
+                        <a class="btn btn--transparent btn-line btn-line-after btn-line-inversed" href="nosotros.html"> <span data-i18n="common.about_us">Sobre Nosotros</span><span class="line"> <span></span></span></a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+<?php
+    return ob_get_clean();
+}
+
 // Paginado: 9 productos por página.
 $productosPorPagina = 9;
 $paginaActual = current_page();
@@ -32,6 +91,20 @@ $productosPagina = array_slice($productos, ($paginaActual - 1) * $productosPorPa
     <link href="assets/css/style.css" rel="stylesheet"/>
     <link href="assets/css/search.css" rel="stylesheet"/>
     <link href="assets/css/content.css" rel="stylesheet"/>
+    <style>
+      /* Hero de Nutrición Animal: baja la foto para que el header no la tape */
+      .slider-nutricion { padding-top: 190px; }
+      /* Altura máxima del hero: 700px (el tema lo deja en 800px o automático). */
+      .slider-nutricion .slide { height: 700px; max-height: 700px; }
+      /* Mobile/tablet: el tema corre la foto 100px hacia abajo y le corta el borde
+         inferior; se anula eso y se baja el hero hasta el final del header. */
+      @media (max-width: 991.98px) {
+        .slider-nutricion .slide { background-position-y: 0; }
+      }
+      @media (max-width: 767.98px) {
+        .slider-nutricion { padding-top: 270px; }
+      }
+    </style>
   </head>
   <body data-i18n-base="assets/i18n" data-lang="es" data-api-root="." data-asset-prefix="" data-product-detail="product-single.php">
     <div class="preloader">
@@ -121,185 +194,16 @@ $productosPagina = array_slice($productos, ($paginaActual - 1) * $productosPorPa
         </nav>
       </header>
 
-    <!-- Hero Slider   -->
-      <section class="slider slider-3" id="slider-3">
+    <!-- Hero: slider de especies, o la foto de la especie elegida -->
+      <section class="slider slider-3 slider-nutricion" id="slider-3">
         <div class="container-fluid pr-0 pl-0">
+          <?php if ($heroEspecie !== null): ?>
+          <?= render_nutricion_hero_slide($heroSlides[$heroEspecie], $heroEspecie) ?>
+          <?php else: ?>
           <div class="slider-carousel owl-carousel carousel-navs carousel-dots" data-slide="1" data-slide-rs="1" data-autoplay="true" data-nav="true" data-dots="true" data-space="0" data-loop="true" data-speed="800" data-slider-id="#custom-carousel">
-            <div class="slide bg-overlay bg-overlay-dark-slider">
-              <div class="bg-section"><img src="assets/images/heros/nutricion-animal/Photo-1.png" alt="Background"/></div>
-              <div class="container">
-                <div class="slide-content">
-                  <div class="row">
-                    <div class="col-12 col-lg-7">
-                      <h1 class="slide-headline" data-i18n="nutrition.hero_title">Nutrición Animal</h1>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12 col-lg-6">
-                      <p class="slide-desc" data-i18n="nutrition.hero_desc">Ofrecemos una línea completa de productos nutricionales desarrollados para cada especie animal, con respaldo técnico, calidad garantizada y asesoramiento especializado.</p>
-                      <div class="slide-action">
-                        <a class="btn btn--white btn-line btn-line-after btn-line-inversed" href="contact.html"> <span data-i18n="common.contact_us">Contáctanos</span><span class="line"> <span></span></span></a>
-                        <a class="btn btn--transparent btn-line btn-line-after btn-line-inversed" href="nosotros.html"> <span data-i18n="common.about_us">Sobre Nosotros</span><span class="line"> <span></span></span></a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="slide bg-overlay bg-overlay-dark-slider">
-              <div class="bg-section"><img src="assets/images/heros/nutricion-animal/Photo-2.png" alt="Background"/></div>
-              <div class="container">
-                <div class="slide-content">
-                  <div class="row">
-                    <div class="col-12 col-lg-7">
-                      <h1 class="slide-headline" data-i18n="nutrition.hero_title">Nutrición Animal</h1>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12 col-lg-6">
-                      <p class="slide-desc" data-i18n="nutrition.hero_desc">Ofrecemos una línea completa de productos nutricionales desarrollados para cada especie animal, con respaldo técnico, calidad garantizada y asesoramiento especializado.</p>
-                      <div class="slide-action">
-                        <a class="btn btn--white btn-line btn-line-after btn-line-inversed" href="contact.html"> <span data-i18n="common.contact_us">Contáctanos</span><span class="line"> <span></span></span></a>
-                        <a class="btn btn--transparent btn-line btn-line-after btn-line-inversed" href="nosotros.html"> <span data-i18n="common.about_us">Sobre Nosotros</span><span class="line"> <span></span></span></a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="slide bg-overlay bg-overlay-dark-slider">
-              <div class="bg-section"><img src="assets/images/heros/nutricion-animal/Photo-3.png" alt="Background"/></div>
-              <div class="container">
-                <div class="slide-content">
-                  <div class="row">
-                    <div class="col-12 col-lg-7">
-                      <h1 class="slide-headline" data-i18n="nutrition.hero_title">Nutrición Animal</h1>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12 col-lg-6">
-                      <p class="slide-desc" data-i18n="nutrition.hero_desc">Ofrecemos una línea completa de productos nutricionales desarrollados para cada especie animal, con respaldo técnico, calidad garantizada y asesoramiento especializado.</p>
-                      <div class="slide-action">
-                        <a class="btn btn--white btn-line btn-line-after btn-line-inversed" href="contact.html"> <span data-i18n="common.contact_us">Contáctanos</span><span class="line"> <span></span></span></a>
-                        <a class="btn btn--transparent btn-line btn-line-after btn-line-inversed" href="nosotros.html"> <span data-i18n="common.about_us">Sobre Nosotros</span><span class="line"> <span></span></span></a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="slide bg-overlay bg-overlay-dark-slider">
-              <div class="bg-section"><img src="assets/images/heros/nutricion-animal/Photo-4.png" alt="Background"/></div>
-              <div class="container">
-                <div class="slide-content">
-                  <div class="row">
-                    <div class="col-12 col-lg-7">
-                      <h1 class="slide-headline" data-i18n="nutrition.hero_title">Nutrición Animal</h1>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12 col-lg-6">
-                      <p class="slide-desc" data-i18n="nutrition.hero_desc">Ofrecemos una línea completa de productos nutricionales desarrollados para cada especie animal, con respaldo técnico, calidad garantizada y asesoramiento especializado.</p>
-                      <div class="slide-action">
-                        <a class="btn btn--white btn-line btn-line-after btn-line-inversed" href="contact.html"> <span data-i18n="common.contact_us">Contáctanos</span><span class="line"> <span></span></span></a>
-                        <a class="btn btn--transparent btn-line btn-line-after btn-line-inversed" href="nosotros.html"> <span data-i18n="common.about_us">Sobre Nosotros</span><span class="line"> <span></span></span></a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="slide bg-overlay bg-overlay-dark-slider">
-              <div class="bg-section"><img src="assets/images/heros/nutricion-animal/Photo-5.png" alt="Background"/></div>
-              <div class="container">
-                <div class="slide-content">
-                  <div class="row">
-                    <div class="col-12 col-lg-7">
-                      <h1 class="slide-headline" data-i18n="nutrition.hero_title">Nutrición Animal</h1>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12 col-lg-6">
-                      <p class="slide-desc" data-i18n="nutrition.hero_desc">Ofrecemos una línea completa de productos nutricionales desarrollados para cada especie animal, con respaldo técnico, calidad garantizada y asesoramiento especializado.</p>
-                      <div class="slide-action">
-                        <a class="btn btn--white btn-line btn-line-after btn-line-inversed" href="contact.html"> <span data-i18n="common.contact_us">Contáctanos</span><span class="line"> <span></span></span></a>
-                        <a class="btn btn--transparent btn-line btn-line-after btn-line-inversed" href="nosotros.html"> <span data-i18n="common.about_us">Sobre Nosotros</span><span class="line"> <span></span></span></a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="slide bg-overlay bg-overlay-dark-slider">
-              <div class="bg-section"><img src="assets/images/heros/nutricion-animal/Photo-6.png" alt="Background"/></div>
-              <div class="container">
-                <div class="slide-content">
-                  <div class="row">
-                    <div class="col-12 col-lg-7">
-                      <h1 class="slide-headline" data-i18n="nutrition.hero_title">Nutrición Animal</h1>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12 col-lg-6">
-                      <p class="slide-desc" data-i18n="nutrition.hero_desc">Ofrecemos una línea completa de productos nutricionales desarrollados para cada especie animal, con respaldo técnico, calidad garantizada y asesoramiento especializado.</p>
-                      <div class="slide-action">
-                        <a class="btn btn--white btn-line btn-line-after btn-line-inversed" href="contact.html"> <span data-i18n="common.contact_us">Contáctanos</span><span class="line"> <span></span></span></a>
-                        <a class="btn btn--transparent btn-line btn-line-after btn-line-inversed" href="nosotros.html"> <span data-i18n="common.about_us">Sobre Nosotros</span><span class="line"> <span></span></span></a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="slide bg-overlay bg-overlay-dark-slider">
-              <div class="bg-section"><img src="assets/images/heros/nutricion-animal/Photo-7.png" alt="Background"/></div>
-              <div class="container">
-                <div class="slide-content">
-                  <div class="row">
-                    <div class="col-12 col-lg-7">
-                      <h1 class="slide-headline" data-i18n="nutrition.hero_title">Nutrición Animal</h1>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12 col-lg-6">
-                      <p class="slide-desc" data-i18n="nutrition.hero_desc">Ofrecemos una línea completa de productos nutricionales desarrollados para cada especie animal, con respaldo técnico, calidad garantizada y asesoramiento especializado.</p>
-                      <div class="slide-action">
-                        <a class="btn btn--white btn-line btn-line-after btn-line-inversed" href="contact.html"> <span data-i18n="common.contact_us">Contáctanos</span><span class="line"> <span></span></span></a>
-                        <a class="btn btn--transparent btn-line btn-line-after btn-line-inversed" href="nosotros.html"> <span data-i18n="common.about_us">Sobre Nosotros</span><span class="line"> <span></span></span></a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="slide bg-overlay bg-overlay-dark-slider">
-              <div class="bg-section"><img src="assets/images/heros/nutricion-animal/Photo-8.png" alt="Background"/></div>
-              <div class="container">
-                <div class="slide-content">
-                  <div class="row">
-                    <div class="col-12 col-lg-7">
-                      <h1 class="slide-headline" data-i18n="nutrition.hero_title">Nutrición Animal</h1>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12 col-lg-6">
-                      <p class="slide-desc" data-i18n="nutrition.hero_desc">Ofrecemos una línea completa de productos nutricionales desarrollados para cada especie animal, con respaldo técnico, calidad garantizada y asesoramiento especializado.</p>
-                      <div class="slide-action">
-                        <a class="btn btn--white btn-line btn-line-after btn-line-inversed" href="contact.html"> <span data-i18n="common.contact_us">Contáctanos</span><span class="line"> <span></span></span></a>
-                        <a class="btn btn--transparent btn-line btn-line-after btn-line-inversed" href="nosotros.html"> <span data-i18n="common.about_us">Sobre Nosotros</span><span class="line"> <span></span></span></a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+            <?php foreach ($heroSlides as $esp => $ruta) { echo render_nutricion_hero_slide($ruta, $esp); } ?>
           </div>
+          <?php endif; ?>
         </div>
       </section>
 

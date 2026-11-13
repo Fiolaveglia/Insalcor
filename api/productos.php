@@ -393,49 +393,10 @@ if ($method === 'PUT' || $method === 'PATCH') {
     json_response(['ok' => true, 'item' => producto_row($stmt->fetch())]);
 }
 
-/** Tope del borrado masivo (más que todo el catálogo actual: ~1.150). */
-const BORRADO_MASIVO_MAX = 5000;
-
 if ($method === 'DELETE') {
     require_auth();
     $body = read_json_body();
     require_csrf($body);
-
-    // Borrado masivo ("Eliminar los N listados" del admin). Llegan los ids
-    // exactos que estaban en pantalla, no un filtro que se vuelva a evaluar
-    // acá: así nunca se borra algo que la persona no vio (ej. un producto
-    // creado mientras tanto). Especies y países se van por ON DELETE CASCADE.
-    if ($id <= 0 && array_key_exists('ids', $body)) {
-        if (!is_array($body['ids'])) {
-            json_error('ids debe ser una lista');
-        }
-        $ids = array_values(array_unique(array_filter(
-            array_map(static fn ($v) => is_numeric($v) ? (int) $v : 0, $body['ids']),
-            static fn (int $v) => $v > 0
-        )));
-        if (!$ids) {
-            json_error('No hay productos para eliminar');
-        }
-        if (count($ids) > BORRADO_MASIVO_MAX) {
-            json_error('Demasiados productos en un solo borrado (máximo ' . BORRADO_MASIVO_MAX . ')');
-        }
-
-        $borrados = 0;
-        db()->beginTransaction();
-        try {
-            // De a 500 para no pasar el límite de parámetros de SQLite.
-            foreach (array_chunk($ids, 500) as $lote) {
-                $stmt = db()->prepare('DELETE FROM productos WHERE id IN (' . implode(',', array_fill(0, count($lote), '?')) . ')');
-                $stmt->execute($lote);
-                $borrados += $stmt->rowCount();
-            }
-            db()->commit();
-        } catch (Throwable $e) {
-            db()->rollBack();
-            throw $e;
-        }
-        json_response(['ok' => true, 'deleted' => $borrados]);
-    }
 
     if ($id <= 0) {
         json_error('ID requerido');
